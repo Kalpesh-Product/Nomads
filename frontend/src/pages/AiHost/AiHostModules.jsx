@@ -1,59 +1,37 @@
-import { ReactFitty } from "react-fitty";
 import Container from "../../components/Container";
+import FitText from "../../components/FitText";
 import GetStartedButton from "../../components/GetStartedButton";
-import SaaSFeatureBlock from "../../components/SaaSFeatured";
 import FinanceImage from "../../assets/images-service/finance-final.png";
 import useIsMobile from "../../hooks/useIsMobile.js";
-import FrontendImage from "../../assets/images-service/frontend-2.png";
-import TicketsImage from "../../assets/images-service/meetings-final.jpeg";
-import SalesImage from "../../assets/images-service/sales-final.png";
-import HrImage from "../../assets/images-service/hr-img-2.jpeg";
-import {
-  customerProfile,
-  mobileSite,
-  notifications,
-  templates,
-  paymentGateway,
-  website,
-  taxesFA,
-  budgetFA,
-  projectionsFA,
-  cashflowFA,
-  invoicingFA,
-  emailMarketingSM,
-  socialMediaSM,
-  leadGenerationSM,
-  eSignHR,
-  templatesHR,
-  performanceHR,
-  payslipsHR,
-  payrollHR,
-  attendanceHR,
-  visitorCM,
-  meetingRoomsCM,
-  ticketRaisingCM,
-  income,
-  expense,
-  reports,
-  calendar,
-  seo,
-  calendarLine,
-  bookingEngineCM,
-  aiSeoCM,
-  inventory,
-  occupancy,
-  clientManagement,
-  profitLoss,
-  jobs,
-  employeeManagement,
-} from "../../assets/icon_service_color";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 import { HiOutlineArrowLeft } from "react-icons/hi";
+import { hostModuleCategories } from "../../data/hostModulesCatalog";
+import ModuleCategoryBlock from "../host/modules/ModuleCategoryBlock";
 
+// MOCK IMPLEMENTATION for manager review: module data in
+// data/hostModulesCatalog.js is placeholder content, sourced from the dev
+// team's Basic-plan doc. Navigation into a module stays with the site's own
+// sidebar — this page just lists every category as its own section, in
+// order: Common Modules, Extra Common Modules, Key Apps, Core Modules.
+// Clicking a sidebar item (?category=&module=) jumps straight to and
+// pre-selects that section. Once signed off, this moves to the master
+// (editable) config.
 export default function Modules() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const onBack = () => navigate("/");
+  const [searchParams] = useSearchParams();
+  const targetCategoryId = searchParams.get("category");
+  const targetModuleId = searchParams.get("module");
+
+  useEffect(() => {
+    const anchorId = targetModuleId || targetCategoryId;
+    if (!anchorId) return;
+    const section = document.getElementById(anchorId);
+    section?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [targetCategoryId, targetModuleId]);
+
   return (
     <>
       <div className="sticky top-0 z-[100] -mx-1 flex min-w-[11rem] items-center gap-3 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
@@ -75,14 +53,13 @@ export default function Modules() {
       <Container padding={false}>
         <div className="flex flex-col gap-8 w-full">
           <div className="flex flex-col gap-8">
-            <div className="text-center">
-              <h1 className="text-2xl sm:text-[clamp(1.7rem,2.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
-                The ONLY Nomad Ecosystem SaaS Platform!
-              </h1>
-              <div className="font-semibold font-comic hidden lg:flex w-full">
-                <ReactFitty>The ONLY Nomad Ecosystem SaaS Platform!</ReactFitty>
-              </div>
-            </div>
+            <FitText
+              as="h1"
+              text="The ONLY Nomad Ecosystem SaaS Platform!"
+              className="font-semibold font-comic"
+              minFontSize={18}
+              maxFontSize={56}
+            />
             <div>
               <h4 className="text-lg lg:text-[1.45rem] lg:leading-[2.75rem] text-start md:text-center lg:text-center xl:text-center 2xl:text-start text-secondary-dark">
                 No Code Website <span className="text-primary-blue"></span>
@@ -149,105 +126,29 @@ export default function Modules() {
           <hr className="border-t-4 mb-2 lg:mt-10" />
         </div>
         <Container padding={false}>
-          <div data-aos="fade-up" className="flex flex-col gap-8">
-            <SaaSFeatureBlock
-              title="Frontend"
-              description1={[
-                { title: "No Code Website", image: website },
-                { title: "Booking Engine", image: bookingEngineCM },
-                { title: "Payment Gateway", image: paymentGateway },
-                { title: "Lead Management", image: leadGenerationSM },
-                { title: "AI SEO", image: aiSeoCM },
-                { title: "Notifications", image: notifications },
-              ]}
-              image={FrontendImage}
-              width={"100%"}
-              imageFit={"fill"}
-              mobileHeight={"11rem"}
-              imagePosition={"left top"}
-              rowReverse={false}
-            />
-            <hr className="border-t-4" />
-            <SaaSFeatureBlock
-              title="Apps"
-              description1={[
-                { title: "Tickets", image: ticketRaisingCM },
-                { title: "Tasks", image: customerProfile },
-                { title: "Meeting Rooms", image: meetingRoomsCM },
-                { title: "Visitors", image: visitorCM },
-                { title: "Assets", image: eSignHR },
-                { title: "Calendar", image: calendar },
-              ]}
-              image={TicketsImage}
-              rowReverse={true}
-            />
-            <hr className="border-t-4" />
-            <SaaSFeatureBlock
-              title="Sales"
-              description1={[
-                { title: "Revenue Reports", image: reports },
-                { title: "Lead Generation", image: leadGenerationSM },
-                { title: "Sales Inventory", image: inventory },
-                { title: "Occupancy", image: occupancy },
-                { title: "Manage Clients", image: clientManagement },
-                { title: "Profiling", image: customerProfile },
-              ]}
-              image={SalesImage}
-              rowReverse={false}
-            />
-            <hr className="border-t-4" />
-            <SaaSFeatureBlock
-              title="Finance"
-              description1={[
-                { title: "P&L Report", image: profitLoss },
-                { title: "Cashflow", image: cashflowFA },
-                { title: "Invoicing", image: invoicingFA },
-                { title: "Collections", image: projectionsFA },
-                { title: "Historical Data", image: taxesFA },
-                { title: "Budgeting", image: expense },
-              ]}
-              image={FinanceImage}
-              imageFit={"cover"}
-              rowReverse={true}
-            />
-            <hr className="border-t-4" />
-            {/* <SaaSFeatureBlock
-            title="Human Resources"
-            description1={[
-              { title: "Manage Employees", image: employeeManagement },
-              { title: "Payroll", image: payrollHR },
-              { title: "Attendance", image: attendanceHR },
-              { title: "Budgeting", image: expense },
-              { title: "Performance", image: performanceHR },
-              { title: "Jobs", image: jobs },
-            ]}
-            image={HrImage}
-            rowReverse={false}
-          /> */}
-            {/* <div className="text-center">
-            <h1 className="text-[clamp(1.7rem,3.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
-              … More coming soon
-            </h1> */}
-            {/* <div className="font-semibold font-comic hidden lg:flex w-full">
-              <ReactFitty> … More coming soon</ReactFitty>
-            </div> */}
-            {/* <div className="font-semibold font-comic hidden lg:block w-full text-[clamp(1.7rem,3.99vw,5rem)]">
-              … More coming soon
-            </div>
-          </div> */}
+          <div data-aos="fade-up" className="flex flex-col gap-10 lg:gap-14">
+            {hostModuleCategories.map((category) => (
+              <div
+                key={category.id}
+                id={category.id}
+                className="flex flex-col gap-10 scroll-mt-24"
+              >
+                <ModuleCategoryBlock
+                  category={category}
+                  sortByPlan={category.id !== "department-accesses"}
+                />
+                <hr className="border-t-4" />
+              </div>
+            ))}
           </div>
         </Container>
-        <div className="text-center">
-          <h1 className="text-[clamp(1.7rem,3.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
-            … More coming soon
-          </h1>
-          {/* <div className="font-semibold font-comic hidden lg:flex w-full">
-              <ReactFitty> … More coming soon</ReactFitty>
-            </div> */}
-          <div className="font-semibold font-comic hidden lg:block w-full text-[clamp(1.7rem,3.99vw,5rem)]">
-            … More coming soon
-          </div>
-        </div>
+        <FitText
+          as="h1"
+          text="… More coming soon"
+          className="font-semibold font-comic"
+          minFontSize={18}
+          maxFontSize={56}
+        />
         <div className="flex justify-center w-full my-6">
           <GetStartedButton
             title={"Get Started"}

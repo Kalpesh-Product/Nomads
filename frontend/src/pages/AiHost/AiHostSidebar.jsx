@@ -6,6 +6,7 @@ import {
 } from "../../hooks/useNomadLoginState";
 import useAuth from "../../hooks/useAuth";
 import useLogout from "../../hooks/useLogout";
+import { findModuleByLabel } from "../../data/hostModulesCatalog";
 import logo from "../../assets/WONO_LOGO_Black_TP.svg";
 import {
   HiChevronDown,
@@ -71,6 +72,29 @@ const getSearchPathForGoal = (goalLabel) => {
 
 const hostSignupEntryPath = "/signup?step=1";
 
+// The "Modules" overview section uses marketing-style labels that don't
+// match any catalog module/department label, so they're mapped explicitly
+// to a real anchor on /modules instead of relying on label matching.
+const modulesOverviewTargets = {
+  "Build & Manage Website": { categoryId: "key-apps", moduleId: "create-edit-website" },
+  "Nomad Listings": { categoryId: "key-apps", moduleId: "listings" },
+  "Sales Management": { categoryId: "department-accesses", moduleId: "sales-leads-management" },
+  "Finance Management": {
+    categoryId: "department-accesses",
+    moduleId: "finance-expenses-budget",
+  },
+  "Administration Management": {
+    categoryId: "department-accesses",
+    moduleId: "admin-printout-management",
+  },
+  "HR Management": { categoryId: "department-accesses", moduleId: "hr-company-management" },
+  "IT Infrastructure": { categoryId: "department-accesses", moduleId: "it-repair-logs" },
+  "Maintenance Management": {
+    categoryId: "department-accesses",
+    moduleId: "maintenance-repair-logs",
+  },
+};
+
 const recommendationItems = [
   {
     label: "Build & Manage Website",
@@ -114,143 +138,117 @@ const recommendationItems = [
   },
 ];
 
+// Real Key Apps, per the dev team's Add-Ons plan matrix.
 const valueAdditionItems = [
-  {
-    label: "Visitor Management",
-    icon: BsPersonVcard,
-    // path: "/assets",
-  },
-  {
-    label: "Assets Management",
-    icon: HiOutlineArchive,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Inventory Management",
-    icon: HiOutlineLibrary,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Finance Management",
-    icon: HiOutlineCash,
-    // path: "/assets",
-  },
-  {
-    label: "Reports Management",
-    icon: HiOutlineDocumentReport,
-  },
+  { label: "Website Builder", icon: CgWebsite },
+  { label: "Nomad Listings", icon: TbWorldWww },
+  { label: "All Leads", icon: HiOutlineDocumentReport },
+  { label: "Visitor Management", icon: BsPersonVcard },
+];
+
+// Locked-until-Custom-plan modules, per the Add-Ons matrix's own
+// "Extra Common Modules" group.
+const extraCommonModules = [
+  { label: "Assets", icon: HiOutlineArchive },
+  { label: "Inventory", icon: HiOutlineLibrary },
+  { label: "Finance Management", icon: HiOutlineCash },
+  { label: "Team Management", icon: BsPeopleFill },
+  { label: "Reports", icon: HiOutlineDocumentReport },
 ];
 
 const commonFeatures = [
-  {
-    label: "Dashboard",
-    icon: HiOutlineViewGrid,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Customer Support",
-    icon: MdOutlineSupportAgent,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Tasks",
-    icon: HiOutlineClipboardList,
-    // path: "/assets",
-  },
-  {
-    label: "Ticketing System",
-    icon: MdOutlineSupportAgent,
-    // path: "/inventory",
-  },
-  {
-    label: "Meeting Room Booking System",
-    icon: MdMeetingRoom,
-    // path: "/finance-management",
-  },
-  {
-    label: "Attendance",
-    icon: MdOutlineFingerprint,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Leave Requests",
-    icon: HiOutlineLogout,
-  },
-  {
-    label: "Calendar",
-    icon: TbCalendarUser,
-    // path: "/finance-management",
-  },
+  { label: "Dashboard", icon: HiOutlineViewGrid },
+  { label: "Customer Support", icon: MdOutlineSupportAgent },
+  { label: "Tickets", icon: HiOutlineClipboardList },
+  { label: "Meeting Room Booking", icon: MdMeetingRoom },
+  { label: "Calendar", icon: TbCalendarUser },
+  { label: "Printouts", icon: HiOutlineDocumentReport },
+  { label: "Attendance", icon: MdOutlineFingerprint },
+  { label: "Tasks", icon: HiOutlineClipboardList },
+  { label: "Leave Requests", icon: HiOutlineLogout },
 ];
 
 const coreModules = [
-  {
-    label: "Organization Management",
-    icon: HiOutlineLibrary,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Module Management",
-    icon: HiOutlineTemplate,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Access Grants",
-    icon: HiOutlineKey,
-    // path: "/assets",
-  },
-  {
-    label: "Unit Setting",
-    icon: HiOutlineCash,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Unit Management",
-    icon: HiOutlineTemplate,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Analytics",
-    icon: HiOutlineChartBar,
-    // path: "/assets",
-  },
+  { label: "Organization Management", icon: HiOutlineLibrary },
+  { label: "Access Grants", icon: HiOutlineKey },
+  { label: "Analytics", icon: HiOutlineChartBar },
+  { label: "Unit Settings", icon: HiOutlineCash },
+  { label: "Unit Management", icon: HiOutlineTemplate },
 ];
 
+// Each department's own module list, per "Department Accesses" in the
+// dev team's Add-Ons plan matrix and the Customise Plan doc. Ordered to
+// match the Modules overview section above (Sales, Finance,
+// Administration, HR, IT, Maintenance), with Tech appended alongside IT.
 const departmentAccess = [
-  {
-    label: "Hr Department",
-    icon: HiOutlineUsers,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Administration Department",
-    icon: HiOutlineBriefcase,
-    // path: "/extra-common-modules",
-  },
   {
     label: "Sales Department",
     icon: HiOutlineTrendingUp,
-    // path: "/assets",
+    children: [
+      { label: "Leads Management", icon: HiOutlineDocumentReport },
+      { label: "Tenant Companies", icon: HiOutlineLibrary },
+      { label: "Virtual Offices", icon: CgWebsite },
+      { label: "Resource & Pricing", icon: HiOutlineCash },
+      { label: "Sales Architecture", icon: TbWorldWww },
+    ],
   },
   {
     label: "Finance Department",
     icon: HiOutlineCurrencyDollar,
-    // path: "/extra-common-modules",
+    children: [
+      { label: "Expenses & Budget", icon: HiOutlineCash },
+      { label: "Billing & Payments", icon: HiOutlineCurrencyDollar },
+      { label: "Accounting", icon: HiOutlineChartBar },
+    ],
   },
   {
-    label: "Maintainence Department",
-    icon: HiOutlineWrenchScrewdriver,
-    // path: "/extra-common-modules",
+    label: "Administration Department",
+    icon: HiOutlineBriefcase,
+    children: [
+      { label: "Printout Management", icon: HiOutlineDocumentReport },
+      { label: "Bookings", icon: MdMeetingRoom },
+      { label: "Visitors Management", icon: BsPersonVcard },
+      { label: "Resource Management", icon: HiOutlineLibrary },
+      { label: "Housekeeping", icon: HiOutlineClipboardList },
+    ],
   },
   {
-    label: "Tech Department",
-    icon: HiOutlineChip,
-    // path: "/assets",
+    label: "HR Department",
+    icon: HiOutlineUsers,
+    children: [
+      { label: "Company Management", icon: HiOutlineLibrary },
+      { label: "Documents", icon: HiOutlineDocumentReport },
+      { label: "Recruitment", icon: HiOutlineBriefcase },
+      { label: "Leave Request Processing", icon: HiOutlineLogout },
+      { label: "Attendance Review", icon: MdOutlineFingerprint },
+      { label: "Payroll Management", icon: HiOutlineCash },
+      { label: "Resignation Management", icon: HiOutlineLogout },
+    ],
   },
   {
     label: "IT Department",
     icon: HiOutlineDatabase,
-    // path: "/assets",
+    children: [{ label: "IT Repair Logs", icon: HiOutlineChip }],
+  },
+  {
+    label: "Maintenance Department",
+    icon: HiOutlineWrenchScrewdriver,
+    children: [
+      { label: "Maintenance Repair Logs", icon: HiOutlineWrenchScrewdriver },
+      { label: "AMC Maintenance Schedule", icon: TbCalendarUser },
+    ],
+  },
+  // Last on purpose: every item here duplicates what Key Apps > Website
+  // Builder already covers — this is that same feature surfaced again
+  // under Tech's own department access.
+  {
+    label: "Tech Department",
+    icon: HiOutlineChip,
+    children: [
+      { label: "Website Builder", icon: CgWebsite },
+      { label: "Website Leads", icon: HiOutlineDocumentReport },
+      { label: "Website Review", icon: HiOutlineHeart },
+    ],
   },
 ];
 
@@ -279,9 +277,10 @@ const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 const collapsedSectionLabels = {
   Modules: "MOD",
   "Common Modules": "COM",
+  "Extra Common Modules": "EXT",
   "Core Modules": "COR",
   "Key Apps": "APP",
-  "Department Access": "DEP",
+  "Department Accesses": "DEP",
   Profile: "PRO",
 };
 
@@ -310,6 +309,19 @@ const SidebarSection = ({
   const ChevronIcon = isOpen ? HiChevronUp : HiChevronDown;
   const shouldShowItems = !isExpandable || isOpen;
   const navigate = useNavigate();
+  const [openChildLabel, setOpenChildLabel] = useState(null);
+
+  // Keep the manually-toggled open item in sync with whichever item is
+  // actually active (e.g. navigated to from elsewhere, like the Modules
+  // overview section). Without this, a stale manual toggle and the
+  // navigation-driven active state can disagree about which item's
+  // children should be showing, making the list jump around instead of
+  // predictably expanding downward.
+  const activeChildLabel =
+    items.find((item) => item.children?.some((c) => c.active))?.label ?? null;
+  useEffect(() => {
+    if (activeChildLabel) setOpenChildLabel(activeChildLabel);
+  }, [activeChildLabel]);
 
   return (
     <div className={`px-4 ${compact ? "pt-0" : "pt-3"}`}>
@@ -360,72 +372,113 @@ const SidebarSection = ({
           <div className=" space-y-1">
             {items.map((item) => {
               const Icon = item.icon;
-              const isActive = !!item.active;
+              const hasChildren = !!item.children?.length;
+              const isChildActive =
+                hasChildren && item.children.some((c) => c.active);
+              const isActive = !!item.active || isChildActive;
+              const isChildrenOpen = openChildLabel === item.label || isChildActive;
 
               return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => onItemClick?.(item)}
-                  onMouseEnter={(event) => {
-                    if (!collapsed) return;
+                <div key={item.label}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (hasChildren) {
+                        setOpenChildLabel((prev) =>
+                          prev === item.label ? null : item.label,
+                        );
+                        return;
+                      }
+                      onItemClick?.(item);
+                    }}
+                    onMouseEnter={(event) => {
+                      if (!collapsed) return;
 
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    onTooltipChange?.({
-                      label: item.label,
-                      top: rect.top + rect.height / 2,
-                      left: rect.right + 14,
-                    });
-                  }}
-                  onMouseLeave={() => onTooltipChange?.(null)}
-                  onFocus={(event) => {
-                    if (!collapsed) return;
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      onTooltipChange?.({
+                        label: item.label,
+                        top: rect.top + rect.height / 2,
+                        left: rect.right + 14,
+                      });
+                    }}
+                    onMouseLeave={() => onTooltipChange?.(null)}
+                    onFocus={(event) => {
+                      if (!collapsed) return;
 
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    onTooltipChange?.({
-                      label: item.label,
-                      top: rect.top + rect.height / 2,
-                      left: rect.right + 14,
-                    });
-                  }}
-                  onBlur={() => onTooltipChange?.(null)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
-                    isActive ? "bg-white text-black shadow-sm" : "text-black/80"
-                  }`}
-                  aria-label={collapsed ? item.label : undefined}
-                >
-                  <Icon
-                    size={18}
-                    className={`shrink-0 ${isActive ? "text-black" : "text-black/80"}`}
-                  />
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      onTooltipChange?.({
+                        label: item.label,
+                        top: rect.top + rect.height / 2,
+                        left: rect.right + 14,
+                      });
+                    }}
+                    onBlur={() => onTooltipChange?.(null)}
+                    className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
+                      isActive ? "text-black" : "text-black/80"
+                    }`}
+                    aria-label={collapsed ? item.label : undefined}
+                  >
+                    <Icon
+                      size={18}
+                      className={`shrink-0 ${isActive ? "text-primary-blue" : "text-black/80"}`}
+                    />
 
-                  {!collapsed && (
-                    <>
-                      <span
-                        className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}
-                      >
-                        {item.label}
-                      </span>
-                      {item.suffixText && (
-                        <span className="ml-auto text-[12px] font-medium tracking-wide text-black/55">
-                          <button
-                            onClick={() => navigate(hostSignupEntryPath)}
-                            className="hover:text-primary-blue"
-                          >
-                            {item.suffixText}
-                          </button>
+                    {!collapsed && (
+                      <>
+                        <span
+                          className={`min-w-0 flex-1 truncate whitespace-nowrap text-xs font-medium ${isActive ? "font-semibold text-black" : ""}`}
+                        >
+                          {item.label}
                         </span>
-                      )}
-                    </>
+                        {item.suffixText && (
+                          <span className="ml-auto text-[12px] font-medium tracking-wide text-black/55">
+                            <button
+                              onClick={() => navigate(hostSignupEntryPath)}
+                              className="hover:text-primary-blue"
+                            >
+                              {item.suffixText}
+                            </button>
+                          </span>
+                        )}
+                        {hasChildren &&
+                          (isChildrenOpen ? (
+                            <HiChevronUp size={14} className="shrink-0" />
+                          ) : (
+                            <HiChevronDown size={14} className="shrink-0" />
+                          ))}
+                      </>
+                    )}
+                  </button>
+
+                  {!collapsed && hasChildren && isChildrenOpen && (
+                    <div className="ml-6 mt-0.5 flex flex-col gap-0.5 border-l border-black/10 pl-2">
+                      {item.children.map((child) => {
+                        const ChildIcon = child.icon;
+                        const isChildSelected = !!child.active;
+                        return (
+                          <button
+                            key={child.label}
+                            type="button"
+                            onClick={() => onItemClick?.(child)}
+                            className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[0.7rem] transition-colors hover:bg-white ${
+                              isChildSelected
+                                ? "font-semibold text-black"
+                                : "text-black/70"
+                            }`}
+                          >
+                            <ChildIcon
+                              size={14}
+                              className={`shrink-0 ${isChildSelected ? "text-primary-blue" : ""}`}
+                            />
+                            <span className="min-w-0 flex-1 truncate whitespace-nowrap">
+                              {child.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   )}
-                  {/* <span
-                    className={`absolute bottom-0 left-0 h-[0.5px] bg-black rounded-t transition-all duration-300 ease-out
-      ${isActive
-                        ? "w-full"
-                        : "w-0 group-hover:w-full"
-                      }`}
-                  /> */}
-                </button>
+                </div>
               );
             })}
           </div>
@@ -440,6 +493,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
   const [isCommonFeaturesOpen, setIsCommonFeaturesOpen] = useState(false);
+  const [isExtraCommonModulesOpen, setIsExtraCommonModulesOpen] = useState(false);
   const [isCoreModulesOpen, setIsCoreModulesOpen] = useState(false);
   const [isDepartmentAccessOpen, setIsDepartmentAccessOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -506,7 +560,29 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
   console.log(isLoggedIn);
 
-  const handleSidebarItemClick = () => {};
+  // Mock wiring: every item under Modules / Common Modules / Core Modules /
+  // Key Apps routes into /modules and jumps straight to that item's
+  // section (and pre-selects it when its label matches a real module from
+  // hostModulesCatalog.js). Falls back to the section's default category,
+  // or the top of the page, when there's no exact match yet.
+  const handleSidebarItemClick = (item, defaultCategoryId) => {
+    const override = modulesOverviewTargets[item?.label];
+    if (override) {
+      navigate(`/modules?category=${override.categoryId}&module=${override.moduleId}`);
+      return;
+    }
+
+    const match = findModuleByLabel(item?.label);
+    if (match) {
+      navigate(`/modules?category=${match.categoryId}&module=${match.moduleId}`);
+      return;
+    }
+    if (defaultCategoryId) {
+      navigate(`/modules?category=${defaultCategoryId}`);
+      return;
+    }
+    navigate("/modules");
+  };
 
   const handleProfileClick = (item) => {
     if (!item.tab) return;
@@ -577,9 +653,25 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     .replace(/\/$/, "")
     .match(/^\/ai-login\/([^/]+)$/)?.[1];
 
+  // A module selected on /modules (?category=&module=) shows as the
+  // selected item here too, by matching its label against the real
+  // catalog — same mapping handleSidebarItemClick uses to get there.
+  const activeModuleParam =
+    normalizedPath === "/modules"
+      ? new URLSearchParams(location.search).get("module")
+      : null;
+  const isModuleActive = (item) => {
+    if (!activeModuleParam) return false;
+    const override = modulesOverviewTargets[item.label];
+    if (override) return override.moduleId === activeModuleParam;
+    const match = findModuleByLabel(item.label);
+    return Boolean(match && match.moduleId === activeModuleParam);
+  };
+
   // Active state logic for recommendations
   const recommendationItemsWithActivePath = recommendationItems.map((item) => {
-    if (!item.path) return item;
+    const moduleActive = isModuleActive(item);
+    if (!item.path) return { ...item, active: moduleActive };
 
     const normalizedItemPath = item.path.replace(/\/$/, "");
     const goalSlug = goalSlugByLabel[item.label];
@@ -592,13 +684,14 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     return {
       ...item,
-      active: isActivePath,
+      active: isActivePath || moduleActive,
     };
   });
 
   // Active state logic for value additions
   const valueAdditionItemsWithActivePath = valueAdditionItems.map((item) => {
-    if (!item.path) return item;
+    const moduleActive = isModuleActive(item);
+    if (!item.path) return { ...item, active: moduleActive };
 
     const normalizedItemPath = item.path.replace(/\/$/, "");
     const isActivePath =
@@ -607,12 +700,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     return {
       ...item,
-      active: isActivePath,
+      active: isActivePath || moduleActive,
     };
   });
 
   const commonFeaturesWithActivePath = commonFeatures.map((item) => {
-    if (!item.path) return item;
+    const moduleActive = isModuleActive(item);
+    if (!item.path) return { ...item, active: moduleActive };
 
     const normalizedItemPath = item.path.replace(/\/$/, "");
     const isActivePath =
@@ -621,12 +715,13 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     return {
       ...item,
-      active: isActivePath,
+      active: isActivePath || moduleActive,
     };
   });
 
   const coreModulesWithActivePath = coreModules.map((item) => {
-    if (!item.path) return item;
+    const moduleActive = isModuleActive(item);
+    if (!item.path) return { ...item, active: moduleActive };
 
     const normalizedItemPath = item.path.replace(/\/$/, "");
     const isActivePath =
@@ -635,12 +730,18 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     return {
       ...item,
-      active: isActivePath,
+      active: isActivePath || moduleActive,
     };
   });
 
   const departmentAccessWithActivePath = departmentAccess.map((item) => {
-    if (!item.path) return item;
+    const children = item.children?.map((child) => ({
+      ...child,
+      active: isModuleActive(child),
+    }));
+    const moduleActive =
+      isModuleActive(item) || Boolean(children?.some((c) => c.active));
+    if (!item.path) return { ...item, active: moduleActive, children };
 
     const normalizedItemPath = item.path.replace(/\/$/, "");
     const isActivePath =
@@ -649,7 +750,24 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     return {
       ...item,
-      active: isActivePath,
+      active: isActivePath || moduleActive,
+      children,
+    };
+  });
+
+  // Extra Common Modules — locked-until-Custom-plan modules.
+  const extraCommonModulesWithActivePath = extraCommonModules.map((item) => {
+    const moduleActive = isModuleActive(item);
+    if (!item.path) return { ...item, active: moduleActive };
+
+    const normalizedItemPath = item.path.replace(/\/$/, "");
+    const isActivePath =
+      normalizedPath === normalizedItemPath ||
+      normalizedPath.startsWith(`${normalizedItemPath}/`);
+
+    return {
+      ...item,
+      active: isActivePath || moduleActive,
     };
   });
 
@@ -710,7 +828,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isExpandable
         isOpen={isRecommendationsOpen}
         onToggle={() => setIsRecommendationsOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
+        onItemClick={(item) => handleSidebarItemClick(item, "key-apps")}
         onTooltipChange={setTooltip}
       />
 
@@ -721,17 +839,17 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isExpandable
         isOpen={isCommonFeaturesOpen}
         onToggle={() => setIsCommonFeaturesOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
+        onItemClick={(item) => handleSidebarItemClick(item, "common-modules")}
         onTooltipChange={setTooltip}
       />
       <SidebarSection
-        title="Core Modules"
-        items={coreModulesWithActivePath}
+        title="Extra Common Modules"
+        items={extraCommonModulesWithActivePath}
         collapsed={isCollapsed}
         isExpandable
-        isOpen={isCoreModulesOpen}
-        onToggle={() => setIsCoreModulesOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
+        isOpen={isExtraCommonModulesOpen}
+        onToggle={() => setIsExtraCommonModulesOpen((prev) => !prev)}
+        onItemClick={(item) => handleSidebarItemClick(item, "extra-common-modules")}
         onTooltipChange={setTooltip}
       />
       <SidebarSection
@@ -741,17 +859,27 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isExpandable
         isOpen={isValueAdditionsOpen}
         onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
+        onItemClick={(item) => handleSidebarItemClick(item, "key-apps")}
         onTooltipChange={setTooltip}
       />
       <SidebarSection
-        title="Department Access"
+        title="Core Modules"
+        items={coreModulesWithActivePath}
+        collapsed={isCollapsed}
+        isExpandable
+        isOpen={isCoreModulesOpen}
+        onToggle={() => setIsCoreModulesOpen((prev) => !prev)}
+        onItemClick={(item) => handleSidebarItemClick(item, "core-modules")}
+        onTooltipChange={setTooltip}
+      />
+      <SidebarSection
+        title="Department Accesses"
         items={departmentAccessWithActivePath}
         collapsed={isCollapsed}
         isExpandable
         isOpen={isDepartmentAccessOpen}
         onToggle={() => setIsDepartmentAccessOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
+        onItemClick={(item) => handleSidebarItemClick(item, "department-accesses")}
         onTooltipChange={setTooltip}
       />
 
