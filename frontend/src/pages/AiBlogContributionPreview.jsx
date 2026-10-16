@@ -648,7 +648,20 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
     const result = await Swal.fire({
       icon: "warning",
       title: `Re-publish this ${contentName}?`,
-      text: `Re-publishing will permanently replace the previously saved version of this ${contentName} with your current changes. The previous version cannot be restored. Your ${contentName} will be submitted for review again.`,
+      html: `<p>Your current changes will replace the saved version of this ${contentName}.</p>
+        <p>The previous version cannot be restored. Your ${contentName} will be submitted for review again.</p>`,
+      input: "checkbox",
+      inputValue: 0,
+      inputPlaceholder: "I understand and accept these changes",
+      inputValidator: (value) => !value && "Please accept before re-publishing.",
+      didOpen: () => {
+        const checkbox = Swal.getInput();
+        const confirmButton = Swal.getConfirmButton();
+        confirmButton.disabled = true;
+        checkbox.addEventListener("change", () => {
+          confirmButton.disabled = !checkbox.checked;
+        });
+      },
       showCancelButton: true,
       confirmButtonText: `Re-publish ${config.label}`,
       cancelButtonText: "Cancel",
@@ -658,6 +671,7 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
       customClass: {
         popup: "swal2-popup--rounded",
         title: "swal2-title--serif",
+        htmlContainer: "swal2-republish-message",
         confirmButton: "swal2-button--pill swal2-button--republish",
         cancelButton: "swal2-button--pill swal2-button--republish",
       },
