@@ -6,6 +6,7 @@ import CommonsTemplate from "./commons/CommonsTemplate";
 import HuddleTemplate from "./huddle/HuddleTemplate";
 import TravigoTemplate from "./travigo/TravigoTemplate";
 import LodgeTemplate from "./lodge/LodgeTemplate";
+import CaliHostelTemplate from "./caliHostel/CaliHostelTemplate";
 import TastycTemplate from "./tastyc/TastycTemplate";
 import GrandBarTemplate from "./grandbar/GrandBarTemplate";
 import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
@@ -27,6 +28,7 @@ export const VERTICAL_TEMPLATES = {
   huddle: HuddleTemplate,
   travigo: TravigoTemplate,
   lodge: LodgeTemplate,
+  "cali-hostel": CaliHostelTemplate,
   tastyc: TastycTemplate,
   grandbar: GrandBarTemplate,
   flowspace: FlowspaceTemplate,
