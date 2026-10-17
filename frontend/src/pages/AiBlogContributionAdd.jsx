@@ -10,6 +10,7 @@ import {
   HiOutlineTrash,
 } from "react-icons/hi";
 import { FaCheck } from "react-icons/fa";
+import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -980,7 +981,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     return errors;
   };
 
-  const handleSubmit = (status) => {
+  const handleSubmit = async (status) => {
+    if (isSaving) return;
+
     const cleanedSections = formValues.sections
       .map((section) => ({
         title: section.title.trim(),
@@ -994,6 +997,28 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
     if (Object.keys(validationErrors).length > 0) {
       return;
+    }
+
+    if (status !== "draft") {
+      const result = await Swal.fire({
+        icon: "info",
+        title: "Submit for review?",
+        text: `Your ${config.contentLabel.toLowerCase()} will be sent for review before it is published.`,
+        showCancelButton: true,
+        confirmButtonText: "Submit for Review",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#0BA9EF",
+        focusCancel: true,
+        heightAuto: false,
+        customClass: {
+          popup: "swal2-popup--rounded",
+          title: "swal2-title--serif",
+          confirmButton: "swal2-button--pill",
+          cancelButton: "swal2-button--pill",
+        },
+      });
+
+      if (!result.isConfirmed) return;
     }
 
     if (supportsSectionImageUploads) {
@@ -1920,7 +1945,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 type="button"
                 onClick={() => handleSubmit("draft")}
                 disabled={isSaving}
-                className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+                className="rounded-lg bg-primary-blue px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-400"
               >
                 Save As Draft
               </button>

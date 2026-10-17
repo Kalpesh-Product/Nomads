@@ -325,11 +325,11 @@ const ContributionCard = ({ item, config }) => {
         {!item.isDraft ? (
           <div className="absolute bottom-2 right-2">
             <span
-              className={`rounded-full border px-2 py-1 text-[10px] font-semibold capitalize ${
+              className={`rounded-full border px-2 py-1 text-[10px] font-semibold ${
                 statusBadgeStyles[status] || statusBadgeStyles.pending
               }`}
             >
-              {status}
+              {status.charAt(0).toUpperCase() + status.slice(1)}
             </span>
           </div>
         ) : null}
