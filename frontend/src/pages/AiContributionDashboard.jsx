@@ -179,11 +179,11 @@ const ContributionStatusFilter = ({ value, onChange, label = "Contribution" }) =
   }, []);
 
   return (
-    <div className="flex items-start gap-3">
+    <div className="flex w-full min-w-0 flex-wrap items-start gap-3 sm:w-auto sm:flex-nowrap">
       <span className="mt-3 whitespace-nowrap font-play text-sm text-black/80">
         Status Options
       </span>
-      <div ref={filterRef} className="relative w-48">
+      <div ref={filterRef} className="relative min-w-0 flex-1 sm:w-48 sm:flex-none">
         <button
           type="button"
           onClick={() => setIsOpen((current) => !current)}
@@ -291,7 +291,7 @@ const ContributionCard = ({ item, config }) => {
       : item;
 
   return (
-    <article className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
+    <article className="flex min-w-0 w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
       <div className="relative aspect-square overflow-hidden rounded-2xl bg-slate-100">
         <img
           src={image}
@@ -335,7 +335,7 @@ const ContributionCard = ({ item, config }) => {
         ) : null}
       </div>
 
-      <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
+      <div className="flex min-w-0 h-[25%] flex-col gap-1 px-4 pr-1">
         <h3
           className="truncate text-xs font-semibold md:text-sm"
           title={title}
@@ -367,7 +367,7 @@ const ContributionTypeFilter = ({ value, onChange, availableTypes }) => {
   );
 
   return (
-    <div className="flex flex-wrap items-center gap-y-2 text-lg font-play">
+    <div className="contribution-type-filters flex flex-wrap items-center gap-y-2 text-lg font-play">
       {options.map((option, index) => {
         const isSelected = option.value === value;
 
@@ -552,7 +552,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
     <>
       <Seo path={config.seoPath} />
       <main className="mx-auto w-full max-w-[80rem] px-4 py-2 md:px-8 lg:px-8">
-        <div className="mt-6 flex items-center justify-between gap-4 border-t border-black/10 pt-6">
+        <div className="mt-6 flex flex-col items-start gap-4 border-t border-black/10 pt-6 lg:flex-row lg:items-center lg:justify-between">
           <h1 className="text-lg font-semibold text-black">{config.heading}</h1>
           {isCombinedPage ? (
             <ContributionStatusFilter

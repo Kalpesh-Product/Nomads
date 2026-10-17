@@ -137,7 +137,7 @@ const BlogImageFileInput = ({
     <label className={labelClassName} htmlFor={id}>
       {label}
     </label>
-    <div className="flex min-h-[42px] items-center gap-3 rounded-md border border-black/10 bg-white px-3 py-2 text-sm transition focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100">
+    <div className="contribution-upload flex min-h-[42px] items-center gap-3 rounded-md border border-black/10 bg-white px-3 py-2 text-sm transition focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100">
       <input
         id={id}
         type="file"
@@ -261,7 +261,7 @@ const PreviewHeader = ({ config, item, onEdit }) => {
       </div>}
 
       {isPending ? (
-        <div className="flex items-center justify-between gap-4 rounded-xl border border-yellow-200 bg-yellow-100 px-4 py-5 text-sm text-yellow-700">
+        <div className="contribution-status-banner flex items-center justify-between gap-4 rounded-xl border border-yellow-200 bg-yellow-100 px-4 py-5 text-sm text-yellow-700">
           <p>
             This {config.label.toLowerCase()} is currently under review.
           </p>
@@ -292,7 +292,7 @@ const ArticlePreview = ({ item, config, onEdit }) => {
   });
 
   return (
-    <div className="mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+    <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
       <PreviewHeader config={config} item={item} onEdit={onEdit} />
 
       <div className="flex flex-col gap-8">
@@ -361,7 +361,7 @@ const DestinationPreview = ({ item, config, onEdit }) => {
   const rightMeta = isEvent ? item.venue : item.address || item.venue;
 
   return (
-    <div className="mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+    <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
       <PreviewHeader config={config} item={item} onEdit={onEdit} />
 
       <section className="mt-4">
@@ -373,7 +373,7 @@ const DestinationPreview = ({ item, config, onEdit }) => {
         ) : null}
 
         {image ? (
-          <div className="mt-6 aspect-[3.3/1] w-full overflow-hidden rounded-xl bg-slate-100">
+          <div className="contribution-banner-image mt-6 aspect-[3.3/1] w-full overflow-hidden rounded-xl bg-slate-100">
             <img src={image} alt={title} className="h-full w-full object-cover" />
           </div>
         ) : null}
@@ -419,7 +419,7 @@ const DestinationPreview = ({ item, config, onEdit }) => {
 };
 
 const EditActions = ({ config, isSaving, onCancel, onSubmit }) => (
-  <div className="sticky top-0 z-30 -mx-4 mb-6 flex flex-col gap-3 border-b border-black/10 bg-[#fffef2]/95 px-4 pb-5 pt-2 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:-mx-8 md:px-8 lg:-mx-8">
+  <div className="contribution-edit-actions sticky top-0 z-30 -mx-4 mb-6 flex flex-col gap-3 border-b border-black/10 bg-[#fffef2]/95 px-4 pb-5 pt-2 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:-mx-8 md:px-8 lg:-mx-8">
     <div>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-blue">
         Editing {config.label}
@@ -925,7 +925,7 @@ const ArticleInlineEdit = ({
   });
 
   return (
-    <main className="mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+    <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
       <EditActions
         config={config}
         isSaving={isSaving}
@@ -1098,7 +1098,7 @@ const DestinationInlineEdit = ({
   const rightMeta = isEvent ? formValues.venue : formValues.address || formValues.venue;
 
   return (
-    <main className="mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+    <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
       <EditActions
         config={config}
         isSaving={isSaving}
@@ -1116,7 +1116,7 @@ const DestinationInlineEdit = ({
         />
 
         {formValues.mainImage || formValues.mainImageFile ? (
-          <div className="mt-6 aspect-[3.3/1] w-full overflow-hidden rounded-xl bg-slate-100">
+          <div className="contribution-banner-image mt-6 aspect-[3.3/1] w-full overflow-hidden rounded-xl bg-slate-100">
             <EditableImage
               src={formValues.mainImage}
               file={formValues.mainImageFile}
@@ -1213,7 +1213,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
 
   if (isLoading && !item) {
     return (
-      <div className="mx-auto w-full max-w-[80rem] px-4 py-10 text-center text-sm text-slate-500 md:px-8 lg:px-8">
+      <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 py-10 text-center text-sm text-slate-500 md:px-8 lg:px-8">
         Loading {config.label.toLowerCase()} preview...
       </div>
     );
@@ -1221,7 +1221,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
 
   if (isError || !item) {
     return (
-      <div className="mx-auto w-full max-w-[80rem] px-4 py-10 text-center md:px-8 lg:px-8">
+      <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 py-10 text-center md:px-8 lg:px-8">
         <p className="text-sm text-red-500">
           Could not load this {config.label.toLowerCase()} contribution.
         </p>

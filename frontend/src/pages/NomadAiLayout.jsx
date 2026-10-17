@@ -16,6 +16,7 @@ import BackToTopButton from "../components/BackToTopButton";
 import AiStickyBackBreadcrumb from "../components/AiStickyBackBreadcrumb";
 import { navigateBackWithinApp } from "../utils/navigationHistory";
 import { buildSearchResultsReturnTarget } from "../utils/aiSearchResultsNavigation";
+import "../contributions.css";
 
 const EXCLUDED_STICKY_BAR_PATHS = new Set([]);
 
@@ -119,6 +120,8 @@ const NomadAiLayout = () => {
   const navigationType = useNavigationType();
   const contentRef = useRef(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const isContributionPage = /^\/contributions(?:\/|$)/.test(location.pathname);
+  const [isTabletWidth, setIsTabletWidth] = useState(() => window.innerWidth < 1024);
   const [isManualSearchCompact, setIsManualSearchCompact] = useState(
     () =>
       typeof window !== "undefined" &&
@@ -127,6 +130,13 @@ const NomadAiLayout = () => {
   );
 
   const formData = useSelector((state) => state.location.formValues);
+  const useCompactNavigation = isManualSearchCompact || (isContributionPage && isTabletWidth);
+
+  useEffect(() => {
+    const updateTabletWidth = () => setIsTabletWidth(window.innerWidth < 1024);
+    window.addEventListener("resize", updateTabletWidth);
+    return () => window.removeEventListener("resize", updateTabletWidth);
+  }, []);
   console.log("formData from layout : ", formData);
 
   useEffect(() => {
@@ -352,15 +362,15 @@ const NomadAiLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white">
-      <div className={isManualSearchCompact ? "hidden" : "hidden sm:block"}>
+    <div className={`flex h-screen bg-white ${isContributionPage ? "contributions-layout" : ""}`}>
+      <div className={useCompactNavigation ? "hidden" : "hidden sm:block"}>
         <AiSidebar />
       </div>
 
       {isMobileSidebarOpen && (
         <div
           className={`fixed inset-0 z-[2100] bg-black/35 ${
-            isManualSearchCompact ? "" : "sm:hidden"
+            useCompactNavigation ? "" : "sm:hidden"
           }`}
           onClick={() => setIsMobileSidebarOpen(false)}
           aria-hidden="true"
@@ -376,7 +386,7 @@ const NomadAiLayout = () => {
         <div className="sticky top-0 z-50 w-full">
           <AiHeader
             onMobileSidebarToggle={() => setIsMobileSidebarOpen(true)}
-            forceMobileNavigation={isManualSearchCompact}
+            forceMobileNavigation={useCompactNavigation}
           />
         </div>
         {shouldShowStickyBar && (
@@ -385,7 +395,7 @@ const NomadAiLayout = () => {
               className={
                 isProductAlignedPage
                   ? "px-3 lg:px-20"
-                  : "px-1 md:px-20"
+                  : `px-1 md:px-20 ${isContributionPage ? "contributions-breadcrumb" : ""}`
               }
             >
               <div

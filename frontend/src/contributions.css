@@ -1,0 +1,97 @@
+/* Contribution-only small-screen rules leave desktop styles intact. */
+.contributions-layout .contribution-content {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1023px) {
+  .contributions-layout {
+    height: 100dvh;
+  }
+
+  .contributions-layout .contributions-breadcrumb {
+    padding-inline: 1.25rem;
+  }
+
+  .contributions-layout nav[aria-label="Breadcrumb"] {
+    overflow-x: auto;
+  }
+
+  .contributions-layout main,
+  .contributions-layout .contribution-content {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .contributions-layout main :is(input, textarea, select) {
+    min-width: 0;
+    max-width: 100%;
+    font-size: 1rem;
+  }
+
+  .contributions-layout .contribution-upload {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .contributions-layout .contribution-upload > span {
+    flex-basis: 7rem;
+  }
+
+  .contributions-layout .contribution-edit-actions {
+    position: static;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .contributions-layout .contribution-edit-actions > div:last-child {
+    gap: 0.5rem;
+  }
+
+  .contributions-layout .contribution-edit-actions button {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+
+  .contributions-layout .contribution-status-banner {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .contributions-layout .contribution-banner-image {
+    aspect-ratio: 16 / 9;
+  }
+
+  .contributions-layout .contribution-type-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-block: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .contributions-layout .contribution-type-filters > * {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 639px) {
+  .contributions-layout .contribution-top-row {
+    grid-template-columns: 1.5rem 3rem minmax(0, 1fr);
+    gap: 0.5rem;
+    padding-inline: 0;
+  }
+
+  .contributions-layout .contribution-recent-row {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding-inline: 0;
+  }
+
+  .contributions-layout :is(.contribution-top-row, .contribution-recent-row) > div.relative {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .contributions-layout .contribution-stat-icon {
+    flex-shrink: 0;
+  }
+}

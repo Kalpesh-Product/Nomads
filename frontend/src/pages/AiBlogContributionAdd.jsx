@@ -213,7 +213,7 @@ const BlogImageFileInput = ({
       <label className={labelClassName}>{label}</label>
     )}
     <div
-      className={`flex min-h-[42px] items-center gap-3 rounded-md border bg-white px-3 py-2 text-sm transition ${
+      className={`contribution-upload flex min-h-[42px] items-center gap-3 rounded-md border bg-white px-3 py-2 text-sm transition ${
         error ? "border-red-500" : "border-black/10 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100"
       }`}
     >

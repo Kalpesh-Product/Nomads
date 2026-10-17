@@ -149,7 +149,7 @@ const StatPill = ({ label, value, tone, icon: Icon }) => (
         <p className="mt-2 text-2xl font-bold text-black">{value}</p>
       </div>
       <div
-        className={`flex h-11 w-11 items-center justify-center rounded-full ${tone}`}
+        className={`contribution-stat-icon flex h-11 w-11 items-center justify-center rounded-full ${tone}`}
       >
         <Icon size={20} />
       </div>
@@ -165,7 +165,7 @@ const TopContributionRow = ({ entry, index }) => {
     <button
       type="button"
       onClick={() => navigate(config.detailsPath(item))}
-      className="grid w-full grid-cols-[2.25rem_4.75rem_minmax(0,1fr)] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white md:grid-cols-[2.25rem_4.75rem_minmax(0,1fr)_5rem_5rem]"
+      className="contribution-top-row grid w-full grid-cols-[2.25rem_4.75rem_minmax(0,1fr)] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white md:grid-cols-[2.25rem_4.75rem_minmax(0,1fr)_5rem_5rem]"
     >
       <span className="text-lg font-semibold text-black/25">
         {String(index + 1).padStart(2, "0")}
@@ -515,7 +515,7 @@ const AiContributionsHubTwo = () => {
                             key={`${config.key}-recent-${item._id || item.id || index}`}
                             type="button"
                             onClick={() => navigate(config.detailsPath(item))}
-                            className="grid w-full grid-cols-[4.75rem_minmax(0,1fr)] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white md:grid-cols-[4.75rem_minmax(0,1fr)_6rem_5.75rem_5rem]"
+                            className="contribution-recent-row grid w-full grid-cols-[4.75rem_minmax(0,1fr)] items-center gap-4 rounded-lg px-3 py-3 text-left transition hover:bg-white md:grid-cols-[4.75rem_minmax(0,1fr)_6rem_5.75rem_5rem]"
                           >
                             <div className="relative h-16 w-16 overflow-hidden rounded-lg bg-slate-100">
                               <img
