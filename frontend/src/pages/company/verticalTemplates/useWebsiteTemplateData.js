@@ -4,6 +4,7 @@ import { Country, State, City } from "country-state-city";
 import axios from "axios";
 import { api } from "../../../utils/axios";
 import { NomadsSiteContext } from "./NomadsSiteContext";
+import { setActiveTemplateCurrency } from "./templateKit";
 const LIVE_PREVIEW_DRAFT_STORAGE_KEY = "website_builder_live_preview_draft";
 // Shared data/logic layer used by every template going forward (Minimal
 // Swiss, Bold Editorial, Warm Organic) — Classic keeps its own self-
@@ -270,6 +271,10 @@ export const useWebsiteTemplateData = () => {
     const site = useContext(NomadsSiteContext);
     const [draft, setDraft] = useState(site?.data ? normalizeSiteMedia(site.data) : null);
     const previewDraftRawRef = useRef(null);
+
+    // The published site's own currency (if it ever carries one) resolves every template's price
+    // display; anything without one yet falls back to USD rather than assuming India.
+    setActiveTemplateCurrency(draft?.currency);
     const [heroIndex, setHeroIndex] = useState(0);
     const [testimonialIndex, setTestimonialIndex] = useState(0);
     const [expandedTestimonials, setExpandedTestimonials] = useState({});
