@@ -5,6 +5,14 @@ import CameliaTemplate from "./camelia/CameliaTemplate";
 import CommonsTemplate from "./commons/CommonsTemplate";
 import HuddleTemplate from "./huddle/HuddleTemplate";
 import TravigoTemplate from "./travigo/TravigoTemplate";
+import LodgeTemplate from "./lodge/LodgeTemplate";
+import CaliHostelTemplate from "./caliHostel/CaliHostelTemplate";
+import TastycTemplate from "./tastyc/TastycTemplate";
+import GrandBarTemplate from "./grandbar/GrandBarTemplate";
+import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
+import WorkscapeTemplate from "./workscape/WorkscapeTemplate";
+import WorpaceTemplate from "./worpace/WorpaceTemplate";
+import QerjaTemplate from "./qerja/QerjaTemplate";
 import TulumTemplate from "./tulum/TulumTemplate";
 import GrindelwaldTemplate from "./grindelwald/GrindelwaldTemplate";
 
@@ -19,6 +27,14 @@ export const VERTICAL_TEMPLATES = {
   commons: CommonsTemplate,
   huddle: HuddleTemplate,
   travigo: TravigoTemplate,
+  lodge: LodgeTemplate,
+  "cali-hostel": CaliHostelTemplate,
+  tastyc: TastycTemplate,
+  grandbar: GrandBarTemplate,
+  flowspace: FlowspaceTemplate,
+  workscape: WorkscapeTemplate,
+  worpace: WorpaceTemplate,
+  qerja: QerjaTemplate,
   tulum: TulumTemplate,
   grindelwald: GrindelwaldTemplate,
 };

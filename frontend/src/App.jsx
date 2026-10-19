@@ -9,9 +9,19 @@ const App = () => {
   const location = useLocation();
   const previousRouteRef = useRef(`${location.pathname}${location.search}`);
 
-  // ✅ Disable right-click globally (across all routes)
+  // ✅ Disable right-click globally (across all routes), but keep the browser's
+  // menu on editable fields so users can paste (e.g. an emailed OTP) via the
+  // right-click menu instead of only Ctrl+V.
   useEffect(() => {
-    const disableContextMenu = (e) => e.preventDefault();
+    const disableContextMenu = (e) => {
+      const el = e.target;
+      const isEditable =
+        el instanceof HTMLElement &&
+        (el.tagName === "INPUT" ||
+          el.tagName === "TEXTAREA" ||
+          el.isContentEditable);
+      if (!isEditable) e.preventDefault();
+    };
     window.addEventListener("contextmenu", disableContextMenu);
     return () => window.removeEventListener("contextmenu", disableContextMenu);
   }, []);
