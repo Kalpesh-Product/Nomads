@@ -1,10 +1,10 @@
 import React from "react";
-import { motion } from "../motion";
+import { motion as Motion } from "../motion";
 import { priceWithUnit } from "../templateKit";
 import { useTpl } from "../shared/TplContext";
-import { ChArrow, ChLabel, ChPhoto, ChReveal } from "./CaliHostelUI";
+import { ChArrow, ChLabel, ChLifePhoto, ChPhoto, ChReveal } from "./CaliHostelUI";
 export const CaliHostelHome = () => {
-    const { t, draft, primary, services, openLead, goToItem, c, photo } = useTpl();
+    const { t, draft, primary, openLead, goToItem, c, photo } = useTpl();
     const hero = photo("home.hero.image", t.heroImages?.[0] || primary?.heroImage || t.galleryItems?.[0] || "");
     const gallery = t.galleryItems || [];
     const rooms = primary?.items || [];
@@ -15,12 +15,12 @@ export const CaliHostelHome = () => {
     const facts = [["04", "Room styles"], ["24/7", "Host on site"], ["01", "Shared kitchen"], ["∞", "Local stories"]];
     return <>
     <section className="ch-hero">
-      <motion.img src={hero} alt="" className="ch-hero-image" initial={{ scale: 1.12 }} animate={{ scale: 1 }} transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}/>
+      <Motion.img src={hero} alt="" className="ch-hero-image" initial={{ scale: 1.12 }} animate={{ scale: 1 }} transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}/>
       <div className="ch-hero-shade"/>
       <div className="ch-hero-copy">
-        <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.7 }}>{c("home.hero.eyebrow", "A hostel for curious people")}</motion.p>
-        <motion.h1 initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 1, ease: [0.22, 1, 0.36, 1] }}>{draft?.title || "Come for the coast. Stay for the people."}</motion.h1>
-        <motion.div className="ch-hero-bottom" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75, duration: 0.7 }}><p>{draft?.subTitle || "Social rooms, deep sleep and good stories in the middle of everything."}</p><button type="button" onClick={book}>{draft?.buttonText || "Find your bed"}<ChArrow /></button></motion.div>
+        <Motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.7 }}>{c("home.hero.eyebrow", "A hostel for curious people")}</Motion.p>
+        <Motion.h1 initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 1, ease: [0.22, 1, 0.36, 1] }}>{draft?.title || "Come for the coast. Stay for the people."}</Motion.h1>
+        <Motion.div className="ch-hero-bottom" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75, duration: 0.7 }}><p>{draft?.subTitle || "Social rooms, deep sleep and good stories in the middle of everything."}</p><button type="button" onClick={book}>{draft?.buttonText || "Find your bed"}<ChArrow /></button></Motion.div>
       </div>
       <div className="ch-scroll-note"><span /> Scroll to meet the house</div>
     </section>
@@ -51,7 +51,7 @@ export const CaliHostelHome = () => {
     <section className="ch-life ch-dark">
       <div className="ch-life-sticky"><ChLabel>{c("home.life.eyebrow", "Life at Marea")}</ChLabel><h2>{c("home.life.title", "A bed. A table. A city waiting.")}</h2><p>{c("home.life.sub", "The best hostel moments happen between plans—over breakfast, on the roof, or halfway through a story with someone you just met.")}</p></div>
       <div className="ch-life-scenes">
-        {[["01", "Wake up rested", gallery[4] || hero], ["02", "Share the long table", gallery[5] || hero], ["03", "Follow the local trail", gallery[6] || hero]].map(([n, title, src], index) => <ChReveal key={n} className={`ch-life-scene scene-${index + 1}`}><ChPhoto src={src} alt={title}/><div><span>{n}</span><h3>{title}</h3></div></ChReveal>)}
+        {[["01", "Wake up rested", gallery[4] || hero], ["02", "Share the long table", gallery[5] || hero], ["03", "Follow the local trail", gallery[6] || hero]].map(([n, title, src], index) => <ChReveal key={n} className={`ch-life-scene scene-${index + 1}`}><ChLifePhoto src={src} alt={title} index={index}/><div><span>{n}</span><h3>{title}</h3></div></ChReveal>)}
       </div>
     </section>
 
