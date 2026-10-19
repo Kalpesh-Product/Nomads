@@ -11,6 +11,7 @@ import TastycTemplate from "./tastyc/TastycTemplate";
 import GrandBarTemplate from "./grandbar/GrandBarTemplate";
 import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
 import WorkscapeTemplate from "./workscape/WorkscapeTemplate";
+import BrixspaceTemplate from "./brixspace/BrixspaceTemplate";
 import WorpaceTemplate from "./worpace/WorpaceTemplate";
 import QerjaTemplate from "./qerja/QerjaTemplate";
 import TulumTemplate from "./tulum/TulumTemplate";
@@ -33,6 +34,7 @@ export const VERTICAL_TEMPLATES = {
   grandbar: GrandBarTemplate,
   flowspace: FlowspaceTemplate,
   workscape: WorkscapeTemplate,
+  brixspace: BrixspaceTemplate,
   worpace: WorpaceTemplate,
   qerja: QerjaTemplate,
   tulum: TulumTemplate,
