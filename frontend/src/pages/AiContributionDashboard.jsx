@@ -309,7 +309,13 @@ const ContributionCard = ({ item, config }) => {
                 selectedStateLabel: destination,
                 sourceSearch: location.search,
                 stickyBreadcrumbs: [
-                  { label: config.label, path: config.seoPath },
+                  { label: "Contributions", path: "/contributions" },
+                  {
+                    label: contributionTypeFilters.find(
+                      ({ value }) => contributionFilterPaths[value] === config.seoPath,
+                    )?.label || config.label,
+                    path: config.seoPath,
+                  },
                   { label: title },
                 ],
                 startEditing: isEditableDraft,
