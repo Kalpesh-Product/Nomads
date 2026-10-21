@@ -1,4 +1,15 @@
-/* Contribution-only small-screen rules leave desktop styles intact. */
+/* Match the header/breadcrumb container without a second page-level inset. */
+@media (min-width: 1024px) {
+  .contributions-layout .contributions-body > :is(main, .contribution-content) {
+    padding-inline: 0;
+  }
+
+  .contributions-layout .contribution-edit-actions {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}
+
 .contributions-layout .contribution-content {
   overflow-wrap: anywhere;
 }

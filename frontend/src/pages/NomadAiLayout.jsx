@@ -426,9 +426,11 @@ const NomadAiLayout = () => {
         >
           <div
             className={
-              isProductAlignedPage
-                ? "px-1 lg:px-20 min-h-[calc(100vh-100px)]"
-                : "px-1 md:px-6 lg:px-6 xl:px-10 2xl:px-12 min-h-[calc(100vh-100px)]"
+              isContributionPage
+                ? "contributions-body min-h-[calc(100vh-100px)] px-1 md:px-6 lg:px-20"
+                : isProductAlignedPage
+                  ? "px-1 lg:px-20 min-h-[calc(100vh-100px)]"
+                  : "px-1 md:px-6 lg:px-6 xl:px-10 2xl:px-12 min-h-[calc(100vh-100px)]"
             }
           >
             <Outlet />
