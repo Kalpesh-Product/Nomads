@@ -302,7 +302,7 @@ const AiContributionsHubTwo = () => {
                   </p>
                 </div>
 
-                <div className="flex h-36 w-36 flex-col items-center justify-center rounded-[1.5rem] border border-white/80 bg-white/90 text-center backdrop-blur">
+                <div className="flex h-36 w-full flex-col items-center justify-center rounded-[1.5rem] border border-white/80 bg-white/90 text-center backdrop-blur sm:w-36">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_12px_26px_rgba(73,159,222,0.24)]">
                     <MdMilitaryTech size={20} />
                   </span>
