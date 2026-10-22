@@ -1965,7 +1965,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 type="button"
                 onClick={() => handleSubmit("draft")}
                 disabled={isSaving}
-                className="rounded-lg bg-primary-blue px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-400"
+                className="rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-400"
               >
                 Save As Draft
               </button>
@@ -1973,7 +1973,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 type="button"
                 onClick={() => handleSubmit("active")}
                 disabled={isSaving}
-                className="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+                className="rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-400"
               >
                 {config.submitButtonLabel}
               </button>
@@ -1981,7 +1981,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 type="button"
                 onClick={() => navigate(config.dashboardPath)}
                 disabled={isSaving}
-                className="rounded-lg bg-slate-300 px-6 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-400 disabled:cursor-not-allowed"
+                className="rounded-full bg-slate-300 px-6 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-400 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
