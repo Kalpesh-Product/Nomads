@@ -675,7 +675,8 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
       focusCancel: true,
       heightAuto: false,
       customClass: {
-        popup: "swal2-popup--rounded",
+        container: "swal2-container--republish",
+        popup: "swal2-popup--rounded swal2-popup--republish",
         title: "swal2-title--serif",
         htmlContainer: "swal2-republish-message",
         confirmButton: "swal2-button--pill swal2-button--republish",
