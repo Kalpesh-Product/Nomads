@@ -558,7 +558,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
     <>
       <Seo path={config.seoPath} />
       <main className="mx-auto w-full max-w-[80rem] px-4 py-2 md:px-8 lg:px-8">
-        <div className="mt-6 flex flex-col items-start gap-4 border-t border-black/10 pt-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col items-start gap-4 border-b border-black/10 pb-6 lg:flex-row lg:items-center lg:justify-between">
           <h1 className="text-lg font-semibold text-black">{config.heading}</h1>
           {isCombinedPage ? (
             <ContributionStatusFilter
