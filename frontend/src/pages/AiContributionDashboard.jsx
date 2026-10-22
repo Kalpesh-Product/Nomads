@@ -583,7 +583,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
         </div>
 
         {hasContributionList ? (
-          <div className="mt-8 min-h-[28rem]">
+          <div className="mt-6 min-h-[28rem]">
             {isContributionsLoading ? (
               <p className="text-center text-sm text-slate-500">Loading...</p>
             ) : isContributionsError ? (
@@ -593,7 +593,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
             ) : (
               <>
                 {isCombinedPage ? (
-                  <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="mb-8 flex flex-col gap-4 lg:min-h-[44px] lg:flex-row lg:items-center lg:justify-between">
                     <ContributionTypeFilter
                       value={contributionFilter}
                       onChange={handleContributionFilterChange}
