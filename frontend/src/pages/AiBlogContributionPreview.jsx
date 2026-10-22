@@ -297,9 +297,9 @@ const ArticlePreview = ({ item, config, onEdit }) => {
 
       <div className="flex flex-col gap-8">
         <section className="clear-both flow-root">
-          <h2 className="mb-8 text-title font-bold leading-normal">{title}</h2>
+          <h2 className="mb-8 text-title font-bold leading-normal max-sm:text-[28px]">{title}</h2>
           <FloatingImage src={item.mainImage} alt={title} />
-          <p className="whitespace-pre-line leading-relaxed">
+          <p className="whitespace-pre-line leading-relaxed max-sm:text-[14px]">
             {String(item.mainContent || "").trimStart()}
           </p>
         </section>
@@ -314,7 +314,7 @@ const ArticlePreview = ({ item, config, onEdit }) => {
                   className="clear-both flow-root"
                 >
                   {section.title ? (
-                    <h3 className="mb-4 text-card-title font-bold leading-[1.2] md:leading-[1.35]">
+                    <h3 className="mb-4 text-card-title font-bold leading-[1.2] max-sm:text-[20px] md:leading-[1.35]">
                       {section.title}
                     </h3>
                   ) : null}
@@ -324,7 +324,7 @@ const ArticlePreview = ({ item, config, onEdit }) => {
                     side={section.imageSide}
                   />
                   {section.content ? (
-                    <p className="whitespace-pre-line leading-relaxed">
+                    <p className="whitespace-pre-line leading-relaxed max-sm:text-[14px]">
                       {String(section.content || "").trimStart()}
                     </p>
                   ) : null}
