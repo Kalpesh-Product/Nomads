@@ -1,4 +1,6 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -183,9 +185,27 @@ const contributionAddConfig = {
 };
 
 const inputClassName =
-  "min-h-[42px] w-full rounded-md border border-black/10 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100";
-const labelClassName = "mb-2 block text-xs font-semibold text-slate-600";
+  "min-h-[42px] w-full rounded-none border-0 border-b border-black/40 bg-transparent px-0 py-2 text-base text-slate-700 outline-none transition hover:border-black focus:border-b-2 focus:border-primary-blue";
+const labelClassName = "block text-xs font-normal text-gray-600";
 const errorTextClassName = "mt-1 text-xs font-medium text-red-500";
+
+const ContributionTextField = ({ as, maxLength, ...props }) => (
+  <CharacterLimitedField
+    as={TextField}
+    {...props}
+    className={undefined}
+    label={props.label || props.placeholder}
+    placeholder={undefined}
+    fullWidth
+    variant="standard"
+    size="small"
+    multiline={as === "textarea"}
+    minRows={as === "textarea" ? 6 : undefined}
+    error={Boolean(props["aria-invalid"])}
+    maxLength={maxLength}
+    slotProps={{ htmlInput: { maxLength } }}
+  />
+);
 
 const RequiredLabel = ({ children }) => (
   <label className={labelClassName}>
@@ -213,8 +233,8 @@ const BlogImageFileInput = ({
       <label className={labelClassName}>{label}</label>
     )}
     <div
-      className={`contribution-upload flex min-h-[42px] items-center gap-3 rounded-md border bg-white px-3 py-2 text-sm transition ${
-        error ? "border-red-500" : "border-black/10 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100"
+      className={`contribution-upload flex min-h-[32px] items-center gap-3 border-b bg-white text-sm transition ${
+        error ? "border-red-500" : "border-black/40 hover:border-black focus-within:border-primary-blue"
       }`}
     >
       <input
@@ -259,6 +279,35 @@ const DropdownBadge = ({
 }) => {
   const isInputVariant = variant === "input";
 
+  if (isInputVariant) {
+    const selectedOption = options.find(
+      (option) => option.value === selectedValue || option.label === selectedValue,
+    );
+
+    return (
+      <TextField
+        select
+        label={label}
+        required
+        fullWidth
+        variant="standard"
+        size="small"
+        disabled={disabled}
+        value={selectedOption?.value ?? ""}
+        onChange={(event) => {
+          const option = options.find(({ value }) => value === event.target.value);
+          if (option) onSelect(option);
+        }}
+      >
+        {options.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </TextField>
+    );
+  }
+
   return (
   <div className="relative w-full min-w-0 flex-1">
     <button
@@ -267,12 +316,12 @@ const DropdownBadge = ({
       disabled={disabled}
       className={
         isInputVariant
-          ? `flex min-h-[42px] w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm font-medium outline-none transition-colors ${
+          ? `flex min-h-[42px] w-full items-center justify-between gap-2 border-b py-2 text-base outline-none transition-colors ${
               disabled
-                ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
+                ? "cursor-not-allowed border-black/20 bg-white text-black/35"
                 : isOpen
-                  ? "border-sky-400 bg-white text-slate-700 ring-2 ring-sky-100"
-                  : "border-black/10 bg-white text-slate-700 hover:border-sky-400"
+                  ? "border-primary-blue bg-white text-slate-700"
+                  : "border-black/40 bg-white text-slate-700 hover:border-black"
             }`
           : `flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
               disabled
@@ -1280,7 +1329,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         </section>
       ) : (
         <section className="mt-0 bg-transparent px-0 py-2">
-          <div className="rounded-lg border border-slate-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
+          <div className="w-full py-6">
             <h1 className="mb-8 text-2xl font-semibold uppercase text-slate-700">
               Add {config.contentLabel}
             </h1>
@@ -1290,7 +1339,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               className="relative z-30 mb-5 grid gap-4 lg:grid-cols-3"
             >
               <div>
-                <RequiredLabel>Continent</RequiredLabel>
                 <DropdownBadge
                   label="Continent"
                   options={continentOptions}
@@ -1325,7 +1373,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
 
               <div>
-                <RequiredLabel>Country</RequiredLabel>
                 <DropdownBadge
                   label="Country"
                   options={countryOptions}
@@ -1359,7 +1406,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
 
               <div>
-                <RequiredLabel>Location</RequiredLabel>
                 <DropdownBadge
                   label="Location"
                   options={locationOptions}
@@ -1389,14 +1435,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
             <div className="grid gap-5 lg:grid-cols-3">
               <div>
-                <RequiredLabel>
-                  {isEventForm
+                <ContributionTextField label={isEventForm
                     ? "Event Name"
                     : isPlaceForm
                       ? "Place Name"
                       : "Main Title"}
-                </RequiredLabel>
-                <CharacterLimitedField
                   className={getFieldClassName(
                     isEventForm
                       ? "eventName"
@@ -1463,8 +1506,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   />
                 ) : (
                   <>
-                  <RequiredLabel>Main Image URL</RequiredLabel>
-                  <CharacterLimitedField
+                  <ContributionTextField label="Main Image URL"
                     className={getFieldClassName("mainImage")}
                     required
                     aria-invalid={Boolean(getErrorMessage("mainImage"))}
@@ -1481,8 +1523,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
               {isArticleContribution ? (
                 <div>
-                  <label className={labelClassName}>Source (optional)</label>
-                  <CharacterLimitedField
+                  <ContributionTextField label="Source (optional)"
                     className={getFieldClassName("source")}
                     aria-invalid={Boolean(getErrorMessage("source"))}
                     value={formValues.source}
@@ -1497,8 +1538,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               ) : null}
               {isEventForm ? (
                 <div>
-                  <RequiredLabel>Category</RequiredLabel>
-                  <CharacterLimitedField
+                  <ContributionTextField label="Category"
                     className={getFieldClassName("category")}
                     required
                     aria-invalid={Boolean(getErrorMessage("category"))}
@@ -1514,8 +1554,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               ) : null}
               {isPlaceForm ? (
                 <div>
-                  <RequiredLabel>Address</RequiredLabel>
-                  <CharacterLimitedField
+                  <ContributionTextField label="Address"
                     className={getFieldClassName("address")}
                     required
                     aria-invalid={Boolean(getErrorMessage("address"))}
@@ -1534,8 +1573,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             {config.formType === "event" ? (
               <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 <div>
-                  <RequiredLabel>Month</RequiredLabel>
-                  <CharacterLimitedField
+                  <ContributionTextField label="Month"
                     className={getFieldClassName("month")}
                     required
                     aria-invalid={Boolean(getErrorMessage("month"))}
@@ -1549,8 +1587,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   <FieldError message={getErrorMessage("month")} />
                 </div>
                 <div>
-                  <RequiredLabel>Venue</RequiredLabel>
-                  <CharacterLimitedField
+                  <ContributionTextField label="Venue"
                     className={getFieldClassName("venue")}
                     required
                     aria-invalid={Boolean(getErrorMessage("venue"))}
@@ -1564,8 +1601,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   <FieldError message={getErrorMessage("venue")} />
                 </div>
                 <div>
-                  <RequiredLabel>Type</RequiredLabel>
-                  <CharacterLimitedField
+                  <ContributionTextField label="Type"
                     className={getFieldClassName("eventType")}
                     required
                     aria-invalid={Boolean(getErrorMessage("eventType"))}
@@ -1583,8 +1619,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               <>
                 <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   <div>
-                    <RequiredLabel>Google Maps Link</RequiredLabel>
-                    <CharacterLimitedField
+                    <ContributionTextField label="Google Maps Link"
                       className={getFieldClassName("googleMapsLink")}
                       required
                       aria-invalid={Boolean(getErrorMessage("googleMapsLink"))}
@@ -1598,8 +1633,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("googleMapsLink")} />
                   </div>
                   <div>
-                    <RequiredLabel>Rating</RequiredLabel>
-                    <CharacterLimitedField
+                    <ContributionTextField label="Rating"
                       className={getFieldClassName("rating")}
                       required
                       aria-invalid={Boolean(getErrorMessage("rating"))}
@@ -1613,8 +1647,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("rating")} />
                   </div>
                   <div>
-                    <RequiredLabel>Type</RequiredLabel>
-                    <CharacterLimitedField
+                    <ContributionTextField label="Type"
                       className={getFieldClassName("placeType")}
                       required
                       aria-invalid={Boolean(getErrorMessage("placeType"))}
@@ -1631,8 +1664,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
                 <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
                   <div>
-                    <RequiredLabel>Category</RequiredLabel>
-                    <CharacterLimitedField
+                    <ContributionTextField label="Category"
                       className={getFieldClassName("category")}
                       required
                       aria-invalid={Boolean(getErrorMessage("category"))}
@@ -1646,8 +1678,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("category")} />
                   </div>
                   <div>
-                    <RequiredLabel>Month</RequiredLabel>
-                    <CharacterLimitedField
+                    <ContributionTextField label="Month"
                       className={getFieldClassName("month")}
                       required
                       aria-invalid={Boolean(getErrorMessage("month"))}
@@ -1661,8 +1692,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("month")} />
                   </div>
                   <div>
-                    <RequiredLabel>Venue</RequiredLabel>
-                    <CharacterLimitedField
+                    <ContributionTextField label="Venue"
                       className={getFieldClassName("venue")}
                       required
                       aria-invalid={Boolean(getErrorMessage("venue"))}
@@ -1676,8 +1706,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("venue")} />
                   </div>
                   <div>
-                    <RequiredLabel>Latitude</RequiredLabel>
-                    <CharacterLimitedField
+                    <ContributionTextField label="Latitude"
                       className={getFieldClassName("latitude")}
                       required
                       aria-invalid={Boolean(getErrorMessage("latitude"))}
@@ -1691,8 +1720,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("latitude")} />
                   </div>
                   <div>
-                    <RequiredLabel>Longitude</RequiredLabel>
-                    <CharacterLimitedField
+                    <ContributionTextField label="Longitude"
                       className={getFieldClassName("longitude")}
                       required
                       aria-invalid={Boolean(getErrorMessage("longitude"))}
@@ -1761,10 +1789,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             )}
 
             <div className="mt-6">
-              <RequiredLabel>
-                {isEventForm || isPlaceForm ? "Short Description" : "Main Content"}
-              </RequiredLabel>
-              <CharacterLimitedField
+              <ContributionTextField label={isEventForm || isPlaceForm ? "Short Description" : "Main Content"}
                 as="textarea"
                 className={`${getFieldClassName(
                   isEventForm || isPlaceForm ? "shortDescription" : "mainContent",
@@ -1816,7 +1841,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   {formValues.sections.map((section, index) => (
                     <div
                       key={index}
-                      className="rounded-lg border border-slate-200 bg-white p-4"
+                      className="border-t border-slate-200 pt-5"
                     >
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <h3 className="text-sm font-medium text-slate-600">
@@ -1836,8 +1861,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
                       <div className="space-y-4">
                         <div>
-                          <RequiredLabel>Section Title</RequiredLabel>
-                          <CharacterLimitedField
+                          <ContributionTextField label="Section Title"
                             className={getFieldClassName(
                               `sections.${index}.title`,
                             )}
@@ -1871,10 +1895,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             />
                           ) : (
                             <>
-                              <RequiredLabel>
-                                Section Image URL
-                              </RequiredLabel>
-                              <CharacterLimitedField
+                              <ContributionTextField label="Section Image URL"
                                 className={getFieldClassName(
                                   `sections.${index}.image`,
                                 )}
@@ -1896,8 +1917,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           )}
                         </div>
                         <div>
-                          <RequiredLabel>Section Content</RequiredLabel>
-                          <CharacterLimitedField
+                          <ContributionTextField label="Section Content"
                             as="textarea"
                             className={`${getFieldClassName(
                               `sections.${index}.content`,
