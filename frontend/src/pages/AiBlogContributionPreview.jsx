@@ -1056,7 +1056,7 @@ const ArticleInlineEdit = ({
         </section>
 
         <hr />
-        <footer className="grid w-full gap-4 sm:hidden">
+        <footer className="grid w-full items-start gap-4 md:grid-cols-3">
           <TextField
             label="Author"
             fullWidth
@@ -1085,28 +1085,6 @@ const ArticleInlineEdit = ({
             slotProps={{ htmlInput: { maxLength: contributionFieldLimits.source } }}
             value={formValues.source}
             onChange={(event) => updateFormField("source", event.target.value)}
-          />
-        </footer>
-        <footer className="hidden w-full gap-4 text-sm text-slate-600 sm:grid md:grid-cols-3 md:text-base">
-          <input
-            className="w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100"
-            value={formValues.author}
-            onChange={(event) => updateFormField("author", event.target.value)}
-            placeholder="Author"
-          />
-          <input
-            className="w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-left outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100 md:text-center"
-            type="date"
-            value={formValues.date}
-            onChange={(event) => updateFormField("date", event.target.value)}
-          />
-          <CharacterLimitedField
-            maxLength={contributionFieldLimits.source}
-            className="w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-left outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100 md:text-right"
-            value={formValues.source}
-            onChange={(event) => updateFormField("source", event.target.value)}
-            placeholder="Source (optional)"
-            aria-label="Source (optional)"
           />
         </footer>
       </div>
