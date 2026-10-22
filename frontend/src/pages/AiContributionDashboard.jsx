@@ -322,7 +322,7 @@ const ContributionCard = ({ item, config }) => {
               },
             })
           }
-          className="absolute left-1/2 top-1/2 inline-flex -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/55 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-black/70"
+          className="absolute left-1/2 top-1/2 inline-flex w-max max-w-[calc(100%_-_1rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/55 px-4 py-1.5 text-center text-xs font-medium text-white transition hover:bg-black/70 sm:w-auto sm:max-w-none"
         >
           {isEditableDraft
             ? `Edit ${config.contentLabel} Draft`
@@ -607,7 +607,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
                             state: { freshAdd: true, openForm: true },
                           })
                         }
-                        className="inline-flex w-fit items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500"
+                        className="inline-flex w-fit self-end items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500 lg:self-auto"
                       >
                         <HiPlus size={18} />
                         {selectedFilterConfig.addLabel}
@@ -629,7 +629,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
                 </div>
 
                 {sortedSubmittedContributions.length > 0 ? (
-                  <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                  <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-5">
                     {sortedSubmittedContributions.map(({ item, config: itemConfig }) => (
                       <ContributionCard
                         key={`${itemConfig.contentLabel}-${item._id || item.id}`}
@@ -651,7 +651,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
                     {config.draftHeading}
                   </h2>
                   {draftContributions.length > 0 ? (
-                    <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                    <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-5">
                       {draftContributions.map(({ item, config: itemConfig }) => (
                         <ContributionCard
                           key={`${itemConfig.contentLabel}-draft-${item._id || item.id}`}
