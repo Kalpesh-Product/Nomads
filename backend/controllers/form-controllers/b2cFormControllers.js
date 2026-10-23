@@ -1027,7 +1027,7 @@ export const addB2CformSubmission = async (req, res, next) => {
             heroSubtitle: "Thank you for your interest in contributing to WONO.",
             greetingHtml: `
               <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
-              <p class="email-text" style="margin:0;">Thank you for your interest in contributing to WONO. Our team has received your details and will get back to you shortly.</p>
+              <p class="email-text" style="margin:0;">Thank you for your interest in contributing to WONO. Our team has received your details and will approve your request within 2 working days.</p>
             `,
             detailsTitle: "Request Details",
             detailRows: [

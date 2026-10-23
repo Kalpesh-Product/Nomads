@@ -2,10 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
   Button,
-  Checkbox,
   CircularProgress,
   InputAdornment,
-  ListSubheader,
   MenuItem,
   TextField,
 } from "@mui/material";
@@ -48,33 +46,28 @@ const PENDING_CONTRIBUTOR_SUBMISSION_KEY =
 const PENDING_CONTRIBUTOR_SUBMISSION_MAX_AGE = 30 * 60 * 1000;
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
-const CONTRIBUTION_TYPE_GROUPS = [
-  {
-    label: "Contributor",
-    options: [
-      "Become a Blogger",
-      "Become A News Writer",
-      "Contribute To Places",
-      "Contribute To Events",
-    ],
-  },
-  {
-    label: "Partner",
-    options: [
-      "Become a Visa & Immigration Partner",
-      "Become a Company Setup Services Partner",
-      "Become a Activation Support Partner",
-      "Become a Consultation Support Partner",
-      "Become a Workation Support Partner",
-      "Not Sure - Lets Connect & Explore",
-    ],
-  },
+const CONTRIBUTION_TYPE_OPTIONS = [
+  "Become a Nomad Blog & News Writer",
+  "Become a Content Creator",
+  "Add your Business Listing & Services",
+  "Become a Overall Destination Partner",
+  "Become a Local Experience Partner",
+  "Become a Visa & Immigration Partner",
+  "Become a Tax & Financial Advisory Partner",
+  "Become a Company Setup Services Partner",
+  "Become a Remote Jobs Posting Partner",
+  "Not Sure - Lets Connect & Explore",
 ];
-const CONTRIBUTOR_CONTRIBUTION_OPTIONS = CONTRIBUTION_TYPE_GROUPS[0].options;
+// Expand each displayed contributor choice into the existing API role options.
+const CONTRIBUTOR_ROLES_BY_OPTION = {
+  "Become a Nomad Blog & News Writer": [
+    "Become a Blogger",
+    "Become A News Writer",
+  ],
+  "Become a Content Creator": ["Contribute To Places", "Contribute To Events"],
+};
 const getSelectedContributorOptions = (selectedOptions = []) =>
-  selectedOptions.filter((option) =>
-    CONTRIBUTOR_CONTRIBUTION_OPTIONS.includes(option),
-  );
+  selectedOptions.flatMap((option) => CONTRIBUTOR_ROLES_BY_OPTION[option] || []);
 
 const readPendingContributorSubmission = () => {
   if (typeof window === "undefined") return null;
@@ -449,18 +442,6 @@ const AiBecomeContributor = () => {
                       SelectProps={{
                         multiple: true,
                         renderValue: (selected) => selected.join(", "),
-                        MenuProps: {
-                          PaperProps: {
-                            sx: {
-                              mt: 0.5,
-                              maxHeight: 420,
-                              "& .MuiMenuItem-root": {
-                                minHeight: 32,
-                                py: 0.5,
-                              },
-                            },
-                          },
-                        },
                       }}
                       onChange={(event) => {
                         const value = event.target.value;
@@ -469,37 +450,18 @@ const AiBecomeContributor = () => {
                         );
                       }}
                     >
-                      {CONTRIBUTION_TYPE_GROUPS.map((group) => [
-                        <ListSubheader
-                          key={group.label}
-                          disableSticky
-                          sx={{
-                            color: "black",
-                            fontSize: "1rem",
-                            fontWeight: 700,
-                            lineHeight: 1.4,
-                            pt: 1.5,
-                            pb: 0.5,
-                          }}
+                      {CONTRIBUTION_TYPE_OPTIONS.map((option) => (
+                        <MenuItem
+                          key={option}
+                          value={option}
+                          sx={tickMenuItemSx}
                         >
-                          {group.label}
-                        </ListSubheader>,
-                        ...group.options.map((option) => (
-                          <MenuItem key={option} value={option}>
-                            <Checkbox
-                              checked={field.value.includes(option)}
-                              size="small"
-                              sx={{
-                                color: "#666",
-                                mr: 1,
-                                p: 0,
-                                "&.Mui-checked": { color: "#1976d2" },
-                              }}
-                            />
+                          <Box className="flex w-full items-center gap-2">
+                            <HiCheck className="tick-icon" size={16} />
                             <span>{option}</span>
-                          </MenuItem>
-                        )),
-                      ])}
+                          </Box>
+                        </MenuItem>
+                      ))}
                     </TextField>
                   )}
                 />
