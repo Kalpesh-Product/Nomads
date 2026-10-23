@@ -607,7 +607,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
                             state: { freshAdd: true, openForm: true },
                           })
                         }
-                        className="inline-flex w-fit self-end items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500 lg:self-auto"
+                        className="inline-flex w-fit self-center items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500 sm:self-end lg:self-auto"
                       >
                         <HiPlus size={18} />
                         {selectedFilterConfig.addLabel}
