@@ -90,6 +90,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    contributionsActivationEmailSentAt: {
+      type: Date,
+      default: null,
+    },
     refreshToken: {
       type: String,
     },

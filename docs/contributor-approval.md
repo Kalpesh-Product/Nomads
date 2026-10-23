@@ -27,5 +27,11 @@ The sidebar refreshes role flags every 30 seconds while the tab is active and
 when the user returns to the tab. It shows Contributions if any role is active;
 the contribution pages expose only the activated categories.
 
+The first activation sends the account's registered email a notification using
+the shared WONO email shell and a link to Contributions. An atomic
+`contributionsActivationEmailSentAt` reservation prevents duplicate notifications
+across role approvals and reactivations. Delivery failure clears the reservation
+for a later retry and returns a warning without revoking the approval.
+
 Run focused checks with `node --test tests/contributorApproval.test.js` from
 `backend/`.

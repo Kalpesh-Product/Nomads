@@ -3,6 +3,7 @@ import BecomeContributor from "../models/BecomeContributor.js";
 import mongoose from "mongoose";
 import NomadUser from "../models/NomadUser.js";
 import { CONTRIBUTOR_ROLE_OPTIONS, getContributorRoleStatus, getRequestedContributorRoles } from "../utils/contributorRoles.js";
+import { notifyFirstContributorActivation } from "../utils/contributorActivationEmail.js";
 
 const MESSAGE_CHARACTER_LIMIT = 1000;
 
@@ -89,10 +90,20 @@ export const updateContributorLeadStatus = async (req, res, next) => {
       lead.nomadUser ? { _id: lead.nomadUser } : { email: lead.email },
       { $set: { [role]: isActive } },
       { new: true, runValidators: true },
-    ).select("isBlogger isNewsWriter isEventWriter isPlaceWriter").lean();
+    ).select("fullName email isBlogger isNewsWriter isEventWriter isPlaceWriter").lean();
     if (!user) return res.status(409).json({ message: "No Nomad account is linked to this lead. The contributor must register first." });
+    let warning;
+    if (isActive) {
+      try {
+        await notifyFirstContributorActivation(user);
+      } catch (error) {
+        console.error("Contributor activation email failed:", error.message);
+        warning = "Contributor access is active, but the activation email could not be sent. Please retry marking this contributor active.";
+      }
+    }
     return res.status(200).json({
-      message: `Contributor access marked as ${isActive ? "active" : "inactive"}.`,
+      message: warning || `Contributor access marked as ${isActive ? "active" : "inactive"}.`,
+      ...(warning ? { warning } : {}),
       data: { ...lead, ...getContributorRoleStatus(user) },
     });
   } catch (error) {
