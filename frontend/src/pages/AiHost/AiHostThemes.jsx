@@ -9,6 +9,7 @@ import {
   templateDemoUrl,
 } from "../../constants/verticalTemplateCatalog";
 import { useWebsiteThemeCatalog } from "../../hooks/useWebsiteThemeCatalog";
+import { nearestColorName } from "../../utils/colorName";
 
 const categoryLabel = (tag, filters) =>
   filters.find((filter) => filter.value === tag)?.label || tag;
@@ -108,15 +109,17 @@ const ThemeCard = ({ template, index, onSelect, filters }) => {
             {[template.swatch.bg, template.swatch.fg, template.swatch.accent].map((color) => (
               <span
                 key={color}
+                title={nearestColorName(color)}
                 className="h-3 w-3 rounded-full border border-black/15"
                 style={{ backgroundColor: color }}
-                aria-hidden="true"
+                role="img"
+                aria-label={nearestColorName(color)}
               />
             ))}
           </div>
         </div>
 
-        <p className="mt-4 text-sm leading-6 text-black/65 sm:text-base">
+        <p className="mt-4 line-clamp-2 text-sm leading-6 text-black/65 sm:text-base">
           {template.description}
         </p>
 
@@ -163,6 +166,11 @@ const Themes = () => {
   const gridRef = useRef(null);
   const [verticalFilter, setVerticalFilter] = useState("all");
   const [filtersDocked, setFiltersDocked] = useState(false);
+  // The top bar is sticky only while there's still a grid of cards under it to
+  // filter — once you've scrolled past the last live card (into proof points,
+  // footer, etc.) there's nothing left for the filters to act on, so it's
+  // released back into normal flow instead of floating over unrelated content.
+  const [filtersActive, setFiltersActive] = useState(true);
   const { themes } = useWebsiteThemeCatalog();
   const verticalFilters = buildVerticalFilters(themes);
   const liveThemes = themes.filter((template) => template.status !== "coming-soon");
@@ -171,6 +179,10 @@ const Themes = () => {
     verticalFilter === "all"
       ? themes
       : themes.filter((template) => template.tag === verticalFilter);
+  // Coming-soon templates get their own callout below instead of sitting
+  // in the grid as disabled cards mixed in among the live, clickable ones.
+  const liveFilteredTemplates = filteredTemplates.filter((template) => template.status !== "coming-soon");
+  const comingSoonFilteredTemplates = filteredTemplates.filter((template) => template.status === "coming-soon");
 
   const viewTemplate = (template) => {
     navigate("/product", { state: { template } });
@@ -194,19 +206,27 @@ const Themes = () => {
     }
     const scrollTarget = node && node !== document.body ? node : window;
 
-    let ticking = false;
+    // Deliberately no manual rAF/"ticking" throttle here: that pattern sets a
+    // flag before the animation frame fires and only clears it inside the
+    // frame callback. If a single frame is ever dropped — the tab losing
+    // visibility mid-scroll is enough — the flag never clears and every
+    // future scroll event is silently ignored for the rest of the page's
+    // life. getBoundingClientRect() x2 + a setState is cheap enough to just
+    // run directly on every scroll event.
     const checkDocked = () => {
-      ticking = false;
-      setFiltersDocked(inline.getBoundingClientRect().top <= bar.getBoundingClientRect().height);
-    };
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(checkDocked);
+      const barHeight = bar.getBoundingClientRect().height;
+      setFiltersDocked(inline.getBoundingClientRect().top <= barHeight);
+
+      const grid = gridRef.current;
+      if (grid) {
+        // Once the grid's bottom edge has scrolled above where the sticky bar
+        // sits, no cards are left below it to filter — release the stickiness.
+        setFiltersActive(grid.getBoundingClientRect().bottom > barHeight);
+      }
     };
     checkDocked();
-    scrollTarget.addEventListener("scroll", onScroll, { passive: true });
-    return () => scrollTarget.removeEventListener("scroll", onScroll);
+    scrollTarget.addEventListener("scroll", checkDocked, { passive: true });
+    return () => scrollTarget.removeEventListener("scroll", checkDocked);
   }, []);
 
   // The filter bar is sticky so it's always clickable, but if you're scrolled
@@ -242,7 +262,7 @@ const Themes = () => {
       const grid = gridRef.current;
       const bar = topBarRef.current;
       if (!grid || !bar) return;
-      const BREATHING_ROOM = 24; // a little gap below the bar so card buttons aren't flush against it
+      const BREATHING_ROOM = 85; // a little gap below the bar so card buttons aren't flush against it
       const targetTop = bar.getBoundingClientRect().height + BREATHING_ROOM;
       const delta = grid.getBoundingClientRect().top - targetTop;
       if (Math.abs(delta) <= 1) return;
@@ -261,7 +281,11 @@ const Themes = () => {
 
   return (
     <div className="text-secondary-dark">
-      <div ref={topBarRef} className="sticky top-0 z-50 -mx-1 flex min-h-[52px] items-center gap-3 border-b border-black/5 bg-white/95 px-1 py-3 backdrop-blur-md md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
+      <div
+        ref={topBarRef}
+        className={`z-50 -mx-1 flex min-h-[52px] items-center gap-3 border-b border-black/5 bg-white/95 px-1 py-3 backdrop-blur-md md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24 ${filtersActive ? "sticky top-0" : ""}`}
+      >
+
         <button
           type="button"
           onClick={() => (locationKey !== "default" ? navigate(-1) : navigate("/"))}
@@ -270,12 +294,19 @@ const Themes = () => {
         >
           <HiOutlineArrowLeft size={18} />
         </button>
-        <span className="shrink-0 text-lg font-medium text-primary-blue">Themes</span>
+        <span className={`shrink-0 text-lg font-medium text-primary-blue ${filtersDocked ? "hidden sm:inline" : ""}`}>Themes</span>
         {filtersDocked ? (
           <>
             <span className="hidden h-5 w-px shrink-0 bg-black/10 sm:block" aria-hidden="true" />
-            <div className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-x-auto custom-scrollbar-hide">
-              <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} compact />
+            {/* justify-start, not -center: centering an overflowing flex row
+                makes the browser clip equally from both ends at scrollLeft 0,
+                so the FIRST pills ("All", "Cafe") were invisible by default
+                and you'd land mid-list instead of at the start. */}
+            <div className="relative min-w-0 flex-1 overflow-hidden">
+              <div className="flex items-center justify-center gap-2 overflow-x-auto custom-scrollbar-hide">
+                <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} compact />
+              </div>
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white/95 to-transparent" aria-hidden="true" />
             </div>
           </>
         ) : null}
@@ -338,7 +369,7 @@ const Themes = () => {
         </div>
       </section>
 
-      <section id="theme-library" className="scroll-mt-24 py-16 sm:py-20 lg:py-24">
+      <section id="theme-library" className="scroll-mt-24 py-10 sm:py-10 lg:py-12">
         {/* overflow-anchor: none — without it, the browser's scroll anchoring
             "helpfully" compensates for this box resizing as Framer Motion
             animates cards in/out (which keeps happening for ~0.4s after our
@@ -353,7 +384,7 @@ const Themes = () => {
               </h2>
             </div>
             <p className="shrink-0 text-sm text-black/55" aria-live="polite">
-              Showing {filteredTemplates.length} {filteredTemplates.length === 1 ? "theme" : "themes"}
+              Showing {liveFilteredTemplates.length} {liveFilteredTemplates.length === 1 ? "theme" : "themes"}
             </p>
           </div>
 
@@ -363,7 +394,7 @@ const Themes = () => {
 
           <Motion.div layout ref={gridRef} className="mt-8 flex flex-wrap justify-center gap-5 xl:gap-7">
             <AnimatePresence mode="popLayout" onExitComplete={correctFilterScroll}>
-              {filteredTemplates.map((template, index) => (
+              {liveFilteredTemplates.map((template, index) => (
                 <ThemeCard
                   key={template.id}
                   template={template}
@@ -375,20 +406,34 @@ const Themes = () => {
             </AnimatePresence>
           </Motion.div>
 
-          <div className="mx-auto mt-14 max-w-xl border-t border-black/10 pt-10 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">More coming soon</p>
-            <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-secondary-dark sm:text-3xl">
-              New themes are on the way.
-            </h3>
-            <p className="mt-3 text-sm leading-6 text-black/55">
-              We are building more experiences for new business types and industries.
-            </p>
-          </div>
+          {comingSoonFilteredTemplates.length > 0 ? (
+            <div className="mt-14 border-t border-black/10 pt-10">
+              <div className="text-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">More coming soon</p>
+                <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-secondary-dark sm:text-3xl">
+                  {comingSoonFilteredTemplates.length === 1
+                    ? `${comingSoonFilteredTemplates[0].name} is on the way.`
+                    : "More themes for this category are on the way."}
+                </h3>
+              </div>
+              <div className="mt-8 flex flex-wrap justify-center gap-5 xl:gap-7">
+                {comingSoonFilteredTemplates.map((template, index) => (
+                  <ThemeCard
+                    key={template.id}
+                    template={template}
+                    index={index}
+                    onSelect={viewTemplate}
+                    filters={verticalFilters}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
 
       <section className="border-y border-black/10 py-14 sm:py-16">
-        <div className="mx-auto grid max-w-[80rem] gap-10 md:grid-cols-3 md:gap-0">
+        <div className="mx-auto grid max-w-[80rem] gap-10 px-6 md:grid-cols-3 md:gap-0">
           {proofPoints.map((item, index) => (
             <div
               key={item.number}
@@ -402,8 +447,8 @@ const Themes = () => {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 lg:py-24">
-        <div className="mx-auto flex max-w-[80rem] flex-col items-start justify-between gap-8 bg-sky-50 p-7 sm:p-10 lg:flex-row lg:items-end lg:p-14">
+      <section className="py-16 sm:py-10 lg:py-10">
+        <div className="mx-auto flex max-w-[80rem] flex-col items-start justify-between gap-8 bg-white p-7 sm:p-10 lg:flex-row lg:items-end lg:p-14">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">Your website, your way</p>
             <h2 className="mt-4 text-[clamp(2.2rem,4.5vw,4.5rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark">
