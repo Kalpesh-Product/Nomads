@@ -1054,6 +1054,10 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     // Build payload
     const payload = config.map(validatedData);
+    if (sheetName === "AI_Become_Contributor") {
+      payload.nomadUser = req.userData?._id || null;
+      await BecomeContributor.create(payload);
+    }
 
     if (isFastResponseSheet) {
       responseSent = true;
@@ -1092,10 +1096,6 @@ export const addB2CformSubmission = async (req, res, next) => {
 
           if (sheetName === "AI_Workation") {
             await Workation.create(payload);
-          }
-
-          if (sheetName === "AI_Become_Contributor") {
-            await BecomeContributor.create(payload);
           }
 
           let sheetsWarning = null;
@@ -1240,10 +1240,6 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     if (sheetName === "AI_Workation") {
       await Workation.create(payload);
-    }
-
-    if (sheetName === "AI_Become_Contributor") {
-      await BecomeContributor.create(payload);
     }
 
     let sheetsWarning = null;

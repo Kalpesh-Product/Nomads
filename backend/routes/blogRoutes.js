@@ -16,14 +16,16 @@ import upload from "../config/multerConfig.js";
 import { verifyJwt } from "../middlewares/verifyJwt.js";
 import { verifyAdminApiKey } from "../middlewares/verifyAdminApiKey.js";
 
+import { requireContributorRole } from "../middlewares/contributorAccess.js";
+
 const router = Router();
 
 router.get("/blogs", getBlogs);
 router.get("/get-blogs", getBlogs);
 router.get("/destination-counts", getBlogDestinationCounts);
-router.get("/my", verifyJwt, getMyBlogs);
-router.post("/my", verifyJwt, upload.any(), createMyBlog);
-router.patch("/my/:id", verifyJwt, upload.any(), updateMyBlog);
+router.get("/my", verifyJwt, requireContributorRole("isBlogger"), getMyBlogs);
+router.post("/my", verifyJwt, requireContributorRole("isBlogger"), upload.any(), createMyBlog);
+router.patch("/my/:id", verifyJwt, requireContributorRole("isBlogger"), upload.any(), updateMyBlog);
 router.get("/contributions", verifyAdminApiKey, getBlogContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updateBlogContributionStatus);
 router.post("/blogs", createBlog);

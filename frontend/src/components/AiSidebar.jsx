@@ -6,6 +6,7 @@ import {
   readStoredLoginState,
 } from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
+import useContributorRoleSync from "../hooks/useContributorRoleSync";
 import useLogout from "../hooks/useLogout";
 import logo from "../assets/WONO_LOGO_Black_TP.svg";
 import {
@@ -361,6 +362,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const queryClient = useQueryClient();
 
   const { auth } = useAuth();
+  useContributorRoleSync();
   const logout = useLogout();
   const userFullName = auth?.user?.fullName?.trim() || "Profile";
 

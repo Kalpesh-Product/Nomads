@@ -17,13 +17,15 @@ import {
 import { verifyJwt } from "../middlewares/verifyJwt.js";
 import { verifyAdminApiKey } from "../middlewares/verifyAdminApiKey.js";
 
+import { requireContributorRole } from "../middlewares/contributorAccess.js";
+
 const router = Router();
 
 router.get("/", getEvents);
 router.get("/destination/:destination", getEventsByDestination);
-router.get("/my", verifyJwt, getMyEvents);
-router.post("/my", verifyJwt, upload.any(), createMyEvent);
-router.patch("/my/:id", verifyJwt, upload.any(), updateMyEvent);
+router.get("/my", verifyJwt, requireContributorRole("isEventWriter"), getMyEvents);
+router.post("/my", verifyJwt, requireContributorRole("isEventWriter"), upload.any(), createMyEvent);
+router.patch("/my/:id", verifyJwt, requireContributorRole("isEventWriter"), upload.any(), updateMyEvent);
 router.get("/contributions", verifyAdminApiKey, getEventContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updateEventContributionStatus);
 router.get("/:eventId", getEventById);

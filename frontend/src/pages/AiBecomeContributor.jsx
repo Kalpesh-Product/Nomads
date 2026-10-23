@@ -138,7 +138,7 @@ const AiBecomeContributor = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const axiosPrivate = useAxiosPrivate();
-  const { auth, setAuth } = useAuth();
+  const { auth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
@@ -171,26 +171,8 @@ const AiBecomeContributor = () => {
 
   const { mutate: submitContributor } = useMutation({
     mutationFn: async ({ formValues, contributorOptions }) => {
-      if (isLoggedIn && contributorOptions.length) {
-        const contributorRoleResponse = await axiosPrivate.patch(
-          "/user/contributor-roles",
-          {
-            contributionTypes: contributorOptions,
-          },
-        );
-
-        if (contributorRoleResponse?.data?.user) {
-          setAuth((prevState) => ({
-            ...prevState,
-            user: {
-              ...prevState.user,
-              ...contributorRoleResponse.data.user,
-            },
-          }));
-        }
-      }
-
-      const response = await axios.post("forms/add-new-b2c-form-submission", {
+      const client = isLoggedIn && contributorOptions.length ? axiosPrivate : axios;
+      const response = await client.post("forms/add-new-b2c-form-submission", {
         ...formValues,
         sheetName: "AI_Become_Contributor",
       });
