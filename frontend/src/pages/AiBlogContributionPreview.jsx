@@ -462,8 +462,17 @@ const editTitleClassName =
   "w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-title font-bold leading-normal outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100";
 const editTextAreaClassName =
   "w-full resize-y rounded-lg border border-transparent bg-white/70 px-3 py-2 leading-relaxed outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100";
-const editImageInputClassName =
-  "mt-3 w-full rounded-full border border-black/10 bg-white px-4 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-300 focus:ring-2 focus:ring-sky-100";
+const ArticleEditField = ({ maxLength, ...props }) => (
+  <CharacterLimitedField
+    as={TextField}
+    fullWidth
+    variant="standard"
+    size="small"
+    {...props}
+    maxLength={maxLength}
+    slotProps={{ htmlInput: { maxLength } }}
+  />
+);
 
 const ArticleFields = ({ formValues, updateFormField }) => (
   <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -937,12 +946,11 @@ const ArticleInlineEdit = ({
 
       <div className="flex flex-col gap-8">
         <section className="clear-both flow-root">
-          <CharacterLimitedField
+          <ArticleEditField
             maxLength={contributionFieldLimits.mainTitle}
-            className={editTitleClassName}
             value={formValues.mainTitle}
             onChange={(event) => updateFormField("mainTitle", event.target.value)}
-            placeholder="Main title"
+            label="Main title"
           />
 
           <div className="mt-6">
@@ -961,24 +969,24 @@ const ArticleInlineEdit = ({
                 onClear={() => updateBlogImageFile("mainImage", null)}
               />
             ) : (
-              <CharacterLimitedField
+              <ArticleEditField
                 maxLength={contributionFieldLimits.mainImage}
-                className={editImageInputClassName}
+                className="mt-3"
                 value={formValues.mainImage}
                 onChange={(event) => updateFormField("mainImage", event.target.value)}
-                placeholder="Main image URL"
+                label="Main image URL"
               />
             )}
           </div>
 
-          <CharacterLimitedField
-
-            as="textarea"
+          <ArticleEditField
+            multiline
+            minRows={8}
             maxLength={contributionFieldLimits.mainContent}
-            className={`${editTextAreaClassName} mt-5 min-h-[220px]`}
+            className="mt-5"
             value={formValues.mainContent}
             onChange={(event) => updateFormField("mainContent", event.target.value)}
-            placeholder="Main content"
+            label="Main content"
           />
         </section>
 
@@ -1003,12 +1011,12 @@ const ArticleInlineEdit = ({
                 ) : null}
               </div>
 
-              <CharacterLimitedField
+              <ArticleEditField
                 maxLength={contributionFieldLimits.sectionTitle}
-                className="mb-4 w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-card-title font-bold leading-[1.2] outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100 md:leading-[1.35]"
+                className="mb-4"
                 value={section.title}
                 onChange={(event) => updateSection(index, "title", event.target.value)}
-                placeholder="Section title"
+                label="Section title"
               />
               <EditableFloatingImage
                 src={section.image}
@@ -1026,21 +1034,22 @@ const ArticleInlineEdit = ({
                   onClear={() => updateSectionImageFile(index, null)}
                 />
               ) : (
-                <CharacterLimitedField
+                <ArticleEditField
                   maxLength={contributionFieldLimits.sectionImage}
-                  className={editImageInputClassName}
+                  className="mt-3"
                   value={section.image}
                   onChange={(event) => updateSection(index, "image", event.target.value)}
-                  placeholder="Section image URL"
+                  label="Section image URL"
                 />
               )}
-              <CharacterLimitedField
-                as="textarea"
-            maxLength={contributionFieldLimits.sectionContent}
-                className={`${editTextAreaClassName} mt-4 min-h-[170px]`}
+              <ArticleEditField
+                multiline
+                minRows={6}
+                maxLength={contributionFieldLimits.sectionContent}
+                className="mt-4"
                 value={section.content}
                 onChange={(event) => updateSection(index, "content", event.target.value)}
-                placeholder="Section content"
+                label="Section content"
               />
             </article>
           ))}
