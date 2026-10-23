@@ -6,6 +6,7 @@ import {
   readStoredLoginState,
 } from "../hooks/useNomadLoginState";
 import useAuth from "../hooks/useAuth";
+import useContributorRoleSync from "../hooks/useContributorRoleSync";
 import useLogout from "../hooks/useLogout";
 import logo from "../assets/WONO_LOGO_Black_TP.svg";
 import {
@@ -18,6 +19,7 @@ import {
   HiOutlineHeart,
   HiOutlineUserCircle,
   HiOutlineKey,
+  HiOutlineLink,
   HiOutlineLogout,
   HiOutlineLogin,
 } from "react-icons/hi";
@@ -128,6 +130,60 @@ const profileItems = [
   { label: "Reviews", icon: MdRateReview, tab: "reviews" },
   { label: "Change Password", icon: HiOutlineKey, tab: "password" },
 ];
+
+const contributionProfileItems = [
+  {
+    label: "Contributions",
+    icon: HiOutlineViewGrid,
+    path: "/contributions",
+    flags: ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"],
+  },
+  {
+    label: "Contributions 2",
+    icon: HiOutlineViewGrid,
+    path: "/contributions-2",
+    flags: ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"],
+    hiddenFromSidebar: true,
+  },
+  {
+    label: "All Contributions",
+    icon: HiOutlineLink,
+    path: "/contributions/all",
+    flags: ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"],
+    hiddenFromSidebar: true,
+  },
+  {
+    label: "Blog Contributions",
+    icon: HiOutlineLink,
+    path: "/contributions/blog",
+    flag: "isBlogger",
+    hiddenFromSidebar: true,
+  },
+  {
+    label: "News Contributions",
+    icon: HiOutlineLink,
+    path: "/contributions/news",
+    flag: "isNewsWriter",
+    hiddenFromSidebar: true,
+  },
+  {
+    label: "Event Contributions",
+    icon: HiOutlineLink,
+    path: "/contributions/event",
+    flag: "isEventWriter",
+    hiddenFromSidebar: true,
+  },
+  {
+    label: "Places Contributions",
+    icon: HiOutlineLink,
+    path: "/contributions/places",
+    flag: "isPlaceWriter",
+    hiddenFromSidebar: true,
+  },
+];
+const contributionProfilePaths = contributionProfileItems.map(
+  (item) => item.path,
+);
 
 const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
@@ -306,11 +362,18 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const queryClient = useQueryClient();
 
   const { auth } = useAuth();
+  useContributorRoleSync();
   const logout = useLogout();
   const userFullName = auth?.user?.fullName?.trim() || "Profile";
 
   const profileItemsWithUserName = profileItems.map((item) =>
     item.label === "userFullName" ? { ...item, label: userFullName } : item,
+  );
+  const visibleContributionProfileItems = contributionProfileItems.filter(
+    (item) =>
+      !item.hiddenFromSidebar &&
+      (Boolean(auth?.user?.[item.flag]) ||
+        item.flags?.some((flag) => Boolean(auth?.user?.[flag]))),
   );
 
   useEffect(() => {
@@ -320,6 +383,11 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
     const isAiHomePage = normalizedPath === "/";
+    const isProfilePage =
+      normalizedPath === "/profile" ||
+      contributionProfilePaths.some(
+        (path) => normalizedPath === path || normalizedPath.startsWith(`${path}/`),
+      );
     const isValueAdditionPage = valueAdditionItems.some((item) => {
       if (!item.path) return false;
 
@@ -338,6 +406,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
     setIsRecommendationsOpen(true);
     setIsValueAdditionsOpen(isValueAdditionPage);
+    setIsProfileOpen(isProfilePage);
   }, [location.pathname]);
 
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
@@ -389,6 +458,15 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   };
 
   const handleProfileClick = (item) => {
+    if (item.path) {
+      const params = new URLSearchParams(location.search);
+      navigate({
+        pathname: item.path,
+        search: params.toString() ? `?${params.toString()}` : "",
+      });
+      return;
+    }
+
     if (!item.tab) return;
 
     const params = new URLSearchParams(location.search);
@@ -523,6 +601,25 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       normalizedPath === becomeContributorLink.path ||
       normalizedPath.startsWith(`${becomeContributorLink.path}/`),
   };
+  const profileItemsWithActivePath = profileItemsWithUserName.map((item) => ({
+    ...item,
+    active:
+      item.path &&
+      (normalizedPath === item.path ||
+        normalizedPath.startsWith(`${item.path}/`)),
+  }));
+  const contributionProfileItemsWithActivePath =
+    visibleContributionProfileItems.map((item) => ({
+      ...item,
+      active:
+        normalizedPath === item.path ||
+        normalizedPath.startsWith(`${item.path}/`),
+    }));
+  const finalProfileItems = [
+    ...profileItemsWithActivePath.slice(0, 3),
+    ...contributionProfileItemsWithActivePath,
+    ...profileItemsWithActivePath.slice(3),
+  ];
 
   return (
     <>
@@ -605,7 +702,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
           <>
             <SidebarSection
               title="Profile"
-              items={profileItemsWithUserName}
+              items={finalProfileItems}
               collapsed={isCollapsed}
               isExpandable
               isOpen={isProfileOpen}

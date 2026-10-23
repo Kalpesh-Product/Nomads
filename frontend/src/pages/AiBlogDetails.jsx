@@ -9,6 +9,27 @@ const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX =
 const ARE_GUIDES_TEMPORARILY_DISABLED = false;
 const CONTENT_DISCLAIMER_TOUR_SELECTOR =
   '[data-tour="content-disclaimer-section"]';
+const getStoredPreviewContent = (search = "") => {
+  const previewKey = new URLSearchParams(search).get("previewKey");
+  if (!previewKey) return null;
+
+  try {
+    const storedContent =
+      localStorage.getItem(previewKey) || sessionStorage.getItem(previewKey);
+    return storedContent ? JSON.parse(storedContent) : null;
+  } catch {
+    return null;
+  }
+};
+
+const normalizeArticleContent = (content = {}) => ({
+  ...content,
+  mainTitle: content.mainTitle || content.title || "",
+  mainImage: content.mainImage || content.image || "",
+  mainContent:
+    content.mainContent || content.content || content.description || "",
+  sections: Array.isArray(content.sections) ? content.sections : [],
+});
 
 const AiBlogDetails = () => {
   // const newsContent = [
@@ -42,7 +63,9 @@ const AiBlogDetails = () => {
   //   },
   // ];
   const location = useLocation();
-  const { content } = location.state || {};
+  const content = normalizeArticleContent(
+    location.state?.content || getStoredPreviewContent(location.search) || {},
+  );
   console.log("content : ", content);
   const newsContent = content?.sections || [];
   let sectionImageIndex = 0;
