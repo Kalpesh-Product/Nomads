@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios, { axiosPrivate } from "../utils/axios"; // ✅ use same axios config as signup
 // import toast from "react-hot-toast";
 import PrimaryButton from "../components/PrimaryButton";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
@@ -13,6 +13,8 @@ import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 export default function LoginPage() {
   const { auth, setAuth } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from || "/profile";
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -25,7 +27,8 @@ export default function LoginPage() {
 
   // inside your component
   useEffect(() => {
-    if (auth?.user) navigate("/profile", { replace: true });
+    if (auth?.user) navigate(redirectTo, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth, navigate]);
 
   const { mutate: submitLogin, isPending: isLoginPending } = useMutation({
@@ -51,8 +54,8 @@ export default function LoginPage() {
       });
       reset();
 
-      // ✅ Redirect to profile page after login
-      navigate("/profile");
+      // ✅ Redirect back to where the user came from (defaults to profile)
+      navigate(redirectTo);
     },
     onError: (error) => {
       if (error.response) {
@@ -156,7 +159,9 @@ export default function LoginPage() {
             <p className="text-gray-600 hover:text-black ">
               <span>New to WoNo? </span>
               <span className="underline">
-                <Link to="/signup">Sign Up</Link>
+                <Link to="/signup" state={location.state}>
+                  Sign Up
+                </Link>
               </span>
             </p>
           </div>

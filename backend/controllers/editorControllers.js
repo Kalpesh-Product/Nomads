@@ -105,6 +105,8 @@ const normalizeProductDropdownPages = (items = []) => {
         faqs: Array.isArray(item?.faqs) ? item.faqs : [],
         subProducts: Array.isArray(item?.subProducts)
           ? item.subProducts.map((sp) => ({
+              // Keep the extras the newer templates show (seats, access hours, features, badge...).
+              ...(sp && typeof sp === "object" ? sp : {}),
               name: normalizeString(sp?.name),
               description: normalizeString(sp?.description),
               cost: normalizeString(sp?.cost),
@@ -206,6 +208,7 @@ const normalizeTemplatePayload = (template) => {
     sectionOverrides: template?.sectionOverrides || {},
     styleConfig: template?.styleConfig || {},
     mapUrl: normalizeString(template?.mapUrl),
+    heroVideoUrl: normalizeString(template?.heroVideoUrl),
     phone: normalizeString(template?.phone || template?.contactPersonPhone),
     address: normalizeString(template?.address),
     copyrightText: normalizeString(template?.copyrightText),
