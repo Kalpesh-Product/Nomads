@@ -142,6 +142,7 @@ const contributionProfileItems = [
     icon: HiOutlineViewGrid,
     path: "/contributions-2",
     flags: ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"],
+    hiddenFromSidebar: true,
   },
   {
     label: "All Contributions",
