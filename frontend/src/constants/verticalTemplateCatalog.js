@@ -132,19 +132,26 @@ export const buildVerticalFilters = (catalog = VERTICAL_TEMPLATE_CATALOG) => [
 
 export const VERTICAL_FILTERS = buildVerticalFilters();
 
-const ROOT_DOMAIN = "wono.co";
+const MASTER_PANEL_PROD_URL = "https://masterpanel.wono.co";
+// The master panel client's own local dev port (see WoNoMasterPanel's
+// .claude/launch.json) — NOT the Nomads dev port.
+const MASTER_PANEL_LOCAL_PORT = 3007;
 
-// Each seeded template has a permanent demo company at "<id>demo" so the marketing site can link
-// straight to a real, always-live render of it. A template can instead set its own
-// `externalDemoUrl` (e.g. Biznest, a real pre-existing live site) to skip that convention.
+// Routes to the master panel's public "/website-preview/demo/:templateId" —
+// loads the same sample-content preview as the Website Builder's own
+// "Preview with sample content" button, generated on the fly client-side.
+// Deliberately NOT a "<id>demo.wono.co" seeded tenant site: those only exist
+// wherever someone manually seeded them (e.g. local dev), so they 404 on
+// environments — like production — where that seeding step was never run.
+// This preview needs no seeded company or DB data at all, so it works the
+// same everywhere. A template can still set its own `externalDemoUrl` (e.g.
+// Biznest, a real pre-existing live site) to skip this entirely.
 export const demoSiteUrl = (templateId) => {
-  if (typeof window === "undefined") return `https://${templateId}demo.${ROOT_DOMAIN}/`;
-  const { protocol, hostname, port } = window.location;
+  if (typeof window === "undefined") return `${MASTER_PANEL_PROD_URL}/website-preview/demo/${templateId}`;
+  const { protocol, hostname } = window.location;
   const isLocalHost = hostname === "localhost" || hostname.endsWith(".localhost");
-  if (isLocalHost) {
-    return `${protocol}//${templateId}demo.localhost${port ? `:${port}` : ""}/`;
-  }
-  return `${protocol}//${templateId}demo.${ROOT_DOMAIN}/`;
+  const base = isLocalHost ? `${protocol}//localhost:${MASTER_PANEL_LOCAL_PORT}` : MASTER_PANEL_PROD_URL;
+  return `${base}/website-preview/demo/${templateId}`;
 };
 
 export const templateDemoUrl = (template) => template.externalDemoUrl || demoSiteUrl(template.id);
