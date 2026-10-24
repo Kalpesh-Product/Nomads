@@ -194,6 +194,10 @@ const months = [
   "July", "August", "September", "October", "November", "December",
 ];
 
+const eventTypes = [
+  "Festival", "Nomad", "Patriotic", "Religious", "None of the above",
+];
+
 const MonthSelect = ({ value, onChange, error }) => (
   <TextField
     select
@@ -1148,7 +1152,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         category: formValues.category.trim(),
         month: formValues.month.trim(),
         venue: formValues.venue.trim(),
-        eventType: formValues.eventType.trim(),
+        eventType: formValues.eventType === "None of the above"
+          ? ""
+          : formValues.eventType.trim(),
         sections: cleanedSections,
         isDraft: status === "draft",
       };
@@ -1622,17 +1628,25 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   <FieldError message={getErrorMessage("venue")} />
                 </div>
                 <div>
-                  <ContributionTextField label="Type"
-                    className={getFieldClassName("eventType")}
+                  <TextField
+                    select
+                    label="Type"
                     required
-                    aria-invalid={Boolean(getErrorMessage("eventType"))}
+                    fullWidth
+                    variant="standard"
+                    size="small"
+                    error={Boolean(getErrorMessage("eventType"))}
                     value={formValues.eventType}
-                    maxLength={contributionFieldLimits.type}
                     onChange={(event) =>
                       updateFormField("eventType", event.target.value)
                     }
-                    placeholder="Type"
-                  />
+                  >
+                    {eventTypes.map((eventType) => (
+                      <MenuItem key={eventType} value={eventType}>
+                        {eventType}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                   <FieldError message={getErrorMessage("eventType")} />
                 </div>
               </div>
