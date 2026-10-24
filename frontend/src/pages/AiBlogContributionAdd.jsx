@@ -324,11 +324,11 @@ const CategorySelect = ({ options, value, onChange, error }) => {
   );
 };
 
-const MonthSelect = ({ value, onChange, error }) => (
+const MonthSelect = ({ value, onChange, error, required = true }) => (
   <TextField
     select
-    label="Month"
-    required
+    label={required ? "Month" : "Month (optional)"}
+    required={required}
     fullWidth
     variant="standard"
     size="small"
@@ -336,6 +336,7 @@ const MonthSelect = ({ value, onChange, error }) => (
     onChange={onChange}
     error={error}
   >
+    {!required && <MenuItem value="">None</MenuItem>}
     {months.map((month) => (
       <MenuItem key={month} value={month}>
         {month}
@@ -1213,8 +1214,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       ) {
         errors.category = "Select between 1 and 4 categories";
       }
-      if (!formValues.month.trim()) errors.month = "Month is required";
-      if (!formValues.venue.trim()) errors.venue = "Venue is required";
       if (!formValues.latitude.trim()) errors.latitude = "Latitude is required";
       if (!formValues.longitude.trim())
         errors.longitude = "Longitude is required";
@@ -1896,6 +1895,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                   <div>
                     <MonthSelect
+                      required={false}
                       error={Boolean(getErrorMessage("month"))}
                       value={formValues.month}
                       onChange={(event) =>
@@ -1906,9 +1906,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                   <div>
                     <ContributionTextField
-                      label="Venue"
+                      label="Venue (optional)"
                       className={getFieldClassName("venue")}
-                      required
                       aria-invalid={Boolean(getErrorMessage("venue"))}
                       value={formValues.venue}
                       maxLength={contributionFieldLimits.venue}
