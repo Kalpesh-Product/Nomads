@@ -1883,7 +1883,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   </div>
                 </div>
 
-                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                   <div>
                     <CategorySelect
                       options={placeCategories}
@@ -1892,17 +1892,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       onChange={(value) => updateFormField("category", value)}
                     />
                     <FieldError message={getErrorMessage("category")} />
-                  </div>
-                  <div>
-                    <MonthSelect
-                      required={false}
-                      error={Boolean(getErrorMessage("month"))}
-                      value={formValues.month}
-                      onChange={(event) =>
-                        updateFormField("month", event.target.value)
-                      }
-                    />
-                    <FieldError message={getErrorMessage("month")} />
                   </div>
                   <div>
                     <ContributionTextField
