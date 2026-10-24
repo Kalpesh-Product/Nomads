@@ -1203,7 +1203,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       if (!formValues.googleMapsLink.trim()) {
         errors.googleMapsLink = "Google Maps link is required";
       }
-      if (!formValues.rating.trim()) errors.rating = "Rating is required";
+      if (!formValues.rating.trim()) {
+        errors.rating = "Rating is required";
+      } else if (
+        !Number.isFinite(Number(formValues.rating)) ||
+        Number(formValues.rating) < 1 ||
+        Number(formValues.rating) > 5
+      ) {
+        errors.rating = "Enter a rating between 1 and 5";
+      }
       const categories = formValues.category
         ? formValues.category.split(" / ")
         : [];
@@ -1867,23 +1875,28 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("googleMapsLink")} />
                   </div>
                   <div>
-                    <ContributionTextField
-                      label="Rating"
-                      className={getFieldClassName("rating")}
+                    <TextField
+                      label="Rating (1 to 5)"
+                      type="text"
                       required
-                      aria-invalid={Boolean(getErrorMessage("rating"))}
+                      fullWidth
+                      variant="standard"
+                      size="small"
+                      error={Boolean(getErrorMessage("rating"))}
                       value={formValues.rating}
-                      maxLength={contributionFieldLimits.rating}
-                      onChange={(event) =>
-                        updateFormField("rating", event.target.value)
-                      }
-                      placeholder="Rating"
+                      slotProps={{ htmlInput: { inputMode: "decimal" } }}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        if (
+                          value === "" ||
+                          (/^[1-5](?:\.\d*)?$/.test(value) && Number(value) <= 5)
+                        ) {
+                          updateFormField("rating", value);
+                        }
+                      }}
                     />
                     <FieldError message={getErrorMessage("rating")} />
                   </div>
-                </div>
-
-                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                   <div>
                     <CategorySelect
                       options={placeCategories}
@@ -1893,6 +1906,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     />
                     <FieldError message={getErrorMessage("category")} />
                   </div>
+                </div>
+
+                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   <div>
                     <ContributionTextField
                       label="Venue (optional)"
