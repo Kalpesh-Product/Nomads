@@ -58,6 +58,19 @@ const normalizePlaceItem = (place = {}) => ({
   googleMapsLink: place.googleMapsLink || place.googleMap || "",
 });
 
+const getStoredPreviewItem = (search = "") => {
+  const previewKey = new URLSearchParams(search).get("previewKey");
+  if (!previewKey) return null;
+
+  try {
+    const storedItem =
+      localStorage.getItem(previewKey) || sessionStorage.getItem(previewKey);
+    return storedItem ? JSON.parse(storedItem) : null;
+  } catch {
+    return null;
+  }
+};
+
 const AiDestinationDetail = ({ type }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -83,7 +96,7 @@ const AiDestinationDetail = ({ type }) => {
   });
   const item = placeDetails
     ? normalizePlaceItem(placeDetails)
-    : location.state?.item || fallback;
+    : location.state?.item || getStoredPreviewItem(location.search) || fallback;
   const mapLatitude = toValidCoordinate(item.lat ?? item.latitude);
   const mapLongitude = toValidCoordinate(item.lng ?? item.longitude);
   const hasMapCoordinates =

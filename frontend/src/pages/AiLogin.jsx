@@ -16,6 +16,8 @@ const LOGIN_PROMPT =
   "Login to unlock all features and get the most out of your Nomad experience.";
 
 const LOGIN_HEADING = "Login";
+const PENDING_CONTRIBUTOR_SUBMISSION_KEY =
+  "wono-pending-contributor-submission";
 
 const toSentenceCase = (value = "") => {
   const trimmedValue = value.trim();
@@ -41,6 +43,14 @@ export default function AiLogin() {
   const [typedLoginHeading, setTypedLoginHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
+  const hasPendingContributorSubmission = () => {
+    if (typeof window === "undefined") return false;
+
+    return Boolean(
+      window.sessionStorage.getItem(PENDING_CONTRIBUTOR_SUBMISSION_KEY),
+    );
+  };
 
   const loginContext = useMemo(() => {
     if (!location.state || typeof location.state !== "object") {
@@ -169,6 +179,10 @@ export default function AiLogin() {
 
     if (redirectGoal) {
       return `/search/${redirectGoal}/results`;
+    }
+
+    if (hasPendingContributorSubmission()) {
+      return "/become-a-contributor";
     }
 
     return "/";

@@ -2,6 +2,10 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import Place from "../models/Place.js";
+import {
+  buildContributionPayloadWithUploads,
+  parseContributionSections,
+} from "../utils/contributionImageUploads.js";
 
 const REQUIRED_COLUMNS = ["Place Name", "Destination"];
 
@@ -80,9 +84,10 @@ const validateCoordinateFields = (payload) =>
     .filter((error) => error.reason);
 
 const buildSectionsFromPayload = (sections) => {
-  if (!Array.isArray(sections)) return [];
+  const parsedSections = parseContributionSections(sections);
+  if (!Array.isArray(parsedSections)) return [];
 
-  return sections.map((section = {}) => ({
+  return parsedSections.map((section = {}) => ({
     title: normalizeString(section.title) || "",
     image: normalizeString(section.image) || "",
     content: normalizeString(section.content) || "",
@@ -197,7 +202,11 @@ const buildPlace = (row) => ({
 export const getPlaces = async (req, res, next) => {
   try {
     const { destination, category, month } = req.query;
-    const query = {};
+    const query = {
+      isDraft: { $ne: true },
+      isActive: { $ne: false },
+      $or: [{ status: "approved" }, { status: { $exists: false } }],
+    };
 
     if (destination) {
       query.destination = {
@@ -232,6 +241,9 @@ export const getPlacesByDestination = async (req, res, next) => {
         $regex: `^${buildExactDestinationPattern(destination)}$`,
         $options: "i",
       },
+      isDraft: { $ne: true },
+      isActive: { $ne: false },
+      $or: [{ status: "approved" }, { status: { $exists: false } }],
     }).sort({ placeName: 1 });
 
     return res.status(200).json(places);
@@ -348,6 +360,206 @@ export const addPlace = async (req, res, next) => {
 
     return res.status(201).json({
       message: "Place created successfully",
+      place,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyPlaces = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const places = await Place.find({ contributor: user }).sort({
+      updatedAt: -1,
+      createdAt: -1,
+    });
+
+    return res.status(200).json({
+      count: places.length,
+      data: places,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createMyPlace = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const uploadPayload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "places",
+      title: req.body?.placeName,
+    });
+    const isDraft =
+      String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
+    const payload = buildPlacePayload(uploadPayload || {});
+    const missingFields = validateRequiredPlaceFields(payload);
+    const coordinateErrors = validateCoordinateFields(payload);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: "Required place fields are missing.",
+        missingFields,
+      });
+    }
+
+    if (coordinateErrors.length > 0) {
+      return res.status(400).json({
+        message: "Place coordinates are invalid.",
+        errors: coordinateErrors,
+      });
+    }
+
+    const place = await Place.create({
+      ...payload,
+      contributor: user,
+      status: "pending",
+      isDraft,
+      isActive: !isDraft,
+    });
+
+    return res.status(201).json({
+      message: isDraft
+        ? "Place saved as draft successfully"
+        : "Place submitted successfully",
+      place,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateMyPlace = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const { id } = req.params;
+    const uploadPayload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "places",
+      title: req.body?.placeName,
+    });
+    const isDraft =
+      String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
+    const payload = buildPlacePayload(uploadPayload || {});
+    const missingFields = validateRequiredPlaceFields(payload);
+    const coordinateErrors = validateCoordinateFields(payload);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: "Required place fields are missing.",
+        missingFields,
+      });
+    }
+
+    if (coordinateErrors.length > 0) {
+      return res.status(400).json({
+        message: "Place coordinates are invalid.",
+        errors: coordinateErrors,
+      });
+    }
+
+    const place = await Place.findOneAndUpdate(
+      {
+        _id: id,
+        contributor: user,
+      },
+      {
+        ...payload,
+        contributor: user,
+        status: "pending",
+        isDraft,
+        isActive: !isDraft,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!place) {
+      return res.status(404).json({ message: "Place contribution not found" });
+    }
+
+    return res.status(200).json({
+      message: isDraft
+        ? "Place draft updated successfully"
+        : "Place submitted successfully",
+      place,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPlaceContributions = async (req, res, next) => {
+  try {
+    const { status, search } = req.query;
+    const query = {
+      contributor: { $exists: true, $ne: null },
+      isDraft: { $ne: true },
+    };
+
+    if (status && status !== "all") {
+      query.status = status;
+    }
+
+    if (search) {
+      const pattern = { $regex: escapeRegex(search), $options: "i" };
+      query.$or = [
+        { placeName: pattern },
+        { shortDescription: pattern },
+        { address: pattern },
+        { category: pattern },
+        { month: pattern },
+        { venue: pattern },
+        { destination: pattern },
+        { placeType: pattern },
+      ];
+    }
+
+    const places = await Place.find(query)
+      .populate("contributor", "firstName lastName fullName name email")
+      .sort({ updatedAt: -1, createdAt: -1 });
+
+    return res.status(200).json({
+      count: places.length,
+      data: places,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updatePlaceContributionStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const normalizedStatus = String(status || "").toLowerCase();
+
+    if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
+      return res.status(400).json({ message: "Invalid place status" });
+    }
+
+    const place = await Place.findOneAndUpdate(
+      {
+        _id: id,
+        contributor: { $exists: true, $ne: null },
+        isDraft: { $ne: true },
+      },
+      {
+        status: normalizedStatus,
+        isActive: normalizedStatus === "approved",
+      },
+      { new: true },
+    ).populate("contributor", "firstName lastName fullName name email");
+
+    if (!place) {
+      return res.status(404).json({ message: "Place contribution not found" });
+    }
+
+    return res.status(200).json({
+      message: `Place ${normalizedStatus} successfully`,
       place,
     });
   } catch (error) {

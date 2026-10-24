@@ -10,9 +10,11 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { Country } from "country-state-city";
 import { useMutation } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "react-router-dom";
 import Container from "../components/Container";
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { HiCheck } from "react-icons/hi";
 import Seo from "../components/Seo";
 
@@ -23,10 +25,11 @@ const floatingLabelSx = {
 };
 
 const defaultValues = {
-  contributionType: "",
+  contributionType: [],
   fullName: "",
   email: "",
   currentCountry: "",
+  linkedinProfile: "",
   contactCode: "",
   contactNumber: "",
   message: "",
@@ -38,20 +41,75 @@ const CONTRIBUTOR_PROMPT =
   "we are constantly looking out for individuals who can support our cause to make WoNo the largest Nomad Community & Platform in the world. We know we will not be able to do this alone.";
 const CONTRIBUTOR_HEADING = "Become a Wono Contributor";
 const CONTRIBUTOR_TYPING_SEEN_KEY = "wono-contributor-typing-seen";
+const PENDING_CONTRIBUTOR_SUBMISSION_KEY =
+  "wono-pending-contributor-submission";
+const PENDING_CONTRIBUTOR_SUBMISSION_MAX_AGE = 30 * 60 * 1000;
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const CONTRIBUTION_TYPE_OPTIONS = [
+  "Become a Nomad Blog & News Writer",
+  "Become a Content Creator",
   "Add your Business Listing & Services",
   "Become a Overall Destination Partner",
   "Become a Local Experience Partner",
   "Become a Visa & Immigration Partner",
   "Become a Tax & Financial Advisory Partner",
   "Become a Company Setup Services Partner",
-  "Become a Nomad Blog & News Writer",
-  "Become A Content Contributor",
   "Become a Remote Jobs Posting Partner",
   "Not Sure - Lets Connect & Explore",
 ];
+// Expand each displayed contributor choice into the existing API role options.
+const CONTRIBUTOR_ROLES_BY_OPTION = {
+  "Become a Nomad Blog & News Writer": [
+    "Become a Blogger",
+    "Become A News Writer",
+  ],
+  "Become a Content Creator": ["Contribute To Places", "Contribute To Events"],
+};
+const getSelectedContributorOptions = (selectedOptions = []) =>
+  selectedOptions.flatMap((option) => CONTRIBUTOR_ROLES_BY_OPTION[option] || []);
+
+const readPendingContributorSubmission = () => {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const storedValue = window.sessionStorage.getItem(
+      PENDING_CONTRIBUTOR_SUBMISSION_KEY,
+    );
+    if (!storedValue) return null;
+
+    const parsedValue = JSON.parse(storedValue);
+    if (!parsedValue?.formValues || !Array.isArray(parsedValue.contributorOptions)) {
+      return null;
+    }
+    if (
+      parsedValue.createdAt &&
+      Date.now() - parsedValue.createdAt > PENDING_CONTRIBUTOR_SUBMISSION_MAX_AGE
+    ) {
+      clearPendingContributorSubmission();
+      return null;
+    }
+
+    return parsedValue;
+  } catch {
+    return null;
+  }
+};
+
+const writePendingContributorSubmission = (payload) => {
+  if (typeof window === "undefined") return;
+
+  window.sessionStorage.setItem(
+    PENDING_CONTRIBUTOR_SUBMISSION_KEY,
+    JSON.stringify(payload),
+  );
+};
+
+const clearPendingContributorSubmission = () => {
+  if (typeof window === "undefined") return;
+
+  window.sessionStorage.removeItem(PENDING_CONTRIBUTOR_SUBMISSION_KEY);
+};
 
 const tickMenuItemSx = {
   "& .tick-icon": { opacity: 0, color: "#1976d2" },
@@ -76,12 +134,17 @@ const AiBecomeContributor = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const messageLimitAlertedRef = useRef(false);
+  const pendingSubmissionHandledRef = useRef(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
   const isLoggedIn = Boolean(auth?.user);
   const countries = useMemo(() => Country.getAllCountries(), []);
   const { handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues,
   });
+  const selectedContributionTypes = watch("contributionType");
   const selectedCountry = watch("currentCountry");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
@@ -92,9 +155,24 @@ const AiBecomeContributor = () => {
     : "Hey, ";
   const contributorPrompt = `${messagePrefix}${CONTRIBUTOR_PROMPT}`;
 
+  const getContributorSubmissionPayload = (formValues) => {
+    const contributorOptions = Array.isArray(formValues.contributionType)
+      ? getSelectedContributorOptions(formValues.contributionType)
+      : [];
+    const normalizedValues = {
+      ...formValues,
+      contributionType: Array.isArray(formValues.contributionType)
+        ? formValues.contributionType.join(", ")
+        : formValues.contributionType,
+    };
+
+    return { contributorOptions, normalizedValues };
+  };
+
   const { mutate: submitContributor } = useMutation({
-    mutationFn: async (formValues) => {
-      const response = await axios.post("forms/add-new-b2c-form-submission", {
+    mutationFn: async ({ formValues, contributorOptions }) => {
+      const client = isLoggedIn && contributorOptions.length ? axiosPrivate : axios;
+      const response = await client.post("forms/add-new-b2c-form-submission", {
         ...formValues,
         sheetName: "AI_Become_Contributor",
       });
@@ -104,6 +182,7 @@ const AiBecomeContributor = () => {
       if (data?.warning) {
         console.warn(data.warning);
       }
+      clearPendingContributorSubmission();
       await showContributorSuccessAlert(
         "We’ll review your details and get back to you soon.",
         {
@@ -124,8 +203,45 @@ const AiBecomeContributor = () => {
   });
 
   const handleFormSubmit = (formValues) => {
+    const { contributorOptions, normalizedValues } =
+      getContributorSubmissionPayload(formValues);
+
     setIsSubmitting(true);
-    submitContributor(formValues);
+    submitContributor({ formValues: normalizedValues, contributorOptions });
+  };
+
+  const selectedContributorOptionsRequireLogin = (selectedOptions = []) =>
+    getSelectedContributorOptions(selectedOptions).length > 0;
+
+  const handleFormGateAndSubmit = (event) => {
+    if (
+      !isLoggedIn &&
+      selectedContributorOptionsRequireLogin(selectedContributionTypes)
+    ) {
+      void handleSubmit((formValues) => {
+        const { contributorOptions } = getContributorSubmissionPayload(formValues);
+
+        writePendingContributorSubmission({
+          formValues,
+          contributorOptions,
+          createdAt: Date.now(),
+        });
+
+        navigate("/login", {
+          state: {
+            loginContext: {
+              title: "Become a Contributor",
+              description:
+                "Login as a Nomad to contribute blogs, news, places, or events to WoNo.",
+            },
+            redirectTo: `${location.pathname}${location.search}`,
+          },
+        });
+      })(event);
+      return;
+    }
+
+    void handleSubmit(handleFormSubmit)(event);
   };
 
   const handleMessageChange = (event, onChange) => {
@@ -165,6 +281,26 @@ const AiBecomeContributor = () => {
 
   useEffect(() => {
     if (isLoggedIn && auth?.user) {
+      const pendingSubmission = readPendingContributorSubmission();
+      if (
+        pendingSubmission &&
+        !pendingSubmissionHandledRef.current &&
+        pendingSubmission.contributorOptions.length > 0
+      ) {
+        pendingSubmissionHandledRef.current = true;
+        reset(pendingSubmission.formValues);
+        const { contributorOptions, normalizedValues } =
+          getContributorSubmissionPayload(pendingSubmission.formValues);
+
+        setIsFormVisible(true);
+        setIsSubmitting(true);
+        submitContributor({
+          formValues: normalizedValues,
+          contributorOptions,
+        });
+        return;
+      }
+
       const {
         fullName,
         email,
@@ -182,7 +318,7 @@ const AiBecomeContributor = () => {
         setValue("currentCountry", userCountry);
       }
     }
-  }, [isLoggedIn, auth, setValue]);
+  }, [isLoggedIn, auth, reset, setValue, submitContributor]);
 
   useEffect(() => {
     const hasSeenTypingEffect =
@@ -262,7 +398,7 @@ const AiBecomeContributor = () => {
             </div>
             <Box
               component="form"
-              onSubmit={handleSubmit(handleFormSubmit)}
+              onSubmit={handleFormGateAndSubmit}
               className={`bg-white p-0 md:p-0 rounded-2xl ${
                 isFormVisible ? "visible" : "invisible"
               }`}
@@ -271,7 +407,10 @@ const AiBecomeContributor = () => {
                 <Controller
                   name="contributionType"
                   control={control}
-                  rules={{ required: "Contribution Type is required" }}
+                  rules={{
+                    validate: (value) =>
+                      value?.length > 0 || "Contribution Type is required",
+                  }}
                   render={({ field, fieldState }) => (
                     <TextField
                       {...field}
@@ -282,7 +421,16 @@ const AiBecomeContributor = () => {
                       error={!!fieldState.error}
                       helperText={fieldState.error?.message}
                       InputLabelProps={{ sx: floatingLabelSx }}
-                      onChange={(event) => field.onChange(event.target.value)}
+                      SelectProps={{
+                        multiple: true,
+                        renderValue: (selected) => selected.join(", "),
+                      }}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        field.onChange(
+                          typeof value === "string" ? value.split(",") : value,
+                        );
+                      }}
                     >
                       {CONTRIBUTION_TYPE_OPTIONS.map((option) => (
                         <MenuItem
