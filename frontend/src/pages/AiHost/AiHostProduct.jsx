@@ -222,7 +222,15 @@ const HostProduct = () => {
                       {suggestedTemplates.map((template) => (
                         <button
                           type="button"
-                          className="group w-full max-w-[520px] overflow-hidden border border-black/10 bg-white text-left lg:w-[calc(50%-1rem)]"
+                          className={`group w-full max-w-[520px] overflow-hidden border border-black/10 bg-white text-left ${
+                            suggestedTemplates.length === 2
+                              ? "lg:w-[calc(50%-1rem)]"
+                              // 3 fit on one line; 4+ also use the 3-per-row
+                              // width so they wrap onto further rows instead
+                              // of leaving a lone card stranded on its own —
+                              // justify-center keeps each wrapped row centered.
+                              : "lg:w-[calc(33.333%-1.334rem)]"
+                          }`}
                           key={template.id}
                           onClick={() => {
                             // A real navigation (not just local state) so switching to a

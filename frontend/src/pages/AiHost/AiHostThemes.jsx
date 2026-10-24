@@ -101,7 +101,7 @@ const ThemeCard = ({ template, index, onSelect, filters }) => {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-black/50">
               {categoryLabel(template.tag, filters)}
             </p>
-            <h3 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-secondary-dark">
+            <h3 className="mt-2 text-2xl font-semibold tracking-[-0.035em] text-secondary-dark">
               {template.name}
             </h3>
           </div>
@@ -119,7 +119,7 @@ const ThemeCard = ({ template, index, onSelect, filters }) => {
           </div>
         </div>
 
-        <p className="mt-4 line-clamp-2 text-sm leading-6 text-black/65 sm:text-base">
+        <p className="mt-4 line-clamp-2 text-sm leading-6 text-black/65">
           {template.description}
         </p>
 
@@ -409,7 +409,7 @@ const Themes = () => {
           {comingSoonFilteredTemplates.length > 0 ? (
             <div className="mt-14 border-t border-black/10 pt-10">
               <div className="text-center">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">More coming soon</p>
+                <p className="text-base font-semibold uppercase tracking-[0.2em] text-primary-blue">More coming soon</p>
                 {/* <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-secondary-dark sm:text-3xl">
                   {comingSoonFilteredTemplates.length === 1
                     ? `${comingSoonFilteredTemplates[0].name} is on the way.`
