@@ -97,7 +97,6 @@ const initialFormState = (author = "", destination = "") => ({
   placeName: "",
   address: "",
   googleMapsLink: "",
-  rating: "",
   latitude: "",
   longitude: "",
   category: "",
@@ -1203,15 +1202,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       if (!formValues.googleMapsLink.trim()) {
         errors.googleMapsLink = "Google Maps link is required";
       }
-      if (!formValues.rating.trim()) {
-        errors.rating = "Rating is required";
-      } else if (
-        !Number.isFinite(Number(formValues.rating)) ||
-        Number(formValues.rating) < 1 ||
-        Number(formValues.rating) > 5
-      ) {
-        errors.rating = "Enter a rating between 1 and 5";
-      }
       const categories = formValues.category
         ? formValues.category.split(" / ")
         : [];
@@ -1392,7 +1382,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         link: "",
         address: formValues.address.trim(),
         googleMapsLink: formValues.googleMapsLink.trim(),
-        rating: formValues.rating.trim(),
         category: formValues.category.trim(),
         month: formValues.month.trim(),
         venue: formValues.venue.trim(),
@@ -1858,7 +1847,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </div>
             ) : config.formType === "place" ? (
               <>
-                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-5 grid gap-5 md:grid-cols-2">
                   <div>
                     <ContributionTextField
                       label="Google Maps Link"
@@ -1873,29 +1862,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       placeholder="Google Maps link"
                     />
                     <FieldError message={getErrorMessage("googleMapsLink")} />
-                  </div>
-                  <div>
-                    <TextField
-                      label="Rating (1 to 5)"
-                      type="text"
-                      required
-                      fullWidth
-                      variant="standard"
-                      size="small"
-                      error={Boolean(getErrorMessage("rating"))}
-                      value={formValues.rating}
-                      slotProps={{ htmlInput: { inputMode: "decimal" } }}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        if (
-                          value === "" ||
-                          (/^[1-5](?:\.\d*)?$/.test(value) && Number(value) <= 5)
-                        ) {
-                          updateFormField("rating", value);
-                        }
-                      }}
-                    />
-                    <FieldError message={getErrorMessage("rating")} />
                   </div>
                   <div>
                     <CategorySelect
