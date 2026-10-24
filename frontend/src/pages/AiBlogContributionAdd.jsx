@@ -189,6 +189,31 @@ const inputClassName =
 const labelClassName = "block text-xs font-normal text-gray-600";
 const errorTextClassName = "mt-1 text-xs font-medium text-red-500";
 
+const months = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+const MonthSelect = ({ value, onChange, error }) => (
+  <TextField
+    select
+    label="Month"
+    required
+    fullWidth
+    variant="standard"
+    size="small"
+    value={value}
+    onChange={onChange}
+    error={error}
+  >
+    {months.map((month) => (
+      <MenuItem key={month} value={month}>
+        {month}
+      </MenuItem>
+    ))}
+  </TextField>
+);
+
 const ContributionTextField = ({ as, maxLength, ...props }) => (
   <CharacterLimitedField
     as={TextField}
@@ -1573,16 +1598,12 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             {config.formType === "event" ? (
               <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 <div>
-                  <ContributionTextField label="Month"
-                    className={getFieldClassName("month")}
-                    required
-                    aria-invalid={Boolean(getErrorMessage("month"))}
+                  <MonthSelect
+                    error={Boolean(getErrorMessage("month"))}
                     value={formValues.month}
-                    maxLength={contributionFieldLimits.month}
                     onChange={(event) =>
                       updateFormField("month", event.target.value)
                     }
-                    placeholder="Month"
                   />
                   <FieldError message={getErrorMessage("month")} />
                 </div>
@@ -1678,16 +1699,12 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("category")} />
                   </div>
                   <div>
-                    <ContributionTextField label="Month"
-                      className={getFieldClassName("month")}
-                      required
-                      aria-invalid={Boolean(getErrorMessage("month"))}
+                    <MonthSelect
+                      error={Boolean(getErrorMessage("month"))}
                       value={formValues.month}
-                      maxLength={contributionFieldLimits.month}
                       onChange={(event) =>
                         updateFormField("month", event.target.value)
                       }
-                      placeholder="Month"
                     />
                     <FieldError message={getErrorMessage("month")} />
                   </div>
