@@ -1,6 +1,8 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import Checkbox from "@mui/material/Checkbox";
+import ListItemText from "@mui/material/ListItemText";
 import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -197,6 +199,59 @@ const months = [
 const eventTypes = [
   "Festival", "Nomad", "Patriotic", "Religious", "None of the above",
 ];
+
+const eventCategories = [
+  "Culture", "Heritage", "Museums", "Architecture", "Fashion", "Tourism",
+  "Cultural", "Nature", "Water Festival", "Street Festival", "Civic", "Salsa",
+  "Dance", "Music", "Folk", "Motorsports", "Lifestyle", "Food", "Historical",
+  "Diaspora", "World Music", "Community", "Trade Fair", "Exhibition",
+  "Literature", "Music & Arts", "LGBTQ+",
+];
+
+const EventCategorySelect = ({ value, onChange, error }) => {
+  const selectedCategories = value ? value.split(" / ") : [];
+
+  return (
+    <TextField
+      select
+      label="Category"
+      required
+      fullWidth
+      variant="standard"
+      size="small"
+      value={selectedCategories}
+      error={error}
+      helperText="Select 1 to 4 categories"
+      onChange={(event) => {
+        const selected = typeof event.target.value === "string"
+          ? event.target.value.split(",")
+          : event.target.value;
+        if (selected.length <= 4) onChange(selected.join(" / "));
+      }}
+      slotProps={{
+        select: {
+          multiple: true,
+          renderValue: (selected) => selected.join(" / "),
+          MenuProps: { PaperProps: { style: { maxHeight: 360 } } },
+        },
+      }}
+    >
+      {eventCategories.map((category) => {
+        const checked = selectedCategories.includes(category);
+        return (
+          <MenuItem
+            key={category}
+            value={category}
+            disabled={!checked && selectedCategories.length >= 4}
+          >
+            <Checkbox checked={checked} />
+            <ListItemText primary={category} />
+          </MenuItem>
+        );
+      })}
+    </TextField>
+  );
+};
 
 const MonthSelect = ({ value, onChange, error }) => (
   <TextField
@@ -1002,7 +1057,13 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
         errors.mainImage = "Main image is required";
       }
-      if (!formValues.category.trim()) errors.category = "Category is required";
+      const categories = formValues.category ? formValues.category.split(" / ") : [];
+      if (
+        categories.length < 1 || categories.length > 4 ||
+        categories.some((category) => !eventCategories.includes(category))
+      ) {
+        errors.category = "Select between 1 and 4 categories";
+      }
       if (!formValues.month.trim()) errors.month = "Month is required";
       if (!formValues.venue.trim()) errors.venue = "Venue is required";
       if (!formValues.eventType.trim()) errors.eventType = "Type is required";
@@ -1569,16 +1630,10 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               ) : null}
               {isEventForm ? (
                 <div>
-                  <ContributionTextField label="Category"
-                    className={getFieldClassName("category")}
-                    required
-                    aria-invalid={Boolean(getErrorMessage("category"))}
+                  <EventCategorySelect
+                    error={Boolean(getErrorMessage("category"))}
                     value={formValues.category}
-                    maxLength={contributionFieldLimits.category}
-                    onChange={(event) =>
-                      updateFormField("category", event.target.value)
-                    }
-                    placeholder="Category"
+                    onChange={(value) => updateFormField("category", value)}
                   />
                   <FieldError message={getErrorMessage("category")} />
                 </div>
