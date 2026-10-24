@@ -7,18 +7,22 @@ const masterPanelBaseUrl = String(
     : import.meta.env.VITE_MASTER_PANEL_BE_URL || "https://masterpanel.wono.co",
 ).replace(/\/+$/, "");
 
-export const useWebsiteThemeCatalog = () => {
+export const useWebsiteThemeCatalog = ({ liveRefresh = false } = {}) => {
   const query = useQuery({
     queryKey: ["public-website-theme-catalog"],
     queryFn: async () => {
-      const response = await fetch(`${masterPanelBaseUrl}/api/public/website-themes`);
+      const response = await fetch(`${masterPanelBaseUrl}/api/public/website-themes`, {
+        cache: "no-store",
+      });
       if (!response.ok) throw new Error("Unable to load the theme catalog");
       const payload = await response.json();
       return Array.isArray(payload?.themes) ? payload.themes : [];
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: liveRefresh ? 0 : 5 * 60 * 1000,
     retry: 1,
-    refetchOnWindowFocus: false,
+    refetchOnMount: liveRefresh ? "always" : true,
+    refetchOnWindowFocus: liveRefresh ? "always" : false,
+    refetchInterval: liveRefresh ? 5000 : false,
   });
 
   return {

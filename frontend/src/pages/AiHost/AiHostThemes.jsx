@@ -124,7 +124,7 @@ const ThemeCard = ({ template, index, onSelect, filters }) => {
         </p>
 
         {comingSoon ? (
-          <p className="mt-auto pt-6 text-center text-sm font-semibold text-primary-blue">{template.disabledReason || "More details coming soon"}</p>
+          <p className="mt-auto pt-6 text-center text-lg font-semibold text-primary-blue">{template.disabledReason || "More details coming soon"}</p>
         ) : <div className="mt-auto flex flex-wrap items-center justify-center gap-3 pt-6">
           <button
             type="button"
@@ -171,7 +171,7 @@ const Themes = () => {
   // footer, etc.) there's nothing left for the filters to act on, so it's
   // released back into normal flow instead of floating over unrelated content.
   const [filtersActive, setFiltersActive] = useState(true);
-  const { themes } = useWebsiteThemeCatalog();
+  const { themes } = useWebsiteThemeCatalog({ liveRefresh: true });
   const verticalFilters = buildVerticalFilters(themes);
   const liveThemes = themes.filter((template) => template.status !== "coming-soon");
   const featuredTemplate = liveThemes.find((template) => template.featured) || liveThemes[0] || themes[0];
@@ -410,11 +410,11 @@ const Themes = () => {
             <div className="mt-14 border-t border-black/10 pt-10">
               <div className="text-center">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">More coming soon</p>
-                <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-secondary-dark sm:text-3xl">
+                {/* <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-secondary-dark sm:text-3xl">
                   {comingSoonFilteredTemplates.length === 1
                     ? `${comingSoonFilteredTemplates[0].name} is on the way.`
                     : "More themes for this category are on the way."}
-                </h3>
+                </h3> */}
               </div>
               <div className="mt-8 flex flex-wrap justify-center gap-5 xl:gap-7">
                 {comingSoonFilteredTemplates.map((template, index) => (
