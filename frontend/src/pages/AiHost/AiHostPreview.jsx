@@ -1,4 +1,5 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import { demoSiteUrl } from "../../constants/verticalTemplateCatalog";
 
@@ -9,7 +10,10 @@ import { demoSiteUrl } from "../../constants/verticalTemplateCatalog";
 // where this sample-content preview is actually generated and served from.
 const AiHostPreview = () => {
   const { templateId } = useParams();
-  const navigate = useNavigate();
+  // The iframe's own page (master panel bundle + the chosen template's lazy
+  // chunk) takes a moment to load — without this it's just blank white in
+  // the meantime, which reads as broken rather than loading.
+  const [loaded, setLoaded] = useState(false);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white">
@@ -24,12 +28,21 @@ const AiHostPreview = () => {
         </button>
         <span className="text-sm font-medium text-black/55">Previewing with sample content</span>
       </div> */}
-      <iframe
-        key={templateId}
-        src={demoSiteUrl(templateId)}
-        title={`${templateId} theme preview`}
-        className="min-h-0 flex-1 border-0"
-      />
+      <div className="relative min-h-0 flex-1">
+        {!loaded ? (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-black/10 border-t-sky-500" />
+            <p className="text-sm font-medium text-black/55">Loading preview…</p>
+          </div>
+        ) : null}
+        <iframe
+          key={templateId}
+          src={demoSiteUrl(templateId)}
+          title={`${templateId} theme preview`}
+          onLoad={() => setLoaded(true)}
+          className="h-full w-full border-0"
+        />
+      </div>
     </div>
   );
 };
