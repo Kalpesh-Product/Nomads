@@ -458,22 +458,14 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
       const itemConfig = contributionPageConfig[itemType];
 
       return {
-        queryKey: [
-          isCombinedPage
-            ? `${itemConfig.queryKey}AllContributions`
-            : itemConfig.queryKey,
-          userId,
-        ],
+        queryKey: [itemConfig.queryKey, userId],
         queryFn: async () => {
           const response = await axiosPrivate.get(itemConfig.endpoint);
           const items = Array.isArray(response.data?.data)
             ? response.data.data
             : [];
 
-          return items.map((item) => ({
-            ...item,
-            __contributionType: itemType,
-          }));
+          return items;
         },
         enabled: Boolean(userId) && Boolean(auth?.user?.[itemConfig.flag]),
         staleTime: 1000 * 60,
