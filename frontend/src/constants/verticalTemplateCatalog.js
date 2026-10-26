@@ -155,3 +155,12 @@ export const demoSiteUrl = (templateId) => {
 };
 
 export const templateDemoUrl = (template) => template.externalDemoUrl || demoSiteUrl(template.id);
+
+// What the "Preview" button actually links to. A real external site
+// (externalDemoUrl set, e.g. Biznest) is opened directly — it's a separate
+// live site, not ours to wrap. The generated master-panel preview instead
+// goes through our own "/preview/:id" route (see AiHostPreview), which
+// iframes demoSiteUrl() so the address bar stays on our own domain the whole
+// time instead of jumping to masterpanel.wono.co.
+export const previewHref = (template) =>
+  template.externalDemoUrl || `/preview/${template.id}`;

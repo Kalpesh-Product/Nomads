@@ -12,7 +12,7 @@ import GetStartedButton from "../../components/GetStartedButton";
 import { ReactFitty } from "react-fitty";
 import Container from "../../components/Container";
 import { HiOutlineArrowLeft } from "react-icons/hi";
-import { buildVerticalFilters, templateDemoUrl } from "../../constants/verticalTemplateCatalog";
+import { buildVerticalFilters, previewHref } from "../../constants/verticalTemplateCatalog";
 import DeviceMockup from "../../components/DeviceMockup";
 import { useWebsiteThemeCatalog } from "../../hooks/useWebsiteThemeCatalog";
 
@@ -161,7 +161,7 @@ const HostProduct = () => {
                       handleSubmit={() => navigate("/signup?step=1")}
                     />
                     <a
-                      href={templateDemoUrl(selectedTemplate)}
+                      href={previewHref(selectedTemplate)}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center justify-center gap-2 rounded-full px-10 py-3 text-base font-semibold border border-black text-black hover:bg-black hover:text-white transition-colors duration-300"

@@ -6,7 +6,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi";
 import DeviceMockup from "../../components/DeviceMockup";
 import {
   buildVerticalFilters,
-  templateDemoUrl,
+  previewHref,
 } from "../../constants/verticalTemplateCatalog";
 import { useWebsiteThemeCatalog } from "../../hooks/useWebsiteThemeCatalog";
 import { nearestColorName } from "../../utils/colorName";
@@ -134,7 +134,7 @@ const ThemeCard = ({ template, index, onSelect, filters }) => {
             View theme
           </button>
           <a
-            href={templateDemoUrl(template)}
+            href={previewHref(template)}
             target="_blank"
             rel="noreferrer"
             onClick={(event) => event.stopPropagation()}
