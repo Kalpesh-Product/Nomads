@@ -9,6 +9,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { HiOutlinePencil, HiOutlinePlus, HiOutlineTrash } from "react-icons/hi";
 import Swal from "sweetalert2";
 import TextField from "@mui/material/TextField";
+import { CalendarDays } from "lucide-react";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import humanDate from "../utils/humanDate";
@@ -371,8 +372,9 @@ const DestinationPreview = ({ item, config, onEdit }) => {
       <section className="mt-4">
         <h2 className="text-title font-bold leading-normal">{title}</h2>
         {isEvent && item.month ? (
-          <p className="mt-2 text-base font-medium text-black">
-            During the month of {item.month}
+          <p className="mt-2 flex items-center gap-2 text-base font-medium text-black">
+            <CalendarDays size={17} />
+            {item.month}
           </p>
         ) : null}
 
