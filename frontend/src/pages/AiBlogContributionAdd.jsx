@@ -1132,9 +1132,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       if (!section.title.trim()) {
         errors[`sections.${index}.title`] = "Section title is required";
       }
-      if (!section.imageFile && !section.image.trim()) {
-        errors[`sections.${index}.image`] = "Section image is required";
-      }
       if (!section.content.trim()) {
         errors[`sections.${index}.content`] = "Section content is required";
       }
@@ -1975,10 +1972,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           {supportsSectionImageUploads ? (
                             <BlogImageFileInput
                               id={`blog-section-image-${index}`}
-                              label={`Section ${index + 1} Image`}
+                              label={`Section ${index + 1} Image (optional)`}
                               file={section.imageFile}
                               error={getErrorMessage(`sections.${index}.image`)}
-                              required
                               onChange={(file) =>
                                 updateSectionImageFile(index, file)
                               }
@@ -1989,11 +1985,10 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           ) : (
                             <>
                               <ContributionTextField
-                                label="Section Image URL"
+                                label="Section Image URL (optional)"
                                 className={getFieldClassName(
                                   `sections.${index}.image`,
                                 )}
-                                required
                                 aria-invalid={Boolean(
                                   getErrorMessage(`sections.${index}.image`),
                                 )}

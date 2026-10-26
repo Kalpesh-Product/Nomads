@@ -137,10 +137,11 @@ const BlogImageFileInput = ({
   existingUrl,
   onChange,
   onClear,
+  required = false,
 }) => (
   <div className="mt-3 rounded-xl border border-black/10 bg-white/70 p-3">
     <label className={labelClassName} htmlFor={id}>
-      {label}
+      {label}{required ? <span className="text-red-500"> *</span> : null}
     </label>
     <div className="contribution-upload flex min-h-[42px] items-center gap-3 rounded-md border border-black/10 bg-white px-3 py-2 text-sm transition focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100">
       <input
@@ -708,6 +709,11 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
   };
 
   const handleSubmit = async (isDraft) => {
+    if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
+      showErrorAlert("Main image is required.");
+      return;
+    }
+
     const cleanedSections = formValues.sections
       .map((section) => ({
         title: section.title.trim(),
@@ -968,6 +974,7 @@ const ArticleInlineEdit = ({
               <BlogImageFileInput
                 id="edit-blog-main-image"
                 label="Main Image"
+                required
                 file={formValues.mainImageFile}
                 existingUrl={formValues.mainImage}
                 onChange={(file) => updateBlogImageFile("mainImage", file)}
@@ -980,6 +987,7 @@ const ArticleInlineEdit = ({
                 value={formValues.mainImage}
                 onChange={(event) => updateFormField("mainImage", event.target.value)}
                 label="Main image URL"
+                required
               />
             )}
           </div>
@@ -1032,7 +1040,7 @@ const ArticleInlineEdit = ({
               {supportsArticleImageUploads ? (
                 <BlogImageFileInput
                   id={`edit-blog-section-image-${index}`}
-                  label={`Section ${index + 1} Image`}
+                  label={`Section ${index + 1} Image (optional)`}
                   file={section.imageFile}
                   existingUrl={section.image}
                   onChange={(file) => updateSectionImageFile(index, file)}
@@ -1044,7 +1052,7 @@ const ArticleInlineEdit = ({
                   className="mt-3"
                   value={section.image}
                   onChange={(event) => updateSection(index, "image", event.target.value)}
-                  label="Section image URL"
+                  label="Section image URL (optional)"
                 />
               )}
               <ArticleEditField
@@ -1150,6 +1158,7 @@ const DestinationInlineEdit = ({
         <BlogImageFileInput
           id={`edit-${config.label.toLowerCase()}-main-image`}
           label="Main Image"
+          required
           file={formValues.mainImageFile}
           existingUrl={formValues.mainImage}
           onChange={(file) => updateBlogImageFile("mainImage", file)}
