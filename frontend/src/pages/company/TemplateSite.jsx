@@ -39,6 +39,7 @@ import { mapTestimonialItem } from "./utils/pageTemplateUtils";
 import { NomadsSiteContext } from "./verticalTemplates/NomadsSiteContext";
 import { VERTICAL_TEMPLATES, isVerticalTemplate } from "./verticalTemplates";
 import TemplateIntroLoader from "./verticalTemplates/shared/TemplateIntroLoader";
+import TemplateBackToTop from "./verticalTemplates/shared/TemplateBackToTop";
 
 // The shared breadcrumb bar hard-codes light/dark text; on Fresh Studio and
 // Warm Organic it should follow the business's text colour instead.
@@ -310,6 +311,7 @@ const TemplateSite = () => {
           themeVariant={themeVariant}
           companyName={normalizedData?.companyName}
         />
+        <TemplateBackToTop themeVariant={themeVariant} />
         <VerticalTemplate />
       </NomadsSiteContext.Provider>
     );
@@ -317,6 +319,7 @@ const TemplateSite = () => {
 
   return (
     <div
+      data-template-scroll-root="true"
       className={`h-screen relative overflow-y-auto overflow-hidden flex flex-col custom-scrollbar-hide${
         isEmeraldStudio ? " es-scope" : isClassic ? " classic-scope" : ""
       }`}
@@ -332,6 +335,7 @@ const TemplateSite = () => {
         themeVariant={themeVariant}
         companyName={normalizedData?.companyName}
       />
+      <TemplateBackToTop themeVariant={themeVariant} />
       {isFreshStudio || isWarmOrganic ? (
         <style>{crumbCss(isFreshStudio ? "#ffffff" : "#2B211A")}</style>
       ) : null}
