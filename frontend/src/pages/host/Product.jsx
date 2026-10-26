@@ -11,6 +11,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import GetStartedButton from "../../components/GetStartedButton";
 import { ReactFitty } from "react-fitty";
 import Container from "../../components/Container";
+import { VERTICAL_TEMPLATE_CATALOG, VERTICAL_FILTERS, templateDemoUrl } from "../../constants/verticalTemplateCatalog";
+import DeviceMockup from "../../components/DeviceMockup";
 
 const features = [
   "No Code Website",
@@ -60,101 +62,49 @@ const perks = [
   },
 ];
 
-const themes = [
-  {
-    src: "/hosts/themes/biznest.png",
-    mockup: "/hosts/themes/biznestProduct.png",
-    alt: "BiznestImage",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/coworkingMewo.png",
-    mockup: "/hosts/themes/coworkingMewoProduct.png",
-    alt: "CoWorkingMewo",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/coworking.png",
-    mockup: "/hosts/themes/coworkingProduct.png",
-    alt: "Co-Working Image",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/boutique.png",
-    mockup: "/hosts/themes/boutiqueProduct.png",
-    alt: "Boutique Image",
-    tag: "boutique",
-  },
-  {
-    src: "/hosts/themes/coliving.png",
-    mockup: "/hosts/themes/colivingProduct.png",
-    alt: "Co-Living Image",
-    tag: "co-living",
-  },
-  {
-    src: "/hosts/themes/coworking2.png",
-    mockup: "/hosts/themes/coworkingNomadProduct.png",
-    alt: "CoLivingImage_2",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/coworking3.png",
-    mockup: "/hosts/themes/coworking3Product.png",
-    alt: "CoLivingImage_3",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/cafe2.png",
-    mockup: "/hosts/themes/cafe2Product.png",
-    alt: "Cafe_2",
-    tag: "cafe",
-  },
-  {
-    src: "/hosts/themes/cafe3.png",
-    mockup: "/hosts/themes/cafe3Product.png",
-    alt: "Cafe_3",
-    tag: "cafe",
-  },
-  {
-    src: "/hosts/themes/hostels.png",
-    mockup: "/hosts/themes/hostelsProduct.png",
-    alt: "Hostels",
-    tag: "hostels",
-  },
-];
-
 const HostProduct = () => {
   const { state } = useLocation();
-  const initialImage = state?.image || themes[0];
+  const initialTemplate = state?.template || VERTICAL_TEMPLATE_CATALOG[0];
 
   const topRef = useRef(null);
 
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState(initialImage);
+  const [selectedTemplate, setSelectedTemplate] = useState(initialTemplate);
 
   useEffect(() => {
-    if (state?.image) {
-      setSelectedImage(state.image);
+    if (state?.template) {
+      setSelectedTemplate(state.template);
     }
   }, [state]);
 
   return (
     <div
-      key={location.state?.image?.src || "default"}
+      key={selectedTemplate.id || "default"}
       className="flex flex-col"
     >
       <div className="flex flex-col">
         <section
           ref={topRef}
-          className="w-full bg-black flex flex-col justify-center gap-8 "
+          className="w-full bg-black flex flex-col justify-center gap-6 "
         >
-          <Container>
+          <Container className="!w-full !pt-4 lg:!pt-6">
+            <nav className="flex min-w-0 items-center overflow-x-auto whitespace-nowrap pb-2 text-sm custom-scrollbar-hide sm:overflow-visible md:text-base" aria-label="Breadcrumb">
+              <button type="button" className="shrink-0 text-sky-400 transition-colors hover:text-sky-300" onClick={() => navigate("/hostold/themes")}>
+                Themes
+              </button>
+              <span className="mx-1 shrink-0 text-white/50 md:mx-2">{">"}</span>
+              <span className="shrink-0 text-white">
+                {VERTICAL_FILTERS.find((filter) => filter.value === selectedTemplate.tag)?.label || selectedTemplate.tag}
+              </span>
+              <span className="mx-1 shrink-0 text-white/50 md:mx-2">{">"}</span>
+              <span className="shrink-0 text-white">{selectedTemplate.name}</span>
+            </nav>
             <div className="flex flex-wrap gap-10 lg:flex-nowrap lg:gap-60 w-full">
-              <div className="flex flex-col gap-10 justify-center w-full text-white">
+              <div className="flex flex-col gap-6 justify-center w-full text-white">
                 <h1 className="text-hero font-semibold">INCLUSIONS</h1>
                 <ul className="flex flex-col gap-2 ">
                   {features.map((feat) => (
-                    <li className="flex gap-2 text-content lg:text-subtitle ">
+                    <li className="flex gap-2 text-content lg:text-subtitle " key={feat}>
                       <span className="text-[#0AA9EF] font-bold">
                         ✔&nbsp;&nbsp;
                       </span>
@@ -162,19 +112,26 @@ const HostProduct = () => {
                     </li>
                   ))}
                 </ul>
-                <GetStartedButton
-                  handleSubmit={() => navigate("/signup")}
-                  externalStyles="bg-white text-black lg:w-[70%]"
-                />
+                <div className="flex flex-wrap gap-4">
+                  <GetStartedButton
+                    handleSubmit={() => navigate("/signup")}
+                    externalStyles="!bg-white !text-black"
+                  />
+                  <a
+                    href={templateDemoUrl(selectedTemplate)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-full px-10 py-3 text-base font-semibold border border-white text-white hover:bg-white hover:text-black transition-colors duration-300"
+                  >
+                    Preview
+                  </a>
+                </div>
               </div>
-              <div
-                data-aos="fade-up"
-                className="w-full overflow-hidden rounded-xl"
-              >
-                <img
-                  className="rounded-xl w-full h-full object-cover"
-                  src={selectedImage.mockup}
-                  alt={selectedImage.alt}
+              <div data-aos="fade-up" className="flex w-full flex-col items-center mt-8 lg:mt-0">
+                <DeviceMockup
+                  laptopSrc={selectedTemplate.heroImage}
+                  mobileSrc={selectedTemplate.heroImageMobile}
+                  alt={selectedTemplate.name}
                 />
               </div>
             </div>
@@ -192,7 +149,7 @@ const HostProduct = () => {
               <div className="col-span-2">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {perks.map((perk) => (
-                    <div className="flex gap-2 items-start">
+                    <div className="flex gap-2 items-start" key={perk.title}>
                       <div className="text-content mt-1">{perk.icon}</div>
                       <div className="flex flex-col gap-2">
                         <h2 className="font-bold">{perk.title}</h2>
@@ -208,33 +165,34 @@ const HostProduct = () => {
         <section className="bg-[#E9F9FF]">
           <Container>
             <div className="w-full  flex flex-col justify-center items-center gap-8">
-              <ReactFitty>Few more suggestions for you</ReactFitty>
+              <ReactFitty className="w-full self-stretch text-center">Few more suggestions for you</ReactFitty>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 justify-between gap-8">
-                {themes
-                  .filter((theme) => theme.tag === selectedImage.tag)
-                  .map((theme) => (
-                    <div
-                      className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer"
-                      onClick={() => {
-                        setSelectedImage(theme); // update hero image
+                {VERTICAL_TEMPLATE_CATALOG.filter(
+                  (template) => template.tag === selectedTemplate.tag && template.id !== selectedTemplate.id,
+                ).map((template) => (
+                  <div
+                    className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer"
+                    key={template.id}
+                    onClick={() => {
+                      setSelectedTemplate(template); // update hero image
 
-                        // Scroll the hero section into view
-                        if (topRef.current) {
-                          topRef.current.scrollIntoView({
-                            behavior: "auto", // or "auto" if you want instant jump
-                            block: "start",
-                          });
-                        }
-                      }}
-                    >
-                      <img
-                        src={theme.src}
-                        alt={theme.alt}
-                        className="w-full h-full object-cover hover:scale-[1.2] transition-transform duration-500 ease"
-                      />
-                    </div>
-                  ))}
+                      // Scroll the hero section into view
+                      if (topRef.current) {
+                        topRef.current.scrollIntoView({
+                          behavior: "auto", // or "auto" if you want instant jump
+                          block: "start",
+                        });
+                      }
+                    }}
+                  >
+                    <img
+                      src={template.heroImage}
+                      alt={template.name}
+                      className="w-full h-full object-cover hover:scale-[1.2] transition-transform duration-500 ease"
+                    />
+                  </div>
+                ))}
               </div>
               <GetStartedButton handleSubmit={() => navigate("/signup")} />
             </div>

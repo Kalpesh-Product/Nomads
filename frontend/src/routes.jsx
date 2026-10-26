@@ -195,6 +195,7 @@ const AiHostVerifyEmail = lazyPage(() =>
 );
 const AiHostModules = lazyPage(() => import("./pages/AiHost/AiHostModules"));
 const AiHostThemes = lazyPage(() => import("./pages/AiHost/AiHostThemes"));
+const AiHostPreview = lazyPage(() => import("./pages/AiHost/AiHostPreview"));
 const AiHostLeads = lazyPage(() => import("./pages/AiHost/AiHostLeads"));
 const AiHostCareer = lazyPage(() => import("./pages/AiHost/AiHostCareer"));
 const AiHostAbout = lazyPage(() => import("./pages/AiHost/AiHostAbout"));
@@ -855,6 +856,9 @@ if (tenant === "main") {
             },
           ],
         },
+        // Deliberately not nested under AiHostLayout — a full-screen iframe
+        // preview (see AiHostPreview), not a page with our own nav around it.
+        { path: "/preview/:templateId", element: <AiHostPreview /> },
         {
           path: "/hostold",
           element: <HostLayout />,

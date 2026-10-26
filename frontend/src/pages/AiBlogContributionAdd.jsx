@@ -1,6 +1,8 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import Checkbox from "@mui/material/Checkbox";
+import ListItemText from "@mui/material/ListItemText";
 import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -54,7 +56,8 @@ const getItemDestination = (item = {}) =>
   item.destination || item.location || item.region || "";
 
 const isSameDestination = (item = {}, destination = "") =>
-  normalizeLocationKey(getItemDestination(item)) === normalizeLocationKey(destination);
+  normalizeLocationKey(getItemDestination(item)) ===
+  normalizeLocationKey(destination);
 
 const storePreviewItemForNewTab = (type, item) => {
   const itemId = getItemId(item) || Date.now();
@@ -94,10 +97,8 @@ const initialFormState = (author = "", destination = "") => ({
   placeName: "",
   address: "",
   googleMapsLink: "",
-  rating: "",
   latitude: "",
   longitude: "",
-  placeType: "",
   category: "",
   month: "",
   venue: "",
@@ -120,7 +121,8 @@ const contributionAddConfig = {
     detailsRoute: "/blog/blog-details",
     successMessage: "Blog saved successfully.",
     successTitle: "Blog Added",
-    errorMessage: "Could not save this blog. Please check the details and try again.",
+    errorMessage:
+      "Could not save this blog. Please check the details and try again.",
     submitButtonLabel: "Publish Blog",
     writeButtonLabel: "Write a Blog",
   },
@@ -138,7 +140,8 @@ const contributionAddConfig = {
     detailsRoute: "/news/news-details",
     successMessage: "News saved successfully.",
     successTitle: "News Added",
-    errorMessage: "Could not save this news item. Please check the details and try again.",
+    errorMessage:
+      "Could not save this news item. Please check the details and try again.",
     submitButtonLabel: "Publish News",
     writeButtonLabel: "Write News",
   },
@@ -157,7 +160,8 @@ const contributionAddConfig = {
     detailsRoute: (item) => `/events/${item._id || item.id}`,
     successMessage: "Event saved successfully.",
     successTitle: "Event Added",
-    errorMessage: "Could not save this event. Please check the details and try again.",
+    errorMessage:
+      "Could not save this event. Please check the details and try again.",
     submitButtonLabel: "Publish Event",
     writeButtonLabel: "Write Event",
     formType: "event",
@@ -177,7 +181,8 @@ const contributionAddConfig = {
     detailsRoute: (item) => `/places/${item._id || item.id}`,
     successMessage: "Place saved successfully.",
     successTitle: "Place Added",
-    errorMessage: "Could not save this place. Please check the details and try again.",
+    errorMessage:
+      "Could not save this place. Please check the details and try again.",
     submitButtonLabel: "Publish Place",
     writeButtonLabel: "Write Place",
     formType: "place",
@@ -188,6 +193,156 @@ const inputClassName =
   "min-h-[42px] w-full rounded-none border-0 border-b border-black/40 bg-transparent px-0 py-2 text-base text-slate-700 outline-none transition hover:border-black focus:border-b-2 focus:border-primary-blue";
 const labelClassName = "block text-xs font-normal text-gray-600";
 const errorTextClassName = "mt-1 text-xs font-medium text-red-500";
+
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const eventTypes = [
+  "Festival",
+  "Nomad",
+  "Patriotic",
+  "Religious",
+  "None of the above",
+];
+
+const eventCategories = [
+  "Culture",
+  "Heritage",
+  "Museums",
+  "Architecture",
+  "Fashion",
+  "Tourism",
+  "Cultural",
+  "Nature",
+  "Water Festival",
+  "Street Festival",
+  "Civic",
+  "Salsa",
+  "Dance",
+  "Music",
+  "Folk",
+  "Motorsports",
+  "Lifestyle",
+  "Food",
+  "Historical",
+  "Diaspora",
+  "World Music",
+  "Community",
+  "Trade Fair",
+  "Exhibition",
+  "Literature",
+  "Music & Arts",
+  "LGBTQ+",
+];
+
+const placeCategories = [
+  "National Library of Romania",
+  "Shopping",
+  "Cafés",
+  "Lifestyle",
+  "Museum",
+  "History",
+  "Culture",
+  "Waterfront",
+  "Dining",
+  "Heritage",
+  "Nightlife",
+  "Food",
+  "Cultural",
+  "Religious",
+  "Architecture",
+  "Bookstore",
+  "Arts",
+  "Entertainment",
+  "Fortress",
+  "Viewpoint",
+  "Nature",
+  "UNESCO Biosphere",
+  "Zoo",
+  "UNESCO World Heritage",
+  "Food Market",
+  "Landmark",
+  "Cultural Street",
+];
+
+const CategorySelect = ({ options, value, onChange, error }) => {
+  const selectedCategories = value ? value.split(" / ") : [];
+
+  return (
+    <TextField
+      select
+      label="Category"
+      required
+      fullWidth
+      variant="standard"
+      size="small"
+      value={selectedCategories}
+      error={error}
+      helperText="Select 1 to 4 categories"
+      onChange={(event) => {
+        const selected =
+          typeof event.target.value === "string"
+            ? event.target.value.split(",")
+            : event.target.value;
+        if (selected.length <= 4) onChange(selected.join(" / "));
+      }}
+      slotProps={{
+        select: {
+          multiple: true,
+          renderValue: (selected) => selected.join(" / "),
+          MenuProps: { PaperProps: { style: { maxHeight: 360 } } },
+        },
+      }}
+    >
+      {options.map((category) => {
+        const checked = selectedCategories.includes(category);
+        return (
+          <MenuItem
+            key={category}
+            value={category}
+            disabled={!checked && selectedCategories.length >= 4}
+          >
+            <Checkbox checked={checked} />
+            <ListItemText primary={category} />
+          </MenuItem>
+        );
+      })}
+    </TextField>
+  );
+};
+
+const MonthSelect = ({ value, onChange, error, required = true }) => (
+  <TextField
+    select
+    label={required ? "Month" : "Month (optional)"}
+    required={required}
+    fullWidth
+    variant="standard"
+    size="small"
+    value={value}
+    onChange={onChange}
+    error={error}
+  >
+    {!required && <MenuItem value="">None</MenuItem>}
+    {months.map((month) => (
+      <MenuItem key={month} value={month}>
+        {month}
+      </MenuItem>
+    ))}
+  </TextField>
+);
 
 const ContributionTextField = ({ as, maxLength, ...props }) => (
   <CharacterLimitedField
@@ -234,7 +389,9 @@ const BlogImageFileInput = ({
     )}
     <div
       className={`contribution-upload flex min-h-[32px] items-center gap-3 border-b bg-white text-sm transition ${
-        error ? "border-red-500" : "border-black/40 hover:border-black focus-within:border-primary-blue"
+        error
+          ? "border-red-500"
+          : "border-black/40 hover:border-black focus-within:border-primary-blue"
       }`}
     >
       <input
@@ -281,7 +438,8 @@ const DropdownBadge = ({
 
   if (isInputVariant) {
     const selectedOption = options.find(
-      (option) => option.value === selectedValue || option.label === selectedValue,
+      (option) =>
+        option.value === selectedValue || option.label === selectedValue,
     );
 
     return (
@@ -295,7 +453,9 @@ const DropdownBadge = ({
         disabled={disabled}
         value={selectedOption?.value ?? ""}
         onChange={(event) => {
-          const option = options.find(({ value }) => value === event.target.value);
+          const option = options.find(
+            ({ value }) => value === event.target.value,
+          );
           if (option) onSelect(option);
         }}
       >
@@ -309,90 +469,96 @@ const DropdownBadge = ({
   }
 
   return (
-  <div className="relative w-full min-w-0 flex-1">
-    <button
-      type="button"
-      onClick={onToggle}
-      disabled={disabled}
-      className={
-        isInputVariant
-          ? `flex min-h-[42px] w-full items-center justify-between gap-2 border-b py-2 text-base outline-none transition-colors ${
-              disabled
-                ? "cursor-not-allowed border-black/20 bg-white text-black/35"
-                : isOpen
-                  ? "border-primary-blue bg-white text-slate-700"
-                  : "border-black/40 bg-white text-slate-700 hover:border-black"
-            }`
-          : `flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
-              disabled
-                ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
-                : isOpen
-                  ? "border-sky-500 bg-sky-500 text-white"
-                  : "border-black/20 bg-white text-black/85 hover:border-sky-500"
-            }`
-      }
-      aria-haspopup="listbox"
-      aria-expanded={isOpen}
-    >
-      <span className="truncate">{selectedValue}</span>
-      <HiOutlineChevronDown
-        size={18}
-        className={`shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
-      />
-    </button>
-
-    {isOpen && !disabled && (
-      <div
-        className={`absolute top-full z-40 w-full min-w-[11rem] max-w-[calc(100vw-4rem)] border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] ${
-          isInputVariant ? "mt-2 rounded-md" : "mt-3 rounded-2xl"
-        }`}
+    <div className="relative w-full min-w-0 flex-1">
+      <button
+        type="button"
+        onClick={onToggle}
+        disabled={disabled}
+        className={
+          isInputVariant
+            ? `flex min-h-[42px] w-full items-center justify-between gap-2 border-b py-2 text-base outline-none transition-colors ${
+                disabled
+                  ? "cursor-not-allowed border-black/20 bg-white text-black/35"
+                  : isOpen
+                    ? "border-primary-blue bg-white text-slate-700"
+                    : "border-black/40 bg-white text-slate-700 hover:border-black"
+              }`
+            : `flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors sm:px-5 ${
+                disabled
+                  ? "cursor-not-allowed border-black/10 bg-black/[0.03] text-black/35"
+                  : isOpen
+                    ? "border-sky-500 bg-sky-500 text-white"
+                    : "border-black/20 bg-white text-black/85 hover:border-sky-500"
+              }`
+        }
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
       >
-        <ul
-          className="max-h-72 overflow-y-auto"
-          role="listbox"
-          aria-label={label}
-        >
-          {options.map((option) => {
-            const isSelected =
-              option.value === selectedValue || option.label === selectedValue;
+        <span className="truncate">{selectedValue}</span>
+        <HiOutlineChevronDown
+          size={18}
+          className={`shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
 
-            return (
-              <li key={option.value}>
-                <button
-                  type="button"
-                  onClick={() => onSelect(option)}
-                  className={`group flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
-                    isSelected
-                      ? "bg-sky-50 font-medium text-sky-600"
-                      : "text-black/80 hover:bg-slate-50"
-                  }`}
-                  role="option"
-                  aria-selected={isSelected}
-                >
-                  <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
-                    <FaCheck
-                      size={13}
-                      className={`shrink-0 text-primary-blue transition-opacity ${
-                        isSelected
-                          ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100"
-                      }`}
-                      aria-hidden="true"
-                    />
-                  </span>
-                  <span>{option.label}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    )}
-  </div>
+      {isOpen && !disabled && (
+        <div
+          className={`absolute top-full z-40 w-full min-w-[11rem] max-w-[calc(100vw-4rem)] border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)] ${
+            isInputVariant ? "mt-2 rounded-md" : "mt-3 rounded-2xl"
+          }`}
+        >
+          <ul
+            className="max-h-72 overflow-y-auto"
+            role="listbox"
+            aria-label={label}
+          >
+            {options.map((option) => {
+              const isSelected =
+                option.value === selectedValue ||
+                option.label === selectedValue;
+
+              return (
+                <li key={option.value}>
+                  <button
+                    type="button"
+                    onClick={() => onSelect(option)}
+                    className={`group flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                      isSelected
+                        ? "bg-sky-50 font-medium text-sky-600"
+                        : "text-black/80 hover:bg-slate-50"
+                    }`}
+                    role="option"
+                    aria-selected={isSelected}
+                  >
+                    <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
+                      <FaCheck
+                        size={13}
+                        className={`shrink-0 text-primary-blue transition-opacity ${
+                          isSelected
+                            ? "opacity-100"
+                            : "opacity-0 group-hover:opacity-100"
+                        }`}
+                        aria-hidden="true"
+                      />
+                    </span>
+                    <span>{option.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 };
 
-const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) => {
+const ContributionPreviewCard = ({
+  item,
+  stateName,
+  config,
+  returnSelection,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isSubmittedByUser = Boolean(item.__submittedByUser);
@@ -425,7 +591,9 @@ const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) =
           image: item.mainImage || item.image,
           location: item.venue || item.location,
           meta: item.month || item.meta,
-          subtitle: item.month ? `During the month of ${item.month}` : item.subtitle,
+          subtitle: item.month
+            ? `During the month of ${item.month}`
+            : item.subtitle,
           description: item.shortDescription || item.description,
           region: item.destination || item.region,
         }
@@ -443,9 +611,12 @@ const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) =
             lat: item.latitude,
             lng: item.longitude,
           }
-      : item;
+        : item;
   const openPublicDetails = () => {
-    const previewKey = storePreviewItemForNewTab(config.contentLabel.toLowerCase(), detailStateItem);
+    const previewKey = storePreviewItemForNewTab(
+      config.contentLabel.toLowerCase(),
+      detailStateItem,
+    );
     const separator = publicDetailsRoute.includes("?") ? "&" : "?";
     window.open(
       `${publicDetailsRoute}${separator}previewKey=${encodeURIComponent(previewKey)}`,
@@ -474,7 +645,9 @@ const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) =
           type="button"
           onClick={openPublicDetails}
           className={`absolute left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/55 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-black/70 ${
-            isSubmittedByUser ? "top-[42%] -translate-y-1/2" : "top-1/2 -translate-y-1/2"
+            isSubmittedByUser
+              ? "top-[42%] -translate-y-1/2"
+              : "top-1/2 -translate-y-1/2"
           }`}
         >
           <HiOutlineEye size={14} />
@@ -503,10 +676,7 @@ const ContributionPreviewCard = ({ item, stateName, config, returnSelection }) =
         ) : null}
       </div>
       <div className="flex h-[25%] flex-col gap-1 px-4 pr-1">
-        <h3
-          className="truncate text-xs font-semibold md:text-sm"
-          title={title}
-        >
+        <h3 className="truncate text-xs font-semibold md:text-sm" title={title}>
           {title}
         </h3>
         <div className="flex w-full items-center justify-between gap-2">
@@ -540,7 +710,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const isArticleContribution = ["blog", "news"].includes(type);
   const isEventForm = config.formType === "event";
   const isPlaceForm = config.formType === "place";
-  const supportsImageUploads = ["blog", "news", "event", "places"].includes(type);
+  const supportsImageUploads = ["blog", "news", "event", "places"].includes(
+    type,
+  );
   const supportsSectionImageUploads = ["blog", "news"].includes(type);
   const selectionStorageKey = getSelectionStorageKey(type);
   const hasAccess = Boolean(user?.[config.accessFlag]);
@@ -552,8 +724,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedLocationLabel, setSelectedLocationLabel] = useState("");
-  const [showForm, setShowForm] = useState(() =>
-    isAddRoute || Boolean(routeLocation.state?.openForm),
+  const [showForm, setShowForm] = useState(
+    () => isAddRoute || Boolean(routeLocation.state?.openForm),
   );
   const [formValues, setFormValues] = useState(() =>
     initialFormState(contributorName),
@@ -588,9 +760,14 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         destinations.forEach((destination) => {
           if (!destination?.title || !destination?.country) return;
 
-          [destination.state, destination.title].filter(Boolean).forEach((name) => {
-            lookup.set(getLocationKey(destination.country, name), destination.title);
-          });
+          [destination.state, destination.title]
+            .filter(Boolean)
+            .forEach((name) => {
+              lookup.set(
+                getLocationKey(destination.country, name),
+                destination.title,
+              );
+            });
         });
 
         return lookup;
@@ -660,7 +837,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     "Select Country";
   const locationLabel =
     selectedLocationLabel ||
-    locationOptions.find((option) => option.value === selectedLocation)?.label ||
+    locationOptions.find((option) => option.value === selectedLocation)
+      ?.label ||
     "Select Location";
 
   const hasAllSelections = Boolean(
@@ -676,53 +854,64 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       location: selectedLocation,
       locationLabel: selectedLocationLabel,
     }),
-    [selectedContinent, selectedCountry, selectedLocation, selectedLocationLabel],
+    [
+      selectedContinent,
+      selectedCountry,
+      selectedLocation,
+      selectedLocationLabel,
+    ],
   );
   const previewHeadingLocation = hasAllSelections ? `${locationLabel} ` : "";
 
-  const { data: existingItems = [], isPending: isExistingItemsLoading } = useQuery({
-    queryKey: [config.existingQueryKey, selectedDestination],
-    queryFn: async () => {
-      const response = await axios.get(config.existingEndpoint, {
-        params:
-          selectedDestination && typeof config.existingParams === "function"
-            ? config.existingParams(selectedDestination)
-            : selectedDestination
-              ? {
-                  keyword: buildExactKeyword(selectedDestination),
-                }
-              : {},
-      });
-
-      return Array.isArray(response.data) ? response.data : [];
-    },
-    enabled: true,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: userSubmittedItems = [], isPending: isUserSubmittedItemsLoading } =
+  const { data: existingItems = [], isPending: isExistingItemsLoading } =
     useQuery({
-      queryKey: [config.myQueryKey, user?._id || user?.id, selectedDestination],
+      queryKey: [config.existingQueryKey, selectedDestination],
       queryFn: async () => {
-        const response = await axiosPrivate.get(config.myEndpoint);
-        const items = Array.isArray(response.data?.data) ? response.data.data : [];
+        const response = await axios.get(config.existingEndpoint, {
+          params:
+            selectedDestination && typeof config.existingParams === "function"
+              ? config.existingParams(selectedDestination)
+              : selectedDestination
+                ? {
+                    keyword: buildExactKeyword(selectedDestination),
+                  }
+                : {},
+        });
 
-        return items
-          .filter(
-            (item) =>
-              (!selectedDestination || isSameDestination(item, selectedDestination)) &&
-              !item.isDraft &&
-              (item.status || "pending").toLowerCase() === "approved",
-          )
-          .sort((a, b) => getItemDateValue(b) - getItemDateValue(a))
-          .map((item) => ({
-            ...item,
-            __submittedByUser: true,
-          }));
+        return Array.isArray(response.data) ? response.data : [];
       },
-      enabled: Boolean(user?._id || user?.id),
+      enabled: true,
       refetchOnWindowFocus: false,
     });
+
+  const {
+    data: userSubmittedItems = [],
+    isPending: isUserSubmittedItemsLoading,
+  } = useQuery({
+    queryKey: [config.myQueryKey, user?._id || user?.id, selectedDestination],
+    queryFn: async () => {
+      const response = await axiosPrivate.get(config.myEndpoint);
+      const items = Array.isArray(response.data?.data)
+        ? response.data.data
+        : [];
+
+      return items
+        .filter(
+          (item) =>
+            (!selectedDestination ||
+              isSameDestination(item, selectedDestination)) &&
+            !item.isDraft &&
+            (item.status || "pending").toLowerCase() === "approved",
+        )
+        .sort((a, b) => getItemDateValue(b) - getItemDateValue(a))
+        .map((item) => ({
+          ...item,
+          __submittedByUser: true,
+        }));
+    },
+    enabled: Boolean(user?._id || user?.id),
+    refetchOnWindowFocus: false,
+  });
 
   const previewItems = useMemo(() => {
     const submittedIds = new Set(
@@ -732,7 +921,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       userSubmittedItems
         .map((item) =>
           normalizeLocationKey(
-            item.mainTitle || item.eventName || item.placeName || item.title || "",
+            item.mainTitle ||
+              item.eventName ||
+              item.placeName ||
+              item.title ||
+              "",
           ),
         )
         .filter(Boolean),
@@ -756,7 +949,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     isExistingItemsLoading || isUserSubmittedItemsLoading;
 
   const { mutate: createContribution, isPending: isSaving } = useMutation({
-    mutationFn: async (payload) => axiosPrivate.post(config.myEndpoint, payload),
+    mutationFn: async (payload) =>
+      axiosPrivate.post(config.myEndpoint, payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: [config.existingQueryKey, selectedDestination],
@@ -770,10 +964,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       navigate(config.dashboardPath);
     },
     onError: (error) => {
-      showErrorAlert(
-        error?.response?.data?.message ||
-          config.errorMessage,
-      );
+      showErrorAlert(error?.response?.data?.message || config.errorMessage);
     },
   });
 
@@ -810,7 +1001,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       sessionStorage.removeItem(selectionStorageKey);
       navigate(`${routeLocation.pathname}${routeLocation.search}`, {
         replace: true,
-        state: { ...routeLocation.state, freshAdd: false, openForm: isAddRoute },
+        state: {
+          ...routeLocation.state,
+          freshAdd: false,
+          openForm: isAddRoute,
+        },
       });
       return;
     }
@@ -865,7 +1060,10 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   useEffect(() => {
     if (!hasAllSelections) return;
 
-    sessionStorage.setItem(selectionStorageKey, JSON.stringify(currentSelection));
+    sessionStorage.setItem(
+      selectionStorageKey,
+      JSON.stringify(currentSelection),
+    );
   }, [currentSelection, hasAllSelections, selectionStorageKey]);
 
   useEffect(() => {
@@ -969,11 +1167,21 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     }
 
     if (isEventForm) {
-      if (!formValues.eventName.trim()) errors.eventName = "Event name is required";
+      if (!formValues.eventName.trim())
+        errors.eventName = "Event name is required";
       if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
         errors.mainImage = "Main image is required";
       }
-      if (!formValues.category.trim()) errors.category = "Category is required";
+      const categories = formValues.category
+        ? formValues.category.split(" / ")
+        : [];
+      if (
+        categories.length < 1 ||
+        categories.length > 4 ||
+        categories.some((category) => !eventCategories.includes(category))
+      ) {
+        errors.category = "Select between 1 and 4 categories";
+      }
       if (!formValues.month.trim()) errors.month = "Month is required";
       if (!formValues.venue.trim()) errors.venue = "Venue is required";
       if (!formValues.eventType.trim()) errors.eventType = "Type is required";
@@ -985,7 +1193,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
     }
 
     if (isPlaceForm) {
-      if (!formValues.placeName.trim()) errors.placeName = "Place name is required";
+      if (!formValues.placeName.trim())
+        errors.placeName = "Place name is required";
       if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
         errors.mainImage = "Main image is required";
       }
@@ -993,13 +1202,19 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       if (!formValues.googleMapsLink.trim()) {
         errors.googleMapsLink = "Google Maps link is required";
       }
-      if (!formValues.rating.trim()) errors.rating = "Rating is required";
-      if (!formValues.placeType.trim()) errors.placeType = "Type is required";
-      if (!formValues.category.trim()) errors.category = "Category is required";
-      if (!formValues.month.trim()) errors.month = "Month is required";
-      if (!formValues.venue.trim()) errors.venue = "Venue is required";
+      const categories = formValues.category
+        ? formValues.category.split(" / ")
+        : [];
+      if (
+        categories.length < 1 ||
+        categories.length > 4 ||
+        categories.some((category) => !placeCategories.includes(category))
+      ) {
+        errors.category = "Select between 1 and 4 categories";
+      }
       if (!formValues.latitude.trim()) errors.latitude = "Latitude is required";
-      if (!formValues.longitude.trim()) errors.longitude = "Longitude is required";
+      if (!formValues.longitude.trim())
+        errors.longitude = "Longitude is required";
       if (!formValues.shortDescription.trim()) {
         errors.shortDescription = "Short description is required";
       }
@@ -1007,7 +1222,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       return errors;
     }
 
-    if (!formValues.mainTitle.trim()) errors.mainTitle = "Main title is required";
+    if (!formValues.mainTitle.trim())
+      errors.mainTitle = "Main title is required";
     if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
       errors.mainImage = "Main image is required";
     }
@@ -1075,7 +1291,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         mainTitle: formValues.mainTitle.trim(),
         mainImage: formValues.mainImage.trim(),
         mainContent: formValues.mainContent.trim(),
-        author: isArticleContribution ? contributorName : formValues.author.trim(),
+        author: isArticleContribution
+          ? contributorName
+          : formValues.author.trim(),
         date: isArticleContribution
           ? new Date().toISOString()
           : formValues.date
@@ -1123,7 +1341,10 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         category: formValues.category.trim(),
         month: formValues.month.trim(),
         venue: formValues.venue.trim(),
-        eventType: formValues.eventType.trim(),
+        eventType:
+          formValues.eventType === "None of the above"
+            ? ""
+            : formValues.eventType.trim(),
         sections: cleanedSections,
         isDraft: status === "draft",
       };
@@ -1161,13 +1382,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
         link: "",
         address: formValues.address.trim(),
         googleMapsLink: formValues.googleMapsLink.trim(),
-        rating: formValues.rating.trim(),
         category: formValues.category.trim(),
         month: formValues.month.trim(),
         venue: formValues.venue.trim(),
         latitude: formValues.latitude,
         longitude: formValues.longitude,
-        placeType: formValues.placeType.trim(),
         sections: cleanedSections,
         isDraft: status === "draft",
       };
@@ -1200,7 +1419,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       mainTitle: formValues.mainTitle.trim(),
       mainImage: formValues.mainImage.trim(),
       mainContent: formValues.mainContent.trim(),
-      author: isArticleContribution ? contributorName : formValues.author.trim(),
+      author: isArticleContribution
+        ? contributorName
+        : formValues.author.trim(),
       date: isArticleContribution
         ? new Date().toISOString()
         : formValues.date
@@ -1282,7 +1503,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               onSelect={(option) => {
                 setSelectedLocation(option.value);
                 setSelectedLocationLabel(option.label);
-                setFormValues(initialFormState(contributorName, option.destination));
+                setFormValues(
+                  initialFormState(contributorName, option.destination),
+                );
                 setShowForm(false);
                 setOpenDropdown(null);
               }}
@@ -1299,33 +1522,34 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
           </div>
 
           <div className="mt-8">
-              <h1 className="mb-4 pl-0 text-sm font-semibold text-black md:pl-12">
-                Latest {previewHeadingLocation}{config.contentLabelPlural}
-              </h1>
+            <h1 className="mb-4 pl-0 text-sm font-semibold text-black md:pl-12">
+              Latest {previewHeadingLocation}
+              {config.contentLabelPlural}
+            </h1>
 
-              {isPreviewItemsLoading ? (
-                <p className="text-sm text-slate-500">
-                  Loading {config.contentLabelPlural.toLowerCase()}...
-                </p>
-              ) : previewItems.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                  {previewItems.map((item, index) => (
-                    <ContributionPreviewCard
-                      key={`${item.__submittedByUser ? "mine" : "public"}-${getItemId(item) || index}`}
-                      item={item}
-                      stateName={locationLabel}
-                      config={config}
-                      returnSelection={currentSelection}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500">
-                  No {config.contentLabel.toLowerCase()} posts found
-                  {hasAllSelections ? ` for ${locationLabel}` : ""}.
-                </p>
-              )}
-            </div>
+            {isPreviewItemsLoading ? (
+              <p className="text-sm text-slate-500">
+                Loading {config.contentLabelPlural.toLowerCase()}...
+              </p>
+            ) : previewItems.length > 0 ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                {previewItems.map((item, index) => (
+                  <ContributionPreviewCard
+                    key={`${item.__submittedByUser ? "mine" : "public"}-${getItemId(item) || index}`}
+                    item={item}
+                    stateName={locationLabel}
+                    config={config}
+                    returnSelection={currentSelection}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">
+                No {config.contentLabel.toLowerCase()} posts found
+                {hasAllSelections ? ` for ${locationLabel}` : ""}.
+              </p>
+            )}
+          </div>
         </section>
       ) : (
         <section className="mt-0 bg-transparent px-0 py-2">
@@ -1435,11 +1659,14 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
             <div className="grid gap-5 lg:grid-cols-3">
               <div>
-                <ContributionTextField label={isEventForm
-                    ? "Event Name"
-                    : isPlaceForm
-                      ? "Place Name"
-                      : "Main Title"}
+                <ContributionTextField
+                  label={
+                    isEventForm
+                      ? "Event Name"
+                      : isPlaceForm
+                        ? "Place Name"
+                        : "Main Title"
+                  }
                   className={getFieldClassName(
                     isEventForm
                       ? "eventName"
@@ -1462,7 +1689,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       ? formValues.eventName
                       : isPlaceForm
                         ? formValues.placeName
-                      : formValues.mainTitle
+                        : formValues.mainTitle
                   }
                   onChange={(event) =>
                     updateFormField(
@@ -1506,24 +1733,26 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   />
                 ) : (
                   <>
-                  <ContributionTextField label="Main Image URL"
-                    className={getFieldClassName("mainImage")}
-                    required
-                    aria-invalid={Boolean(getErrorMessage("mainImage"))}
-                    value={formValues.mainImage}
-                    maxLength={contributionFieldLimits.mainImage}
-                    onChange={(event) =>
-                      updateFormField("mainImage", event.target.value)
-                    }
-                    placeholder="Main image URL"
-                  />
-                  <FieldError message={getErrorMessage("mainImage")} />
-                </>
+                    <ContributionTextField
+                      label="Main Image URL"
+                      className={getFieldClassName("mainImage")}
+                      required
+                      aria-invalid={Boolean(getErrorMessage("mainImage"))}
+                      value={formValues.mainImage}
+                      maxLength={contributionFieldLimits.mainImage}
+                      onChange={(event) =>
+                        updateFormField("mainImage", event.target.value)
+                      }
+                      placeholder="Main image URL"
+                    />
+                    <FieldError message={getErrorMessage("mainImage")} />
+                  </>
                 )}
               </div>
               {isArticleContribution ? (
                 <div>
-                  <ContributionTextField label="Source (optional)"
+                  <ContributionTextField
+                    label="Source (optional)"
                     className={getFieldClassName("source")}
                     aria-invalid={Boolean(getErrorMessage("source"))}
                     value={formValues.source}
@@ -1538,23 +1767,19 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               ) : null}
               {isEventForm ? (
                 <div>
-                  <ContributionTextField label="Category"
-                    className={getFieldClassName("category")}
-                    required
-                    aria-invalid={Boolean(getErrorMessage("category"))}
+                  <CategorySelect
+                    options={eventCategories}
+                    error={Boolean(getErrorMessage("category"))}
                     value={formValues.category}
-                    maxLength={contributionFieldLimits.category}
-                    onChange={(event) =>
-                      updateFormField("category", event.target.value)
-                    }
-                    placeholder="Category"
+                    onChange={(value) => updateFormField("category", value)}
                   />
                   <FieldError message={getErrorMessage("category")} />
                 </div>
               ) : null}
               {isPlaceForm ? (
                 <div>
-                  <ContributionTextField label="Address"
+                  <ContributionTextField
+                    label="Address"
                     className={getFieldClassName("address")}
                     required
                     aria-invalid={Boolean(getErrorMessage("address"))}
@@ -1573,21 +1798,18 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             {config.formType === "event" ? (
               <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 <div>
-                  <ContributionTextField label="Month"
-                    className={getFieldClassName("month")}
-                    required
-                    aria-invalid={Boolean(getErrorMessage("month"))}
+                  <MonthSelect
+                    error={Boolean(getErrorMessage("month"))}
                     value={formValues.month}
-                    maxLength={contributionFieldLimits.month}
                     onChange={(event) =>
                       updateFormField("month", event.target.value)
                     }
-                    placeholder="Month"
                   />
                   <FieldError message={getErrorMessage("month")} />
                 </div>
                 <div>
-                  <ContributionTextField label="Venue"
+                  <ContributionTextField
+                    label="Venue"
                     className={getFieldClassName("venue")}
                     required
                     aria-invalid={Boolean(getErrorMessage("venue"))}
@@ -1601,25 +1823,34 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   <FieldError message={getErrorMessage("venue")} />
                 </div>
                 <div>
-                  <ContributionTextField label="Type"
-                    className={getFieldClassName("eventType")}
+                  <TextField
+                    select
+                    label="Type"
                     required
-                    aria-invalid={Boolean(getErrorMessage("eventType"))}
+                    fullWidth
+                    variant="standard"
+                    size="small"
+                    error={Boolean(getErrorMessage("eventType"))}
                     value={formValues.eventType}
-                    maxLength={contributionFieldLimits.type}
                     onChange={(event) =>
                       updateFormField("eventType", event.target.value)
                     }
-                    placeholder="Type"
-                  />
+                  >
+                    {eventTypes.map((eventType) => (
+                      <MenuItem key={eventType} value={eventType}>
+                        {eventType}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                   <FieldError message={getErrorMessage("eventType")} />
                 </div>
               </div>
             ) : config.formType === "place" ? (
               <>
-                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-5 grid gap-5 md:grid-cols-2">
                   <div>
-                    <ContributionTextField label="Google Maps Link"
+                    <ContributionTextField
+                      label="Google Maps Link"
                       className={getFieldClassName("googleMapsLink")}
                       required
                       aria-invalid={Boolean(getErrorMessage("googleMapsLink"))}
@@ -1633,68 +1864,21 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("googleMapsLink")} />
                   </div>
                   <div>
-                    <ContributionTextField label="Rating"
-                      className={getFieldClassName("rating")}
-                      required
-                      aria-invalid={Boolean(getErrorMessage("rating"))}
-                      value={formValues.rating}
-                      maxLength={contributionFieldLimits.rating}
-                      onChange={(event) =>
-                        updateFormField("rating", event.target.value)
-                      }
-                      placeholder="Rating"
-                    />
-                    <FieldError message={getErrorMessage("rating")} />
-                  </div>
-                  <div>
-                    <ContributionTextField label="Type"
-                      className={getFieldClassName("placeType")}
-                      required
-                      aria-invalid={Boolean(getErrorMessage("placeType"))}
-                      value={formValues.placeType}
-                      maxLength={contributionFieldLimits.type}
-                      onChange={(event) =>
-                        updateFormField("placeType", event.target.value)
-                      }
-                      placeholder="Type"
-                    />
-                    <FieldError message={getErrorMessage("placeType")} />
-                  </div>
-                </div>
-
-                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
-                  <div>
-                    <ContributionTextField label="Category"
-                      className={getFieldClassName("category")}
-                      required
-                      aria-invalid={Boolean(getErrorMessage("category"))}
+                    <CategorySelect
+                      options={placeCategories}
+                      error={Boolean(getErrorMessage("category"))}
                       value={formValues.category}
-                      maxLength={contributionFieldLimits.category}
-                      onChange={(event) =>
-                        updateFormField("category", event.target.value)
-                      }
-                      placeholder="Category"
+                      onChange={(value) => updateFormField("category", value)}
                     />
                     <FieldError message={getErrorMessage("category")} />
                   </div>
+                </div>
+
+                <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   <div>
-                    <ContributionTextField label="Month"
-                      className={getFieldClassName("month")}
-                      required
-                      aria-invalid={Boolean(getErrorMessage("month"))}
-                      value={formValues.month}
-                      maxLength={contributionFieldLimits.month}
-                      onChange={(event) =>
-                        updateFormField("month", event.target.value)
-                      }
-                      placeholder="Month"
-                    />
-                    <FieldError message={getErrorMessage("month")} />
-                  </div>
-                  <div>
-                    <ContributionTextField label="Venue"
+                    <ContributionTextField
+                      label="Venue (optional)"
                       className={getFieldClassName("venue")}
-                      required
                       aria-invalid={Boolean(getErrorMessage("venue"))}
                       value={formValues.venue}
                       maxLength={contributionFieldLimits.venue}
@@ -1706,7 +1890,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("venue")} />
                   </div>
                   <div>
-                    <ContributionTextField label="Latitude"
+                    <ContributionTextField
+                      label="Latitude"
                       className={getFieldClassName("latitude")}
                       required
                       aria-invalid={Boolean(getErrorMessage("latitude"))}
@@ -1720,7 +1905,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     <FieldError message={getErrorMessage("latitude")} />
                   </div>
                   <div>
-                    <ContributionTextField label="Longitude"
+                    <ContributionTextField
+                      label="Longitude"
                       className={getFieldClassName("longitude")}
                       required
                       aria-invalid={Boolean(getErrorMessage("longitude"))}
@@ -1736,9 +1922,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                 </div>
               </>
             ) : isArticleContribution ? null : (
-              <div
-                className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4"
-              >
+              <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <label className={labelClassName}>Author</label>
                   <input
@@ -1789,15 +1973,24 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             )}
 
             <div className="mt-6">
-              <ContributionTextField label={isEventForm || isPlaceForm ? "Short Description" : "Main Content"}
+              <ContributionTextField
+                label={
+                  isEventForm || isPlaceForm
+                    ? "Short Description"
+                    : "Main Content"
+                }
                 as="textarea"
                 className={`${getFieldClassName(
-                  isEventForm || isPlaceForm ? "shortDescription" : "mainContent",
+                  isEventForm || isPlaceForm
+                    ? "shortDescription"
+                    : "mainContent",
                 )} min-h-[150px] resize-y leading-relaxed`}
                 required
                 aria-invalid={Boolean(
                   getErrorMessage(
-                    isEventForm || isPlaceForm ? "shortDescription" : "mainContent",
+                    isEventForm || isPlaceForm
+                      ? "shortDescription"
+                      : "mainContent",
                   ),
                 )}
                 value={
@@ -1826,12 +2019,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               />
               <FieldError
                 message={getErrorMessage(
-                  isEventForm || isPlaceForm ? "shortDescription" : "mainContent",
+                  isEventForm || isPlaceForm
+                    ? "shortDescription"
+                    : "mainContent",
                 )}
               />
             </div>
 
-            {config.formType === "event" || config.formType === "place" ? null : (
+            {config.formType === "event" ||
+            config.formType === "place" ? null : (
               <>
                 <h2 className="mt-5 text-lg font-semibold text-slate-700">
                   Sections
@@ -1839,10 +2035,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
                 <div className="mt-3 space-y-4">
                   {formValues.sections.map((section, index) => (
-                    <div
-                      key={index}
-                      className="border-t border-slate-200 pt-5"
-                    >
+                    <div key={index} className="border-t border-slate-200 pt-5">
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <h3 className="text-sm font-medium text-slate-600">
                           Section {index + 1}
@@ -1861,7 +2054,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
                       <div className="space-y-4">
                         <div>
-                          <ContributionTextField label="Section Title"
+                          <ContributionTextField
+                            label="Section Title"
                             className={getFieldClassName(
                               `sections.${index}.title`,
                             )}
@@ -1891,11 +2085,14 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                               onChange={(file) =>
                                 updateSectionImageFile(index, file)
                               }
-                              onClear={() => updateSectionImageFile(index, null)}
+                              onClear={() =>
+                                updateSectionImageFile(index, null)
+                              }
                             />
                           ) : (
                             <>
-                              <ContributionTextField label="Section Image URL"
+                              <ContributionTextField
+                                label="Section Image URL"
                                 className={getFieldClassName(
                                   `sections.${index}.image`,
                                 )}
@@ -1906,18 +2103,25 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                                 value={section.image}
                                 maxLength={contributionFieldLimits.sectionImage}
                                 onChange={(event) =>
-                                  updateSection(index, "image", event.target.value)
+                                  updateSection(
+                                    index,
+                                    "image",
+                                    event.target.value,
+                                  )
                                 }
                                 placeholder="Section Image URL"
                               />
                               <FieldError
-                                message={getErrorMessage(`sections.${index}.image`)}
+                                message={getErrorMessage(
+                                  `sections.${index}.image`,
+                                )}
                               />
                             </>
                           )}
                         </div>
                         <div>
-                          <ContributionTextField label="Section Content"
+                          <ContributionTextField
+                            label="Section Content"
                             as="textarea"
                             className={`${getFieldClassName(
                               `sections.${index}.content`,
@@ -1929,7 +2133,11 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             value={section.content}
                             maxLength={contributionFieldLimits.sectionContent}
                             onChange={(event) =>
-                              updateSection(index, "content", event.target.value)
+                              updateSection(
+                                index,
+                                "content",
+                                event.target.value,
+                              )
                             }
                             placeholder="Section content"
                           />

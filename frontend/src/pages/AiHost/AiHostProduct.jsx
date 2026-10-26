@@ -12,7 +12,9 @@ import GetStartedButton from "../../components/GetStartedButton";
 import { ReactFitty } from "react-fitty";
 import Container from "../../components/Container";
 import { HiOutlineArrowLeft } from "react-icons/hi";
-import { navigateBackWithinApp } from "../../utils/navigationHistory";
+import { buildVerticalFilters, previewHref } from "../../constants/verticalTemplateCatalog";
+import DeviceMockup from "../../components/DeviceMockup";
+import { useWebsiteThemeCatalog } from "../../hooks/useWebsiteThemeCatalog";
 
 const features = [
   "No Code Website",
@@ -62,116 +64,91 @@ const perks = [
   },
 ];
 
-const themes = [
-  {
-    src: "/hosts/themes/biznest.png",
-    mockup: "/hosts/themes/biznestProductWhite.png",
-    alt: "BiznestImage",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/coworkingMewo.png",
-    mockup: "/hosts/themes/coworkingMewoProductWhite.png",
-    alt: "CoWorkingMewo",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/coworking.png",
-    mockup: "/hosts/themes/coworkingProductWhite.png",
-    alt: "Co-Working Image",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/boutique.png",
-    mockup: "/hosts/themes/boutiqueProductTransparent.png",
-    alt: "Boutique Image",
-    tag: "boutique",
-  },
-  {
-    src: "/hosts/themes/coliving.png",
-    mockup: "/hosts/themes/colivingProductWhite.png",
-    alt: "Co-Living Image",
-    tag: "co-living",
-  },
-  {
-    src: "/hosts/themes/coworking2.png",
-    mockup: "/hosts/themes/coworkingNomadProductWhite.png",
-    alt: "CoLivingImage_2",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/coworking3.png",
-    mockup: "/hosts/themes/coworking3ProductWhite.png",
-    alt: "CoLivingImage_3",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/cafe2.png",
-    mockup: "/hosts/themes/cafe2ProductWhite.png",
-    alt: "Cafe_2",
-    tag: "cafe",
-  },
-  {
-    src: "/hosts/themes/cafe3.png",
-    mockup: "/hosts/themes/cafe3ProductWhite.png",
-    alt: "Cafe_3",
-    tag: "cafe",
-  },
-  {
-    src: "/hosts/themes/hostels.png",
-    mockup: "/hosts/themes/hostelsProductWhite.png",
-    alt: "Hostels",
-    tag: "hostels",
-  },
-];
-
 const HostProduct = () => {
-  const { state } = useLocation();
-  const initialImage = state?.image || themes[0];
+  const { state, key: locationKey } = useLocation();
+  const { themes } = useWebsiteThemeCatalog();
+  const liveThemes = themes.filter((template) => template.status !== "coming-soon");
+  const verticalFilters = buildVerticalFilters(themes);
+  const initialTemplate = state?.template || liveThemes[0] || themes[0];
 
   const topRef = useRef(null);
 
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState(initialImage);
+  const [selectedTemplate, setSelectedTemplate] = useState(initialTemplate);
+  const suggestedTemplates = liveThemes.filter(
+    (template) => template.tag === selectedTemplate?.tag && template.id !== selectedTemplate?.id,
+  );
 
+  // A real "go back" — to wherever the visitor actually came from — not always
+  // the themes grid. `location.key === "default"` means there's nothing before
+  // this entry in the app's own history (direct link/refresh), so fall back to
+  // the themes list instead of navigating(-1) out of the site.
   const onBack = () => {
-    navigateBackWithinApp(navigate);
+    if (locationKey !== "default") {
+      navigate(-1);
+    } else {
+      navigate("/themes");
+    }
   };
 
+  // Only re-sync from the navigation payload when it actually changes (a fresh
+  // navigate("/product", { state }) call) — not on every selectedTemplate update,
+  // otherwise picking a "few more suggestions" card gets immediately overwritten
+  // back to the originally-opened template on the next render.
   useEffect(() => {
-    if (state?.image) {
-      setSelectedImage(state.image);
+    if (state?.template) {
+      setSelectedTemplate(state.template);
     }
   }, [state]);
 
+  useEffect(() => {
+    if (!selectedTemplate && initialTemplate) {
+      setSelectedTemplate(initialTemplate);
+    }
+  }, [initialTemplate, selectedTemplate]);
+
+  if (!selectedTemplate) return null;
+
   return (
     <>
-      <div className="sticky top-0 z-[100] -mx-1 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
+      <div className="sticky top-0 z-[100] -mx-1 flex items-center gap-3 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
         <button
           type="button"
           onClick={onBack}
           className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-          aria-label="Go back to search results"
+          aria-label="Back to themes"
         >
           <HiOutlineArrowLeft size={18} />
         </button>
+        <nav className="flex min-w-0 flex-1 items-center overflow-x-auto whitespace-nowrap text-sm text-primary-blue custom-scrollbar-hide sm:overflow-visible md:text-base" aria-label="Breadcrumb">
+          <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
+          <button type="button" className="shrink-0 text-primary-blue transition-colors hover:text-primary-dark" onClick={() => navigate("/themes")}>
+            Themes
+          </button>
+          <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
+          <span className="shrink-0 text-primary-blue">
+            {verticalFilters.find((filter) => filter.value === selectedTemplate.tag)?.label || selectedTemplate.tag}
+          </span>
+          <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
+          <span className="shrink-0 inline-block max-w-none align-bottom">{selectedTemplate.name}</span>
+        </nav>
       </div>
       <div
-        key={location.state?.image?.src || "default"}
+        key={selectedTemplate.id || "default"}
         className="flex flex-col"
       >
         <div className="flex flex-col">
           <section
             ref={topRef}
-            className="w-full flex flex-col justify-center gap-8 "
+            className="w-full flex flex-col justify-center gap-6 "
           >
-            <Container>
+            <Container className="!w-full !pt-4 lg:!pt-6">
               <div className="grid w-full grid-cols-1 items-center gap-0 lg:grid-cols-2">
-                <div className="flex flex-col gap-10 justify-center w-full text-black">
+                <div className="flex flex-col gap-6 justify-center w-full text-black">
                   <h1 className="text-hero font-semibold">INCLUSIONS</h1>
                   <ul className="flex flex-col gap-2 ">
                     {features.map((feat) => (
-                      <li className="flex gap-2 text-content lg:text-subtitle ">
+                      <li className="flex gap-2 text-content lg:text-subtitle " key={feat}>
                         <span className="text-[#0AA9EF] font-bold">
                           ✔&nbsp;&nbsp;
                         </span>
@@ -179,20 +156,28 @@ const HostProduct = () => {
                       </li>
                     ))}
                   </ul>
-                  <GetStartedButton
-                    handleSubmit={() => navigate("/signup?step=1")}
-                    externalStyles="bg-black text-white w-full max-w-[420px] py-4 text-xl font-semibold"
-                  />
+                  <div className="flex flex-wrap gap-4">
+                    <GetStartedButton
+                      handleSubmit={() => navigate("/signup?step=1")}
+                    />
+                    <a
+                      href={previewHref(selectedTemplate)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-2 rounded-full px-10 py-3 text-base font-semibold border border-black text-black hover:bg-black hover:text-white transition-colors duration-300"
+                    >
+                      Preview
+                    </a>
+                  </div>
                 </div>
-                <div
-                  data-aos="fade-up"
-                  className="w-full overflow-hidden rounded-xl flex justify-center lg:justify-end"
-                >
-                  <img
-                    className="block rounded-xl w-full max-w-[760px] h-auto object-contain"
-                    src={selectedImage.mockup}
-                    alt={selectedImage.alt}
-                  />
+                <div data-aos="fade-up" className="flex w-full flex-col items-center mt-8 lg:mt-0 lg:items-end">
+                  <div className="w-full max-w-[640px]">
+                    <DeviceMockup
+                      laptopSrc={selectedTemplate.heroImage}
+                      mobileSrc={selectedTemplate.heroImageMobile}
+                      alt={selectedTemplate.name}
+                    />
+                  </div>
                 </div>
               </div>
             </Container>
@@ -209,7 +194,7 @@ const HostProduct = () => {
                 <div className="col-span-2">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {perks.map((perk) => (
-                      <div className="flex gap-2 items-start">
+                      <div className="flex gap-2 items-start" key={perk.title}>
                         <div className="text-content mt-1">{perk.icon}</div>
                         <div className="flex flex-col gap-2">
                           <h2 className="font-bold">{perk.title}</h2>
@@ -227,34 +212,73 @@ const HostProduct = () => {
           <section>
             <Container>
               <div className="w-full  flex flex-col justify-center items-center gap-8">
-                <ReactFitty>Few more suggestions for you</ReactFitty>
+                {suggestedTemplates.length > 0 ? (
+                  <>
+                    <ReactFitty className="w-full self-stretch text-center text-3xl font-semibold tracking-[-0.03em] text-secondary-dark sm:text-4xl">
+                      Few more suggestions for you
+                    </ReactFitty>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 justify-between gap-8">
-                  {themes
-                    .filter((theme) => theme.tag === selectedImage.tag)
-                    .map((theme) => (
-                      <div
-                        className="w-full h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] cursor-pointer"
-                        onClick={() => {
-                          setSelectedImage(theme); // update hero image
+                    <div className="flex w-full flex-wrap justify-center gap-8">
+                      {suggestedTemplates.map((template) => (
+                        <button
+                          type="button"
+                          className={`group w-full max-w-[520px] overflow-hidden border border-black/10 bg-white text-left ${
+                            suggestedTemplates.length === 2
+                              ? "lg:w-[calc(50%-1rem)]"
+                              // 3 fit on one line; 4+ also use the 3-per-row
+                              // width so they wrap onto further rows instead
+                              // of leaving a lone card stranded on its own —
+                              // justify-center keeps each wrapped row centered.
+                              : "lg:w-[calc(33.333%-1.334rem)]"
+                          }`}
+                          key={template.id}
+                          onClick={() => {
+                            // A real navigation (not just local state) so switching to a
+                            // suggested theme is its own history entry — otherwise "back"
+                            // has nothing to step through and jumps straight to Themes.
+                            navigate("/product", { state: { template } });
 
-                          // Scroll the hero section into view
-                          if (topRef.current) {
-                            topRef.current.scrollIntoView({
-                              behavior: "auto", // or "auto" if you want instant jump
-                              block: "start",
-                            });
-                          }
-                        }}
-                      >
-                        <img
-                          src={theme.src}
-                          alt={theme.alt}
-                          className="w-full h-full object-cover hover:scale-[1.2] transition-transform duration-500 ease"
-                        />
-                      </div>
-                    ))}
-                </div>
+                            if (topRef.current) {
+                              topRef.current.scrollIntoView({
+                                behavior: "auto",
+                                block: "start",
+                              });
+                            }
+                          }}
+                        >
+                          <div className="aspect-[16/10] overflow-hidden bg-gray-100">
+                            <img
+                              src={template.heroImage}
+                              alt={template.name}
+                              className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.025]"
+                            />
+                          </div>
+                          <div className="flex items-center justify-between gap-4 p-5">
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-black/45">
+                                {verticalFilters.find((filter) => filter.value === template.tag)?.label || template.tag}
+                              </p>
+                              <h3 className="mt-1 text-2xl font-semibold text-black">{template.name}</h3>
+                            </div>
+                            <span className="text-sm font-semibold text-primary-blue">View theme →</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="mx-auto max-w-2xl border-y border-black/10 py-12 text-center">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">
+                      More coming soon
+                    </p>
+                    <h2 className="mt-3 text-3xl font-semibold tracking-[-0.03em] text-black sm:text-4xl">
+                      More {verticalFilters.find((filter) => filter.value === selectedTemplate.tag)?.label || selectedTemplate.tag} themes are on the way.
+                    </h2>
+                    <p className="mt-4 text-base leading-7 text-black/55">
+                      We are working on more options for this business type.
+                    </p>
+                  </div>
+                )}
                 <GetStartedButton
                   handleSubmit={() => navigate("/signup?step=1")}
                 />
