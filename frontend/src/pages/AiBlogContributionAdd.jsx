@@ -1,8 +1,8 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import Checkbox from "@mui/material/Checkbox";
-import ListItemText from "@mui/material/ListItemText";
+import CategorySelect from "../components/CategorySelect";
+import eventCategories from "../constants/eventCategories";
 import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -217,35 +217,7 @@ const eventTypes = [
   "None of the above",
 ];
 
-const eventCategories = [
-  "Culture",
-  "Heritage",
-  "Museums",
-  "Architecture",
-  "Fashion",
-  "Tourism",
-  "Cultural",
-  "Nature",
-  "Water Festival",
-  "Street Festival",
-  "Civic",
-  "Salsa",
-  "Dance",
-  "Music",
-  "Folk",
-  "Motorsports",
-  "Lifestyle",
-  "Food",
-  "Historical",
-  "Diaspora",
-  "World Music",
-  "Community",
-  "Trade Fair",
-  "Exhibition",
-  "Literature",
-  "Music & Arts",
-  "LGBTQ+",
-];
+
 
 const placeCategories = [
   "National Library of Romania",
@@ -276,52 +248,6 @@ const placeCategories = [
   "Landmark",
   "Cultural Street",
 ];
-
-const CategorySelect = ({ options, value, onChange, error }) => {
-  const selectedCategories = value ? value.split(" / ") : [];
-
-  return (
-    <TextField
-      select
-      label="Category"
-      required
-      fullWidth
-      variant="standard"
-      size="small"
-      value={selectedCategories}
-      error={error}
-      helperText="Select 1 to 4 categories"
-      onChange={(event) => {
-        const selected =
-          typeof event.target.value === "string"
-            ? event.target.value.split(",")
-            : event.target.value;
-        if (selected.length <= 4) onChange(selected.join(" / "));
-      }}
-      slotProps={{
-        select: {
-          multiple: true,
-          renderValue: (selected) => selected.join(" / "),
-          MenuProps: { PaperProps: { style: { maxHeight: 360 } } },
-        },
-      }}
-    >
-      {options.map((category) => {
-        const checked = selectedCategories.includes(category);
-        return (
-          <MenuItem
-            key={category}
-            value={category}
-            disabled={!checked && selectedCategories.length >= 4}
-          >
-            <Checkbox checked={checked} />
-            <ListItemText primary={category} />
-          </MenuItem>
-        );
-      })}
-    </TextField>
-  );
-};
 
 const MonthSelect = ({ value, onChange, error, required = true }) => (
   <TextField

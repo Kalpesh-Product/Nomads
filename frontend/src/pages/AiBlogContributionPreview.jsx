@@ -1,4 +1,6 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
+import CategorySelect from "../components/CategorySelect";
+import eventCategories from "../constants/eventCategories";
 import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
@@ -1154,9 +1156,33 @@ const DestinationInlineEdit = ({
         />
 
         <div className="mt-6 grid gap-4 text-base font-bold text-black md:grid-cols-3">
-          <p>{primaryMeta || ""}</p>
-          <p className="md:text-center">{centerMeta || ""}</p>
-          <p className="md:text-right">{rightMeta || ""}</p>
+          {isEvent ? (
+            <>
+              <CategorySelect
+                options={eventCategories}
+                value={formValues.category}
+                onChange={(value) => updateFormField("category", value)}
+              />
+              <ArticleEditField
+                label="Month"
+                maxLength={contributionFieldLimits.month}
+                value={formValues.month}
+                onChange={(event) => updateFormField("month", event.target.value)}
+              />
+              <ArticleEditField
+                label="Venue"
+                maxLength={contributionFieldLimits.venue}
+                value={formValues.venue}
+                onChange={(event) => updateFormField("venue", event.target.value)}
+              />
+            </>
+          ) : (
+            <>
+              <p>{primaryMeta || ""}</p>
+              <p className="md:text-center">{centerMeta || ""}</p>
+              <p className="md:text-right">{rightMeta || ""}</p>
+            </>
+          )}
         </div>
 
         <hr className="my-6" />
