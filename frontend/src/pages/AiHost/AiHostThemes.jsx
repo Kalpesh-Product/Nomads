@@ -171,7 +171,7 @@ const Themes = () => {
   // footer, etc.) there's nothing left for the filters to act on, so it's
   // released back into normal flow instead of floating over unrelated content.
   const [filtersActive, setFiltersActive] = useState(true);
-  const { themes } = useWebsiteThemeCatalog({ liveRefresh: true });
+  const { themes, isPending: isCatalogPending } = useWebsiteThemeCatalog({ liveRefresh: true });
   const verticalFilters = buildVerticalFilters(themes);
   const liveThemes = themes.filter((template) => template.status !== "coming-soon");
   const featuredTemplate = liveThemes.find((template) => template.featured) || liveThemes[0] || themes[0];
@@ -356,15 +356,27 @@ const Themes = () => {
             transition={{ duration: 0.75, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
             className="relative mx-auto w-full max-w-[620px]"
           >
-            <div className="mb-4 flex items-center justify-between text-xs font-medium uppercase tracking-[0.15em] text-black/50">
-              <span>{featuredTemplate.name}</span>
-              <span>{categoryLabel(featuredTemplate.tag, verticalFilters)}</span>
-            </div>
-            <DeviceMockup
-              laptopSrc={featuredTemplate.heroImage}
-              mobileSrc={featuredTemplate.heroImageMobile}
-              alt={`${featuredTemplate.name} theme`}
-            />
+            {isCatalogPending ? (
+              <div aria-label="Loading featured theme" aria-busy="true">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="h-3 w-20 animate-pulse rounded-full bg-black/10" />
+                  <span className="h-3 w-24 animate-pulse rounded-full bg-black/10" />
+                </div>
+                <div className="aspect-[16/10] w-[88%] animate-pulse rounded-t-2xl bg-[#ebeae5]" />
+              </div>
+            ) : (
+              <>
+                <div className="mb-4 flex items-center justify-between text-xs font-medium uppercase tracking-[0.15em] text-black/50">
+                  <span>{featuredTemplate.name}</span>
+                  <span>{categoryLabel(featuredTemplate.tag, verticalFilters)}</span>
+                </div>
+                <DeviceMockup
+                  laptopSrc={featuredTemplate.heroImage}
+                  mobileSrc={featuredTemplate.heroImageMobile}
+                  alt={`${featuredTemplate.name} theme`}
+                />
+              </>
+            )}
           </Motion.div>
         </div>
       </section>
