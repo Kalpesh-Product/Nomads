@@ -1,4 +1,7 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
+import CategorySelect from "../components/CategorySelect";
+import eventCategories from "../constants/eventCategories";
+import placeCategories from "../constants/placeCategories";
 import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
@@ -6,6 +9,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { HiOutlinePencil, HiOutlinePlus, HiOutlineTrash } from "react-icons/hi";
 import Swal from "sweetalert2";
 import TextField from "@mui/material/TextField";
+import { CalendarDays } from "lucide-react";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import humanDate from "../utils/humanDate";
@@ -133,10 +137,11 @@ const BlogImageFileInput = ({
   existingUrl,
   onChange,
   onClear,
+  required = false,
 }) => (
   <div className="mt-3 rounded-xl border border-black/10 bg-white/70 p-3">
     <label className={labelClassName} htmlFor={id}>
-      {label}
+      {label}{required ? <span className="text-red-500"> *</span> : null}
     </label>
     <div className="contribution-upload flex min-h-[42px] items-center gap-3 rounded-md border border-black/10 bg-white px-3 py-2 text-sm transition focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100">
       <input
@@ -368,8 +373,9 @@ const DestinationPreview = ({ item, config, onEdit }) => {
       <section className="mt-4">
         <h2 className="text-title font-bold leading-normal">{title}</h2>
         {isEvent && item.month ? (
-          <p className="mt-2 text-base font-medium text-black">
-            During the month of {item.month}
+          <p className="mt-2 flex items-center gap-2 text-base font-medium text-black">
+            <CalendarDays size={17} />
+            {item.month}
           </p>
         ) : null}
 
@@ -703,6 +709,11 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
   };
 
   const handleSubmit = async (isDraft) => {
+    if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
+      showErrorAlert("Main image is required.");
+      return;
+    }
+
     const cleanedSections = formValues.sections
       .map((section) => ({
         title: section.title.trim(),
@@ -963,6 +974,7 @@ const ArticleInlineEdit = ({
               <BlogImageFileInput
                 id="edit-blog-main-image"
                 label="Main Image"
+                required
                 file={formValues.mainImageFile}
                 existingUrl={formValues.mainImage}
                 onChange={(file) => updateBlogImageFile("mainImage", file)}
@@ -975,6 +987,7 @@ const ArticleInlineEdit = ({
                 value={formValues.mainImage}
                 onChange={(event) => updateFormField("mainImage", event.target.value)}
                 label="Main image URL"
+                required
               />
             )}
           </div>
@@ -1027,7 +1040,7 @@ const ArticleInlineEdit = ({
               {supportsArticleImageUploads ? (
                 <BlogImageFileInput
                   id={`edit-blog-section-image-${index}`}
-                  label={`Section ${index + 1} Image`}
+                  label={`Section ${index + 1} Image (optional)`}
                   file={section.imageFile}
                   existingUrl={section.image}
                   onChange={(file) => updateSectionImageFile(index, file)}
@@ -1039,7 +1052,7 @@ const ArticleInlineEdit = ({
                   className="mt-3"
                   value={section.image}
                   onChange={(event) => updateSection(index, "image", event.target.value)}
-                  label="Section image URL"
+                  label="Section image URL (optional)"
                 />
               )}
               <ArticleEditField
@@ -1113,9 +1126,7 @@ const DestinationInlineEdit = ({
   const isEvent = config.formType === "event";
   const titleField = isEvent ? "eventName" : "placeName";
   const titlePlaceholder = isEvent ? "Event name" : "Place name";
-  const primaryMeta = isEvent ? formValues.category : formValues.category || formValues.placeType;
   const centerMeta = isEvent ? formValues.month : formValues.rating || formValues.month;
-  const rightMeta = isEvent ? formValues.venue : formValues.address || formValues.venue;
 
   return (
     <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
@@ -1147,6 +1158,7 @@ const DestinationInlineEdit = ({
         <BlogImageFileInput
           id={`edit-${config.label.toLowerCase()}-main-image`}
           label="Main Image"
+          required
           file={formValues.mainImageFile}
           existingUrl={formValues.mainImage}
           onChange={(file) => updateBlogImageFile("mainImage", file)}
@@ -1154,9 +1166,37 @@ const DestinationInlineEdit = ({
         />
 
         <div className="mt-6 grid gap-4 text-base font-bold text-black md:grid-cols-3">
-          <p>{primaryMeta || ""}</p>
-          <p className="md:text-center">{centerMeta || ""}</p>
-          <p className="md:text-right">{rightMeta || ""}</p>
+          <CategorySelect
+            options={isEvent ? eventCategories : placeCategories}
+            value={formValues.category}
+            onChange={(value) => updateFormField("category", value)}
+          />
+          {isEvent ? (
+            <>
+              <ArticleEditField
+                label="Month"
+                maxLength={contributionFieldLimits.month}
+                value={formValues.month}
+                onChange={(event) => updateFormField("month", event.target.value)}
+              />
+              <ArticleEditField
+                label="Venue"
+                maxLength={contributionFieldLimits.venue}
+                value={formValues.venue}
+                onChange={(event) => updateFormField("venue", event.target.value)}
+              />
+            </>
+          ) : (
+            <>
+              <p className="md:text-center">{centerMeta || ""}</p>
+              <ArticleEditField
+                label="Address"
+                maxLength={contributionFieldLimits.address}
+                value={formValues.address}
+                onChange={(event) => updateFormField("address", event.target.value)}
+              />
+            </>
+          )}
         </div>
 
         <hr className="my-6" />
