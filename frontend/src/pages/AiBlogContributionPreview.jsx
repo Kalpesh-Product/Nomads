@@ -1,6 +1,7 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
 import CategorySelect from "../components/CategorySelect";
 import eventCategories from "../constants/eventCategories";
+import placeCategories from "../constants/placeCategories";
 import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
@@ -1115,9 +1116,7 @@ const DestinationInlineEdit = ({
   const isEvent = config.formType === "event";
   const titleField = isEvent ? "eventName" : "placeName";
   const titlePlaceholder = isEvent ? "Event name" : "Place name";
-  const primaryMeta = isEvent ? formValues.category : formValues.category || formValues.placeType;
   const centerMeta = isEvent ? formValues.month : formValues.rating || formValues.month;
-  const rightMeta = isEvent ? formValues.venue : formValues.address || formValues.venue;
 
   return (
     <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
@@ -1156,13 +1155,13 @@ const DestinationInlineEdit = ({
         />
 
         <div className="mt-6 grid gap-4 text-base font-bold text-black md:grid-cols-3">
+          <CategorySelect
+            options={isEvent ? eventCategories : placeCategories}
+            value={formValues.category}
+            onChange={(value) => updateFormField("category", value)}
+          />
           {isEvent ? (
             <>
-              <CategorySelect
-                options={eventCategories}
-                value={formValues.category}
-                onChange={(value) => updateFormField("category", value)}
-              />
               <ArticleEditField
                 label="Month"
                 maxLength={contributionFieldLimits.month}
@@ -1178,9 +1177,13 @@ const DestinationInlineEdit = ({
             </>
           ) : (
             <>
-              <p>{primaryMeta || ""}</p>
               <p className="md:text-center">{centerMeta || ""}</p>
-              <p className="md:text-right">{rightMeta || ""}</p>
+              <ArticleEditField
+                label="Address"
+                maxLength={contributionFieldLimits.address}
+                value={formValues.address}
+                onChange={(event) => updateFormField("address", event.target.value)}
+              />
             </>
           )}
         </div>

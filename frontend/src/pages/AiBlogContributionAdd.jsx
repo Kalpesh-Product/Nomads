@@ -3,6 +3,7 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import CategorySelect from "../components/CategorySelect";
 import eventCategories from "../constants/eventCategories";
+import placeCategories from "../constants/placeCategories";
 import contributionFieldLimits from "../constants/contributionFieldLimits";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -218,36 +219,6 @@ const eventTypes = [
 ];
 
 
-
-const placeCategories = [
-  "National Library of Romania",
-  "Shopping",
-  "Cafés",
-  "Lifestyle",
-  "Museum",
-  "History",
-  "Culture",
-  "Waterfront",
-  "Dining",
-  "Heritage",
-  "Nightlife",
-  "Food",
-  "Cultural",
-  "Religious",
-  "Architecture",
-  "Bookstore",
-  "Arts",
-  "Entertainment",
-  "Fortress",
-  "Viewpoint",
-  "Nature",
-  "UNESCO Biosphere",
-  "Zoo",
-  "UNESCO World Heritage",
-  "Food Market",
-  "Landmark",
-  "Cultural Street",
-];
 
 const MonthSelect = ({ value, onChange, error, required = true }) => (
   <TextField
