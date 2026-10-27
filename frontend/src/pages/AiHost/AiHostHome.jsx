@@ -1,5 +1,5 @@
 import React from "react";
-import Container from "../../components/Container";
+import AiAlignBox from "../../components/AiAlignBox";
 import images from "../../assets/images";
 import FeatureCard from "../../components/FeatureCard";
 import GetStartedButton from "../../components/GetStartedButton";
@@ -12,6 +12,7 @@ import {
   TbWorldWww,
 } from "react-icons/tb";
 import Seo from "../../components/Seo";
+import { useWebsiteThemeCatalog } from "../../hooks/useWebsiteThemeCatalog";
 
 const ReactFitty = React.lazy(() =>
   import("react-fitty").then((module) => ({ default: module.ReactFitty })),
@@ -116,17 +117,22 @@ const HostHome = () => {
         "Our approach is based on data and analytics to help you make decisions which will grow your business without employee dependency.",
     },
   ];
-  const noCode = [
-    { id: 1, image: "/hosts/themes/cafe.webp", label: "Cafe" },
-    { id: 2, image: "/hosts/themes/coworking.png", label: "Co-Working" },
-    { id: 3, image: "/hosts/themes/coliving.png", label: "Co-Living" },
-    { id: 4, image: "/hosts/themes/boutique.png", label: "Boutique" },
-  ];
+  // Admin-picked via Theme Store Catalog's "Show on host.wono.co homepage"
+  // toggle, instead of a hardcoded list — shows at most 4.
+  const { themes } = useWebsiteThemeCatalog();
+  const noCode = themes
+    .filter((template) => template.showOnHostHome)
+    .slice(0, 4)
+    .map((template) => ({
+      id: template.id,
+      image: template.heroImage,
+      label: template.name,
+    }));
   return (
-    <main>
+    <main className="-mx-1 w-[calc(100%+0.5rem)] md:-mx-6 md:w-[calc(100%+3rem)] lg:-mx-10 lg:w-[calc(100%+5rem)] xl:-mx-24 xl:w-[calc(100%+12rem)]">
       <Seo path="https://host.wono.co/" />
       <AiHostPricing />
-      <Container padding={false}>
+      <AiAlignBox>
         <section className="pb-4 pt-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
@@ -173,9 +179,9 @@ const HostHome = () => {
             })}
           </div>
         </section>
-      </Container>
+      </AiAlignBox>
       {/* Key Modules */}
-      <Container>
+      <AiAlignBox className="py-10 lg:py-16">
         <section className="space-y-2">
           <div>
             <h1 className="text-[clamp(1.2rem,2.9vw,7rem)] font-semibold text-center text-secondary-dark">
@@ -188,13 +194,13 @@ const HostHome = () => {
             ))}
           </div>
         </section>
-      </Container>
+      </AiAlignBox>
       {/* Key Modules */}
-      <Container padding={false}>
+      <AiAlignBox>
         <hr className="border-t-4 border-gray-300" />
-      </Container>
+      </AiAlignBox>
       <section>
-        <Container padding={false}>
+        <AiAlignBox>
           <div className="flex flex-col gap-6 lg:pt-16 lg:pb-8 pb-10 pt-10">
             <div className="flex flex-col leading-tight">
               <FitText>
@@ -232,11 +238,11 @@ const HostHome = () => {
               />
             </div>
           </div>
-        </Container>
+        </AiAlignBox>
       </section>
       <MySeperator />
       <section className="">
-        <Container padding={false}>
+        <AiAlignBox>
           <div className="flex flex-col leading-tight lg:pt-16 lg:pb-8 pt-10 pb-10">
             <FitText>
               <h1 className="font-semibold uppercase">NO CODE SELF SERVE</h1>
@@ -275,7 +281,7 @@ const HostHome = () => {
               </NavLink>
             </div>
           </div>
-        </Container>
+        </AiAlignBox>
       </section>
       <MySeperator />
       <div className="flex w-full flex-col items-center justify-center pt-8 pb-0">

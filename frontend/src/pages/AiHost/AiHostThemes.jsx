@@ -4,6 +4,7 @@ import { AnimatePresence, motion as Motion } from "motion/react";
 import { FiArrowUpRight, FiCheck, FiMonitor, FiSmartphone } from "react-icons/fi";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import DeviceMockup from "../../components/DeviceMockup";
+import AiAlignBox from "../../components/AiAlignBox";
 import {
   buildVerticalFilters,
   previewHref,
@@ -79,7 +80,7 @@ const ThemeCard = ({ template, index, onSelect, filters }) => {
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.38, delay: Math.min(index * 0.045, 0.2) }}
       onClick={openTemplate}
-      className={`group flex w-full max-w-[380px] flex-col overflow-hidden border border-black/10 bg-white sm:w-[calc(50%-0.625rem)] xl:w-[calc(33.333%-1.167rem)] ${comingSoon ? "" : "cursor-pointer"}`}
+      className={`group flex w-full flex-col overflow-hidden border border-black/10 bg-white sm:w-[calc(50%-0.625rem)] xl:w-[calc(33.333%-1.167rem)] min-[2000px]:w-[calc(25%-1.3125rem)] ${comingSoon ? "" : "cursor-pointer"}`}
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-[#ebeae5]">
         {template.heroImage ? (
@@ -177,6 +178,7 @@ const Themes = () => {
   // released back into normal flow instead of floating over unrelated content.
   const [filtersActive, setFiltersActive] = useState(true);
   const { themes, isPending: isCatalogPending } = useWebsiteThemeCatalog({ liveRefresh: true });
+
   const verticalFilters = buildVerticalFilters(themes);
   const liveThemes = themes.filter((template) => template.status !== "coming-soon");
   const featuredTemplate = liveThemes.find((template) => template.featured) || liveThemes[0] || themes[0];
@@ -295,17 +297,20 @@ const Themes = () => {
   };
 
   return (
-    <div className="text-secondary-dark">
+    // Full-bleed: cancels AiHostLayout's px-1/md:px-6/lg:px-10/xl:px-24 so
+    // this page spans the same width as the header row above it, letting
+    // AlignBox reproduce the header's exact left/right alignment.
+    <div className="text-secondary-dark -mx-1 md:-mx-6 lg:-mx-10 xl:-mx-24 w-[calc(100%+0.5rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+5rem)] xl:w-[calc(100%+12rem)]">
       <div
         ref={topBarRef}
-        className={`isolate z-[100] -mx-1 -mt-px w-[calc(100%+0.5rem)] bg-white pt-px md:-mx-6 md:w-[calc(100%+3rem)] lg:-mx-10 lg:w-[calc(100%+5rem)] xl:-mx-24 xl:w-[calc(100%+12rem)] ${filtersActive ? "sticky top-0" : ""}`}
+        className={`isolate z-30 -mt-px bg-white ${filtersActive ? "sticky top-0" : ""}`}
       >
-        <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
-          <div className="flex h-11 w-full min-w-0 items-center gap-2 bg-white pb-4 shadow-none md:px-10">
+        <AiAlignBox>
+          <div className="flex min-h-11 w-full min-w-0 items-center gap-2 bg-white py-1.5 pb-3 md:h-11 md:pb-4">
             <button
               type="button"
               onClick={() => (locationKey !== "default" ? navigate(-1) : navigate("/"))}
-              className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 transition-colors hover:bg-sky-50"
+              className="ml-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 transition-colors hover:bg-sky-50 md:ml-0"
               aria-label="Go back"
             >
               <HiOutlineArrowLeft size={18} />
@@ -327,11 +332,12 @@ const Themes = () => {
               </>
             ) : null}
           </div>
-        </div>
+        </AiAlignBox>
       </div>
 
-      <section className="mx-auto max-w-[80rem]">
-        <div className="grid items-center gap-8 px-6 py-10 sm:py-12 lg:grid-cols-[minmax(0,0.92fr)_minmax(420px,1.08fr)] lg:gap-8 lg:py-10 xl:py-12">
+      <section>
+        <AiAlignBox>
+          <div className="grid items-center gap-8 py-8 sm:py-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(420px,1.08fr)] lg:gap-8 lg:py-12 min-[2000px]:py-16">
           <Motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -372,7 +378,7 @@ const Themes = () => {
             initial={{ opacity: 0, x: 36, scale: 0.98 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.75, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-            className="relative mx-auto w-full max-w-[620px]"
+            className="relative mx-auto w-full max-w-[620px] lg:mx-0 lg:ml-auto"
           >
             {isCatalogPending ? (
               <div aria-label="Loading featured theme" aria-busy="true">
@@ -399,22 +405,23 @@ const Themes = () => {
               </>
             )}
           </Motion.div>
-        </div>
+          </div>
+        </AiAlignBox>
       </section>
 
-      <section id="theme-library" className="scroll-mt-24 py-10 sm:py-10 lg:py-12">
+      <section id="theme-library" className="scroll-mt-24 pb-8 lg:pb-10 pt-8 lg:pt-10">
         {/* overflow-anchor: none — without it, the browser's scroll anchoring
             "helpfully" compensates for this box resizing as Framer Motion
             animates cards in/out (which keeps happening for ~0.4s after our
             own scroll correction runs), scrolling you right back to roughly
             where you started and undoing the correction. */}
-        <div className="mx-auto max-w-[80rem] px-6 [overflow-anchor:none]">
+        <AiAlignBox>
+          <div className="[overflow-anchor:none]">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">Theme library</p>
-              <h2 className="mt-3 max-w-3xl text-[clamp(1.75rem,8vw,4.75rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark sm:text-[clamp(2.25rem,4.5vw,4.75rem)]">
-                <span className="block">Pick the experience</span>
-                <span className="block">that fits your business.</span>
+              <h2 className="mt-3 max-w-3xl text-[clamp(1.75rem,8vw,4.75rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark sm:text-[clamp(2.25rem,4.5vw,4.75rem)] min-[2000px]:max-w-4xl">
+                Pick the experience that fits your business.
               </h2>
             </div>
             <p className="shrink-0 text-sm text-black/55" aria-live="polite">
@@ -428,7 +435,9 @@ const Themes = () => {
             </div>
           </div>
 
-          <Motion.div layout ref={gridRef} className="mt-8 flex flex-wrap justify-center gap-5 xl:gap-7">
+          {/* Mobile: strict 1-col grid (cards fill edge-to-edge, no centering).
+              sm+: centered flex-wrap so any under-filled row centers. */}
+          <Motion.div layout ref={gridRef} className="mt-8 grid grid-cols-1 gap-5 sm:flex sm:flex-wrap sm:justify-center xl:gap-7">
             <AnimatePresence mode="popLayout" onExitComplete={correctFilterScroll}>
               {liveFilteredTemplates.map((template, index) => (
                 <ThemeCard
@@ -452,7 +461,7 @@ const Themes = () => {
                     : "More themes for this category are on the way."}
                 </h3> */}
               </div>
-              <div className="mt-8 flex flex-wrap justify-center gap-5 xl:gap-7">
+              <div className="mt-8 grid grid-cols-1 gap-5 sm:flex sm:flex-wrap sm:justify-center xl:gap-7">
                 {comingSoonFilteredTemplates.map((template, index) => (
                   <ThemeCard
                     key={template.id}
@@ -465,41 +474,46 @@ const Themes = () => {
               </div>
             </div>
           ) : null}
-        </div>
+          </div>
+        </AiAlignBox>
       </section>
 
       <section className="border-y border-black/10 py-14 sm:py-16">
-        <div className="mx-auto grid max-w-[80rem] gap-10 px-6 md:grid-cols-3 md:gap-0">
-          {proofPoints.map((item, index) => (
-            <div
-              key={item.number}
-              className={`md:px-8 ${index === 0 ? "md:pl-0" : "md:border-l md:border-black/10"}`}
-            >
-              <span className="text-xs font-semibold tracking-[0.18em] text-primary-blue">{item.number}</span>
-              <h3 className="mt-4 text-xl font-semibold tracking-[-0.025em] text-secondary-dark">{item.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-black/60">{item.description}</p>
-            </div>
-          ))}
-        </div>
+        <AiAlignBox>
+          <div className="grid gap-10 md:grid-cols-3 md:gap-0">
+            {proofPoints.map((item, index) => (
+              <div
+                key={item.number}
+                className={`md:px-8 ${index === 0 ? "md:pl-0" : "md:border-l md:border-black/10"}`}
+              >
+                <span className="text-xs font-semibold tracking-[0.18em] text-primary-blue">{item.number}</span>
+                <h3 className="mt-4 text-xl font-semibold tracking-[-0.025em] text-secondary-dark">{item.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-black/60">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </AiAlignBox>
       </section>
 
-      <section className="py-16 sm:py-10 lg:py-10">
-        <div className="mx-auto flex max-w-[80rem] flex-col items-start justify-between gap-8 bg-white p-7 sm:p-10 lg:flex-row lg:items-end lg:p-14">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">Your website, your way</p>
-            <h2 className="mt-4 text-[clamp(2.2rem,4.5vw,4.5rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark">
-              Choose a strong starting point. Make every detail yours.
-            </h2>
+      <section className="pb-12 sm:pb-14 lg:pb-16 pt-8 lg:pt-10">
+        <AiAlignBox>
+          <div className="flex flex-col items-start justify-between gap-8 bg-white py-8 sm:py-12 lg:flex-row lg:items-end lg:py-14">
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">Your website, your way</p>
+              <h2 className="mt-4 text-[clamp(2.2rem,4.5vw,4.5rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark">
+                Choose a strong starting point. Make every detail yours.
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/signup?step=1")}
+              className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-black px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
+            >
+              Start building
+              <FiArrowUpRight aria-hidden="true" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => navigate("/signup?step=1")}
-            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-black px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
-          >
-            Start building
-            <FiArrowUpRight aria-hidden="true" />
-          </button>
-        </div>
+        </AiAlignBox>
       </section>
     </div>
   );
