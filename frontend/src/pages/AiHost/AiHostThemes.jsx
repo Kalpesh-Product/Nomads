@@ -16,7 +16,7 @@ const categoryLabel = (tag, filters) =>
 
 // Rendered twice: full-size in its normal spot on the page, and compact once
 // docked into the top bar on scroll — same filters, same click handler.
-const FilterPills = ({ filters, active, onSelect, compact = false }) => (
+const FilterPills = ({ filters, active, onSelect, compact = false, mobileGrid = false }) => (
   <>
     {filters.map((filter) => {
       const isActive = active === filter.value;
@@ -26,8 +26,12 @@ const FilterPills = ({ filters, active, onSelect, compact = false }) => (
           type="button"
           aria-pressed={isActive}
           onClick={() => onSelect(filter.value)}
-          className={`shrink-0 rounded-full font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue ${
-            compact ? "px-3.5 py-1.5 text-xs" : "px-4 py-2 text-sm"
+          className={`shrink-0 whitespace-nowrap rounded-full font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue ${
+            compact
+              ? "px-3.5 py-1.5 text-xs"
+              : mobileGrid
+                ? "px-1.5 py-2 text-[11px] min-[390px]:px-2 min-[390px]:text-xs sm:px-4 sm:text-sm"
+                : "px-4 py-2 text-sm"
           } ${
             isActive ? "bg-black text-white" : "bg-[#f1f1f3] text-black/65 hover:bg-black/10 hover:text-black"
           }`}
@@ -164,6 +168,7 @@ const Themes = () => {
   const topBarRef = useRef(null);
   const inlineFilterRef = useRef(null);
   const gridRef = useRef(null);
+  const filtersDockedRef = useRef(false);
   const [verticalFilter, setVerticalFilter] = useState("all");
   const [filtersDocked, setFiltersDocked] = useState(false);
   // The top bar is sticky only while there's still a grid of cards under it to
@@ -215,7 +220,17 @@ const Themes = () => {
     // run directly on every scroll event.
     const checkDocked = () => {
       const barHeight = bar.getBoundingClientRect().height;
-      setFiltersDocked(inline.getBoundingClientRect().top <= barHeight);
+      const inlineTop = inline.getBoundingClientRect().top;
+      // Keep a small release buffer after docking. Without it, a sub-pixel
+      // layout change at the exact crossover can repeatedly dock/undock the
+      // pills while the user is making one continuous scroll gesture.
+      const shouldDock = filtersDockedRef.current
+        ? inlineTop <= barHeight + 12
+        : inlineTop <= barHeight;
+      if (shouldDock !== filtersDockedRef.current) {
+        filtersDockedRef.current = shouldDock;
+        setFiltersDocked(shouldDock);
+      }
 
       const grid = gridRef.current;
       if (grid) {
@@ -283,37 +298,40 @@ const Themes = () => {
     <div className="text-secondary-dark">
       <div
         ref={topBarRef}
-        className={`z-50 -mx-1 flex min-h-[52px] items-center gap-3 border-b border-black/5 bg-white/95 px-1 py-3 backdrop-blur-md md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24 ${filtersActive ? "sticky top-0" : ""}`}
+        className={`isolate z-[100] -mx-1 -mt-px w-[calc(100%+0.5rem)] bg-white pt-px md:-mx-6 md:w-[calc(100%+3rem)] lg:-mx-10 lg:w-[calc(100%+5rem)] xl:-mx-24 xl:w-[calc(100%+12rem)] ${filtersActive ? "sticky top-0" : ""}`}
       >
-
-        <button
-          type="button"
-          onClick={() => (locationKey !== "default" ? navigate(-1) : navigate("/"))}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 transition-colors hover:bg-sky-50"
-          aria-label="Go back"
-        >
-          <HiOutlineArrowLeft size={18} />
-        </button>
-        <span className={`shrink-0 text-lg font-medium text-primary-blue ${filtersDocked ? "hidden sm:inline" : ""}`}>Themes</span>
-        {filtersDocked ? (
-          <>
-            <span className="hidden h-5 w-px shrink-0 bg-black/10 sm:block" aria-hidden="true" />
-            {/* justify-start, not -center: centering an overflowing flex row
-                makes the browser clip equally from both ends at scrollLeft 0,
-                so the FIRST pills ("All", "Cafe") were invisible by default
-                and you'd land mid-list instead of at the start. */}
-            <div className="relative min-w-0 flex-1 overflow-hidden">
-              <div className="flex items-center justify-center gap-2 overflow-x-auto custom-scrollbar-hide">
-                <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} compact />
-              </div>
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white/95 to-transparent" aria-hidden="true" />
-            </div>
-          </>
-        ) : null}
+        <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
+          <div className="flex h-11 w-full min-w-0 items-center gap-2 bg-white pb-4 shadow-none md:px-10">
+            <button
+              type="button"
+              onClick={() => (locationKey !== "default" ? navigate(-1) : navigate("/"))}
+              className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 transition-colors hover:bg-sky-50"
+              aria-label="Go back"
+            >
+              <HiOutlineArrowLeft size={18} />
+            </button>
+            <span className={`shrink-0 text-lg font-medium text-primary-blue ${filtersDocked ? "hidden sm:inline" : ""}`}>Themes</span>
+            {filtersDocked ? (
+              <>
+                <span className="hidden h-5 w-px shrink-0 bg-black/10 sm:block" aria-hidden="true" />
+                {/* justify-start, not -center: centering an overflowing flex row
+                    makes the browser clip equally from both ends at scrollLeft 0,
+                    so the FIRST pills ("All", "Cafe") were invisible by default
+                    and you'd land mid-list instead of at the start. */}
+                <div className="relative min-w-0 flex-1 overflow-hidden bg-white">
+                  <div className="flex items-center justify-start gap-2 overflow-x-auto pr-6 custom-scrollbar-hide sm:justify-center sm:pr-0">
+                    <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} compact />
+                  </div>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent" aria-hidden="true" />
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div>
       </div>
 
       <section className="mx-auto max-w-[80rem]">
-        <div className="grid items-center gap-10 px-6 py-14 sm:py-16 lg:grid-cols-[1fr_0.9fr] lg:py-16">
+        <div className="grid items-center gap-8 px-6 py-10 sm:py-12 lg:grid-cols-[minmax(0,0.92fr)_minmax(420px,1.08fr)] lg:gap-8 lg:py-10 xl:py-12">
           <Motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -323,7 +341,7 @@ const Themes = () => {
             <p className="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-primary-blue">
               Website themes by WoNo
             </p>
-            <h1 className="text-[clamp(2.75rem,5.2vw,5.25rem)] font-medium leading-[0.94] tracking-[-0.055em] text-secondary-dark">
+            <h1 className="text-[clamp(2.5rem,4.2vw,4.65rem)] font-medium leading-[0.94] tracking-[-0.055em] text-secondary-dark">
               Start with a site that already feels right.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-black/65 sm:text-lg">
@@ -362,7 +380,10 @@ const Themes = () => {
                   <span className="h-3 w-20 animate-pulse rounded-full bg-black/10" />
                   <span className="h-3 w-24 animate-pulse rounded-full bg-black/10" />
                 </div>
-                <div className="aspect-[16/10] w-[88%] animate-pulse rounded-t-2xl bg-[#ebeae5]" />
+                <div className="relative pr-[13%] sm:pr-[12%]">
+                  <div className="aspect-[16/10] animate-pulse rounded-t-2xl border-[8px] border-b-0 border-gray-200 bg-[#ebeae5] sm:border-[14px]" />
+                  <div className="absolute bottom-[5%] right-0 aspect-[9/19.5] w-[24%] animate-pulse rounded-[1.1rem] border-4 border-gray-200 bg-[#ebeae5] sm:bottom-[8%] sm:w-[23%] sm:rounded-[1.4rem] sm:border-[6px]" />
+                </div>
               </div>
             ) : (
               <>
@@ -391,8 +412,9 @@ const Themes = () => {
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">Theme library</p>
-              <h2 className="mt-3 max-w-3xl text-[clamp(2.25rem,4.5vw,4.75rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark">
-                Pick the experience that fits your business.
+              <h2 className="mt-3 max-w-3xl text-[clamp(1.75rem,8vw,4.75rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark sm:text-[clamp(2.25rem,4.5vw,4.75rem)]">
+                <span className="block">Pick the experience</span>
+                <span className="block">that fits your business.</span>
               </h2>
             </div>
             <p className="shrink-0 text-sm text-black/55" aria-live="polite">
@@ -400,8 +422,10 @@ const Themes = () => {
             </p>
           </div>
 
-          <div ref={inlineFilterRef} className="mt-9 flex flex-wrap items-center justify-center gap-2 border-y border-black/10 py-3">
-            <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} />
+          <div ref={inlineFilterRef} className="mt-9 border-y border-black/10 py-3">
+            <div className="grid grid-cols-3 items-center gap-2 sm:flex sm:flex-wrap sm:justify-center sm:gap-3 lg:gap-4">
+              <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} mobileGrid />
+            </div>
           </div>
 
           <Motion.div layout ref={gridRef} className="mt-8 flex flex-wrap justify-center gap-5 xl:gap-7">

@@ -111,27 +111,30 @@ const HostProduct = () => {
 
   return (
     <>
-      <div className="sticky top-0 z-[100] -mx-1 flex items-center gap-3 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-          aria-label="Back to themes"
-        >
-          <HiOutlineArrowLeft size={18} />
-        </button>
-        <nav className="flex min-w-0 flex-1 items-center overflow-x-auto whitespace-nowrap text-sm text-primary-blue custom-scrollbar-hide sm:overflow-visible md:text-base" aria-label="Breadcrumb">
-          <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
-          <button type="button" className="shrink-0 text-primary-blue transition-colors hover:text-primary-dark" onClick={() => navigate("/themes")}>
-            Themes
-          </button>
-          <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
-          <span className="shrink-0 text-primary-blue">
-            {verticalFilters.find((filter) => filter.value === selectedTemplate.tag)?.label || selectedTemplate.tag}
-          </span>
-          <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
-          <span className="shrink-0 inline-block max-w-none align-bottom">{selectedTemplate.name}</span>
-        </nav>
+      <div className="sticky top-0 isolate z-[100] -mx-1 -mt-px w-[calc(100%+0.5rem)] bg-white pt-px md:-mx-6 md:w-[calc(100%+3rem)] lg:-mx-10 lg:w-[calc(100%+5rem)] xl:-mx-24 xl:w-[calc(100%+12rem)]">
+        <div className="px-3 md:px-8 lg:px-10 xl:px-12 2xl:px-14">
+          <div className="flex min-h-6 w-full min-w-0 items-center gap-2 bg-white pb-4 shadow-none md:px-10">
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
+              aria-label="Back to themes"
+            >
+              <HiOutlineArrowLeft size={18} />
+            </button>
+            <nav className="flex min-w-0 flex-1 items-center overflow-hidden whitespace-nowrap text-xs text-primary-blue sm:text-sm md:text-base" aria-label="Breadcrumb">
+              <button type="button" className="shrink-0 text-primary-blue transition-colors hover:text-primary-dark" onClick={() => navigate("/themes")}>
+                Themes
+              </button>
+              <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
+              <span className="shrink-0 text-primary-blue">
+                {verticalFilters.find((filter) => filter.value === selectedTemplate.tag)?.label || selectedTemplate.tag}
+              </span>
+              <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
+              <span className="min-w-0 truncate align-bottom" title={selectedTemplate.name}>{selectedTemplate.name}</span>
+            </nav>
+          </div>
+        </div>
       </div>
       <div
         key={selectedTemplate.id || "default"}
