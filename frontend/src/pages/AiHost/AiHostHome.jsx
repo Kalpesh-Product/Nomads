@@ -4,7 +4,6 @@ import images from "../../assets/images";
 import FeatureCard from "../../components/FeatureCard";
 import GetStartedButton from "../../components/GetStartedButton";
 import { NavLink, useNavigate } from "react-router-dom";
-import MySeperator from "../../components/MySeperator";
 import AiHostPricing from "./AiHostPricing";
 import {
   TbFileDescription,
@@ -13,6 +12,14 @@ import {
 } from "react-icons/tb";
 import Seo from "../../components/Seo";
 import { useWebsiteThemeCatalog } from "../../hooks/useWebsiteThemeCatalog";
+
+// MySeperator's own <hr> isn't inset to AiAlignBox's frame (it's built for the
+// old /hostold layout, which has no matching padding to cancel) — this one is.
+const AlignedSeparator = () => (
+  <AiAlignBox>
+    <hr className="border-t border-black/30" />
+  </AiAlignBox>
+);
 
 const ReactFitty = React.lazy(() =>
   import("react-fitty").then((module) => ({ default: module.ReactFitty })),
@@ -197,7 +204,7 @@ const HostHome = () => {
       </AiAlignBox>
       {/* Key Modules */}
       <AiAlignBox>
-        <hr className="border-t-4 border-gray-300" />
+        <hr className="border-t border-black/30" />
       </AiAlignBox>
       <section>
         <AiAlignBox>
@@ -240,7 +247,7 @@ const HostHome = () => {
           </div>
         </AiAlignBox>
       </section>
-      <MySeperator />
+      <AlignedSeparator />
       <section className="">
         <AiAlignBox>
           <div className="flex flex-col leading-tight lg:pt-16 lg:pb-8 pt-10 pb-10">
@@ -283,7 +290,7 @@ const HostHome = () => {
           </div>
         </AiAlignBox>
       </section>
-      <MySeperator />
+      <AlignedSeparator />
       <div className="flex w-full flex-col items-center justify-center pt-8 pb-0">
         <div className="text-[clamp(1.2rem,2.8vw,7rem)] font-semibold text-center text-secondary-dark">
           ACTIVATE YOUR MODERN NOMAD BUSINESS NOW.
@@ -295,7 +302,7 @@ const HostHome = () => {
           />
         </div>
       </div>
-      {/* <MySeperator /> */}
+      {/* <AlignedSeparator /> */}
     </main>
   );
 };
