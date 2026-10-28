@@ -14,7 +14,6 @@ import {
   MdMilitaryTech,
   MdOutlineNewspaper,
   MdOutlinePlace,
-  MdRateReview,
 } from "react-icons/md";
 import { TbNotebook } from "react-icons/tb";
 import useAuth from "../hooks/useAuth";
@@ -179,9 +178,8 @@ const TopContributionRow = ({ entry, index }) => {
         <HiHeart className="text-rose-500" size={18} />
         {entry.favoritesCount.toLocaleString()}
       </span>
-      <span className="hidden items-center justify-center gap-1.5 text-sm font-semibold text-black/75 md:inline-flex">
-        <MdRateReview className="text-primary-blue" size={18} />
-        {Math.max(1, index + 1)}.{index + 4}K
+      <span className="hidden w-fit justify-self-center rounded-full bg-white px-3 py-1 text-xs text-black/65 md:inline-flex">
+        {config.label}
       </span>
     </button>
   );
@@ -465,7 +463,7 @@ const AiContributionsHubTwo = () => {
                         <span>Image</span>
                         <span>Title</span>
                         <span className="justify-self-center">Likes</span>
-                        <span className="justify-self-center">Reviews</span>
+                        <span className="justify-self-center">Category</span>
                       </div>
                       <div className="hidden border-t border-black/10 md:block" />
                       <div className="mt-2 space-y-1">
