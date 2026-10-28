@@ -10,7 +10,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import GetStartedButton from "../../components/GetStartedButton";
 import { ReactFitty } from "react-fitty";
-import Container from "../../components/Container";
+import AiAlignBox from "../../components/AiAlignBox";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import { buildVerticalFilters, previewHref } from "../../constants/verticalTemplateCatalog";
 import DeviceMockup from "../../components/DeviceMockup";
@@ -110,41 +110,46 @@ const HostProduct = () => {
   if (!selectedTemplate) return null;
 
   return (
-    <>
-      <div className="sticky top-0 z-[100] -mx-1 flex items-center gap-3 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-          aria-label="Back to themes"
-        >
-          <HiOutlineArrowLeft size={18} />
-        </button>
-        <nav className="flex min-w-0 flex-1 items-center overflow-x-auto whitespace-nowrap text-sm text-primary-blue custom-scrollbar-hide sm:overflow-visible md:text-base" aria-label="Breadcrumb">
-          <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
-          <button type="button" className="shrink-0 text-primary-blue transition-colors hover:text-primary-dark" onClick={() => navigate("/themes")}>
-            Themes
-          </button>
-          <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
-          <span className="shrink-0 text-primary-blue">
-            {verticalFilters.find((filter) => filter.value === selectedTemplate.tag)?.label || selectedTemplate.tag}
-          </span>
-          <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
-          <span className="shrink-0 inline-block max-w-none align-bottom">{selectedTemplate.name}</span>
-        </nav>
+    // Full-bleed: cancels AiHostLayout's px-1/md:px-6/lg:px-10/xl:px-24 so
+    // this page spans the same width as the header row above it, letting
+    // AiAlignBox reproduce the header's exact left/right alignment.
+    <div className="-mx-1 mt-px flex flex-col md:-mx-6 lg:-mx-10 xl:-mx-24 w-[calc(100%+0.5rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+5rem)] xl:w-[calc(100%+12rem)]">
+      <div className="sticky top-0 isolate z-30 bg-white">
+        <AiAlignBox>
+          <div className="flex min-h-11 w-full min-w-0 items-center gap-2 bg-white py-1.5 pb-3 md:h-11 md:pb-4">
+            <button
+              type="button"
+              onClick={onBack}
+              className="ml-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 md:ml-0"
+              aria-label="Back to themes"
+            >
+              <HiOutlineArrowLeft size={18} />
+            </button>
+            <nav className="flex min-w-0 flex-1 items-center overflow-hidden whitespace-nowrap text-xs text-primary-blue sm:text-sm md:text-base" aria-label="Breadcrumb">
+              <button type="button" className="shrink-0 text-primary-blue transition-colors hover:text-primary-dark" onClick={() => navigate("/themes")}>
+                Themes
+              </button>
+              <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
+              <span className="shrink-0 text-primary-blue">
+                {verticalFilters.find((filter) => filter.value === selectedTemplate.tag)?.label || selectedTemplate.tag}
+              </span>
+              <span className="mx-1 shrink-0 md:mx-2">{">"}</span>
+              <span className="min-w-0 truncate align-bottom" title={selectedTemplate.name}>{selectedTemplate.name}</span>
+            </nav>
+          </div>
+        </AiAlignBox>
       </div>
       <div
         key={selectedTemplate.id || "default"}
         className="flex flex-col"
       >
         <div className="flex flex-col">
-          <section
-            ref={topRef}
-            className="w-full flex flex-col justify-center gap-6 "
-          >
-            <Container className="!w-full !pt-4 lg:!pt-6">
-              <div className="grid w-full grid-cols-1 items-center gap-0 lg:grid-cols-2">
-                <div className="flex flex-col gap-6 justify-center w-full text-black">
+          <AiAlignBox>
+            <div
+              ref={topRef}
+              className="grid w-full grid-cols-1 items-center gap-0 py-6 lg:grid-cols-2 lg:py-10"
+            >
+              <div className="flex flex-col gap-6 justify-center w-full text-black">
                   <h1 className="text-hero font-semibold">INCLUSIONS</h1>
                   <ul className="flex flex-col gap-2 ">
                     {features.map((feat) => (
@@ -180,11 +185,10 @@ const HostProduct = () => {
                   </div>
                 </div>
               </div>
-            </Container>
-          </section>
+          </AiAlignBox>
           <section>
-            <Container>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <AiAlignBox>
+              <div className="grid grid-cols-1 py-12 lg:grid-cols-3 lg:gap-12 lg:py-16">
                 <div className="text-hero col-span-1">
                   <h1>
                     Built with confidence — <br />
@@ -207,30 +211,25 @@ const HostProduct = () => {
                   </div>
                 </div>
               </div>
-            </Container>
+            </AiAlignBox>
           </section>
           <section>
-            <Container>
-              <div className="w-full  flex flex-col justify-center items-center gap-8">
+            <AiAlignBox>
+              <div className="w-full flex flex-col justify-center items-center gap-8 pb-12 lg:pb-16">
                 {suggestedTemplates.length > 0 ? (
                   <>
                     <ReactFitty className="w-full self-stretch text-center text-3xl font-semibold tracking-[-0.03em] text-secondary-dark sm:text-4xl">
                       Few more suggestions for you
                     </ReactFitty>
 
-                    <div className="flex w-full flex-wrap justify-center gap-8">
+                    {/* Mobile: strict 1-col grid (cards fill edge-to-edge, no
+                        centering). sm+: centered flex-wrap so any under-filled
+                        row centers. */}
+                    <div className="grid grid-cols-1 gap-8 sm:flex sm:flex-wrap sm:justify-center">
                       {suggestedTemplates.map((template) => (
                         <button
                           type="button"
-                          className={`group w-full max-w-[520px] overflow-hidden border border-black/10 bg-white text-left ${
-                            suggestedTemplates.length === 2
-                              ? "lg:w-[calc(50%-1rem)]"
-                              // 3 fit on one line; 4+ also use the 3-per-row
-                              // width so they wrap onto further rows instead
-                              // of leaving a lone card stranded on its own —
-                              // justify-center keeps each wrapped row centered.
-                              : "lg:w-[calc(33.333%-1.334rem)]"
-                          }`}
+                          className="group flex w-full flex-col overflow-hidden border border-black/10 bg-white text-left sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.334rem)] min-[2000px]:w-[calc(25%-1.5rem)]"
                           key={template.id}
                           onClick={() => {
                             // A real navigation (not just local state) so switching to a
@@ -283,11 +282,11 @@ const HostProduct = () => {
                   handleSubmit={() => navigate("/signup?step=1")}
                 />
               </div>
-            </Container>
+            </AiAlignBox>
           </section>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

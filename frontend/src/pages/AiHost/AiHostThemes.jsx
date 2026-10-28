@@ -4,6 +4,7 @@ import { AnimatePresence, motion as Motion } from "motion/react";
 import { FiArrowUpRight, FiCheck, FiMonitor, FiSmartphone } from "react-icons/fi";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import DeviceMockup from "../../components/DeviceMockup";
+import AiAlignBox from "../../components/AiAlignBox";
 import {
   buildVerticalFilters,
   previewHref,
@@ -16,7 +17,7 @@ const categoryLabel = (tag, filters) =>
 
 // Rendered twice: full-size in its normal spot on the page, and compact once
 // docked into the top bar on scroll — same filters, same click handler.
-const FilterPills = ({ filters, active, onSelect, compact = false }) => (
+const FilterPills = ({ filters, active, onSelect, compact = false, mobileGrid = false }) => (
   <>
     {filters.map((filter) => {
       const isActive = active === filter.value;
@@ -26,8 +27,12 @@ const FilterPills = ({ filters, active, onSelect, compact = false }) => (
           type="button"
           aria-pressed={isActive}
           onClick={() => onSelect(filter.value)}
-          className={`shrink-0 rounded-full font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue ${
-            compact ? "px-3.5 py-1.5 text-xs" : "px-4 py-2 text-sm"
+          className={`shrink-0 whitespace-nowrap rounded-full font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue ${
+            compact
+              ? "px-3.5 py-1.5 text-xs"
+              : mobileGrid
+                ? "px-1.5 py-2 text-[11px] min-[390px]:px-2 min-[390px]:text-xs sm:px-4 sm:text-sm"
+                : "px-4 py-2 text-sm"
           } ${
             isActive ? "bg-black text-white" : "bg-[#f1f1f3] text-black/65 hover:bg-black/10 hover:text-black"
           }`}
@@ -75,7 +80,7 @@ const ThemeCard = ({ template, index, onSelect, filters }) => {
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.38, delay: Math.min(index * 0.045, 0.2) }}
       onClick={openTemplate}
-      className={`group flex w-full max-w-[380px] flex-col overflow-hidden border border-black/10 bg-white sm:w-[calc(50%-0.625rem)] xl:w-[calc(33.333%-1.167rem)] ${comingSoon ? "" : "cursor-pointer"}`}
+      className={`group flex w-full flex-col overflow-hidden border border-black/10 bg-white sm:w-[calc(50%-0.625rem)] xl:w-[calc(33.333%-1.167rem)] min-[2000px]:w-[calc(25%-1.3125rem)] ${comingSoon ? "" : "cursor-pointer"}`}
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-[#ebeae5]">
         {template.heroImage ? (
@@ -164,6 +169,7 @@ const Themes = () => {
   const topBarRef = useRef(null);
   const inlineFilterRef = useRef(null);
   const gridRef = useRef(null);
+  const filtersDockedRef = useRef(false);
   const [verticalFilter, setVerticalFilter] = useState("all");
   const [filtersDocked, setFiltersDocked] = useState(false);
   // The top bar is sticky only while there's still a grid of cards under it to
@@ -171,7 +177,8 @@ const Themes = () => {
   // footer, etc.) there's nothing left for the filters to act on, so it's
   // released back into normal flow instead of floating over unrelated content.
   const [filtersActive, setFiltersActive] = useState(true);
-  const { themes } = useWebsiteThemeCatalog({ liveRefresh: true });
+  const { themes, isPending: isCatalogPending } = useWebsiteThemeCatalog({ liveRefresh: true });
+
   const verticalFilters = buildVerticalFilters(themes);
   const liveThemes = themes.filter((template) => template.status !== "coming-soon");
   const featuredTemplate = liveThemes.find((template) => template.featured) || liveThemes[0] || themes[0];
@@ -215,7 +222,17 @@ const Themes = () => {
     // run directly on every scroll event.
     const checkDocked = () => {
       const barHeight = bar.getBoundingClientRect().height;
-      setFiltersDocked(inline.getBoundingClientRect().top <= barHeight);
+      const inlineTop = inline.getBoundingClientRect().top;
+      // Keep a small release buffer after docking. Without it, a sub-pixel
+      // layout change at the exact crossover can repeatedly dock/undock the
+      // pills while the user is making one continuous scroll gesture.
+      const shouldDock = filtersDockedRef.current
+        ? inlineTop <= barHeight + 12
+        : inlineTop <= barHeight;
+      if (shouldDock !== filtersDockedRef.current) {
+        filtersDockedRef.current = shouldDock;
+        setFiltersDocked(shouldDock);
+      }
 
       const grid = gridRef.current;
       if (grid) {
@@ -280,40 +297,47 @@ const Themes = () => {
   };
 
   return (
-    <div className="text-secondary-dark">
+    // Full-bleed: cancels AiHostLayout's px-1/md:px-6/lg:px-10/xl:px-24 so
+    // this page spans the same width as the header row above it, letting
+    // AlignBox reproduce the header's exact left/right alignment.
+    <div className="text-secondary-dark -mx-1 md:-mx-6 lg:-mx-10 xl:-mx-24 w-[calc(100%+0.5rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+5rem)] xl:w-[calc(100%+12rem)]">
       <div
         ref={topBarRef}
-        className={`z-50 -mx-1 flex min-h-[52px] items-center gap-3 border-b border-black/5 bg-white/95 px-1 py-3 backdrop-blur-md md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24 ${filtersActive ? "sticky top-0" : ""}`}
+        className={`isolate z-30 -mt-px bg-white ${filtersActive ? "sticky top-0" : ""}`}
       >
-
-        <button
-          type="button"
-          onClick={() => (locationKey !== "default" ? navigate(-1) : navigate("/"))}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 transition-colors hover:bg-sky-50"
-          aria-label="Go back"
-        >
-          <HiOutlineArrowLeft size={18} />
-        </button>
-        <span className={`shrink-0 text-lg font-medium text-primary-blue ${filtersDocked ? "hidden sm:inline" : ""}`}>Themes</span>
-        {filtersDocked ? (
-          <>
-            <span className="hidden h-5 w-px shrink-0 bg-black/10 sm:block" aria-hidden="true" />
-            {/* justify-start, not -center: centering an overflowing flex row
-                makes the browser clip equally from both ends at scrollLeft 0,
-                so the FIRST pills ("All", "Cafe") were invisible by default
-                and you'd land mid-list instead of at the start. */}
-            <div className="relative min-w-0 flex-1 overflow-hidden">
-              <div className="flex items-center justify-center gap-2 overflow-x-auto custom-scrollbar-hide">
-                <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} compact />
-              </div>
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white/95 to-transparent" aria-hidden="true" />
-            </div>
-          </>
-        ) : null}
+        <AiAlignBox>
+          <div className="flex min-h-11 w-full min-w-0 items-center gap-2 bg-white py-1.5 pb-3 md:h-11 md:pb-4">
+            <button
+              type="button"
+              onClick={() => (locationKey !== "default" ? navigate(-1) : navigate("/"))}
+              className="ml-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 transition-colors hover:bg-sky-50 md:ml-0"
+              aria-label="Go back"
+            >
+              <HiOutlineArrowLeft size={18} />
+            </button>
+            <span className={`shrink-0 text-lg font-medium text-primary-blue ${filtersDocked ? "hidden sm:inline" : ""}`}>Themes</span>
+            {filtersDocked ? (
+              <>
+                <span className="hidden h-5 w-px shrink-0 bg-black/10 sm:block" aria-hidden="true" />
+                {/* justify-start, not -center: centering an overflowing flex row
+                    makes the browser clip equally from both ends at scrollLeft 0,
+                    so the FIRST pills ("All", "Cafe") were invisible by default
+                    and you'd land mid-list instead of at the start. */}
+                <div className="relative min-w-0 flex-1 overflow-hidden bg-white">
+                  <div className="flex items-center justify-start gap-2 overflow-x-auto pr-6 custom-scrollbar-hide sm:justify-center sm:pr-0">
+                    <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} compact />
+                  </div>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent" aria-hidden="true" />
+                </div>
+              </>
+            ) : null}
+          </div>
+        </AiAlignBox>
       </div>
 
-      <section className="mx-auto max-w-[80rem]">
-        <div className="grid items-center gap-10 px-6 py-14 sm:py-16 lg:grid-cols-[1fr_0.9fr] lg:py-16">
+      <section>
+        <AiAlignBox>
+          <div className="grid items-center gap-8 py-8 sm:py-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(420px,1.08fr)] lg:gap-8 lg:py-12 min-[2000px]:py-16">
           <Motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -323,7 +347,7 @@ const Themes = () => {
             <p className="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-primary-blue">
               Website themes by WoNo
             </p>
-            <h1 className="text-[clamp(2.75rem,5.2vw,5.25rem)] font-medium leading-[0.94] tracking-[-0.055em] text-secondary-dark">
+            <h1 className="text-[clamp(2.5rem,4.2vw,4.65rem)] font-medium leading-[0.94] tracking-[-0.055em] text-secondary-dark">
               Start with a site that already feels right.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-black/65 sm:text-lg">
@@ -354,32 +378,49 @@ const Themes = () => {
             initial={{ opacity: 0, x: 36, scale: 0.98 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.75, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-            className="relative mx-auto w-full max-w-[620px]"
+            className="relative mx-auto w-full max-w-[620px] lg:mx-0 lg:ml-auto"
           >
-            <div className="mb-4 flex items-center justify-between text-xs font-medium uppercase tracking-[0.15em] text-black/50">
-              <span>{featuredTemplate.name}</span>
-              <span>{categoryLabel(featuredTemplate.tag, verticalFilters)}</span>
-            </div>
-            <DeviceMockup
-              laptopSrc={featuredTemplate.heroImage}
-              mobileSrc={featuredTemplate.heroImageMobile}
-              alt={`${featuredTemplate.name} theme`}
-            />
+            {isCatalogPending ? (
+              <div aria-label="Loading featured theme" aria-busy="true">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="h-3 w-20 animate-pulse rounded-full bg-black/10" />
+                  <span className="h-3 w-24 animate-pulse rounded-full bg-black/10" />
+                </div>
+                <div className="relative pr-[13%] sm:pr-[12%]">
+                  <div className="aspect-[16/10] animate-pulse rounded-t-2xl border-[8px] border-b-0 border-gray-200 bg-[#ebeae5] sm:border-[14px]" />
+                  <div className="absolute bottom-[5%] right-0 aspect-[9/19.5] w-[24%] animate-pulse rounded-[1.1rem] border-4 border-gray-200 bg-[#ebeae5] sm:bottom-[8%] sm:w-[23%] sm:rounded-[1.4rem] sm:border-[6px]" />
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="mb-4 flex items-center justify-between text-xs font-medium uppercase tracking-[0.15em] text-black/50">
+                  <span>{featuredTemplate.name}</span>
+                  <span>{categoryLabel(featuredTemplate.tag, verticalFilters)}</span>
+                </div>
+                <DeviceMockup
+                  laptopSrc={featuredTemplate.heroImage}
+                  mobileSrc={featuredTemplate.heroImageMobile}
+                  alt={`${featuredTemplate.name} theme`}
+                />
+              </>
+            )}
           </Motion.div>
-        </div>
+          </div>
+        </AiAlignBox>
       </section>
 
-      <section id="theme-library" className="scroll-mt-24 py-10 sm:py-10 lg:py-12">
+      <section id="theme-library" className="scroll-mt-24 pb-8 lg:pb-10 pt-8 lg:pt-10">
         {/* overflow-anchor: none — without it, the browser's scroll anchoring
             "helpfully" compensates for this box resizing as Framer Motion
             animates cards in/out (which keeps happening for ~0.4s after our
             own scroll correction runs), scrolling you right back to roughly
             where you started and undoing the correction. */}
-        <div className="mx-auto max-w-[80rem] px-6 [overflow-anchor:none]">
+        <AiAlignBox>
+          <div className="[overflow-anchor:none]">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">Theme library</p>
-              <h2 className="mt-3 max-w-3xl text-[clamp(2.25rem,4.5vw,4.75rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark">
+              <h2 className="mt-3 max-w-3xl text-[clamp(1.75rem,8vw,4.75rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark sm:text-[clamp(2.25rem,4.5vw,4.75rem)] min-[2000px]:max-w-4xl">
                 Pick the experience that fits your business.
               </h2>
             </div>
@@ -388,11 +429,15 @@ const Themes = () => {
             </p>
           </div>
 
-          <div ref={inlineFilterRef} className="mt-9 flex flex-wrap items-center justify-center gap-2 border-y border-black/10 py-3">
-            <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} />
+          <div ref={inlineFilterRef} className="mt-9 border-y border-black/10 py-3">
+            <div className="grid grid-cols-3 items-center gap-2 sm:flex sm:flex-wrap sm:justify-center sm:gap-3 lg:gap-4">
+              <FilterPills filters={verticalFilters} active={verticalFilter} onSelect={setVerticalFilter} mobileGrid />
+            </div>
           </div>
 
-          <Motion.div layout ref={gridRef} className="mt-8 flex flex-wrap justify-center gap-5 xl:gap-7">
+          {/* Mobile: strict 1-col grid (cards fill edge-to-edge, no centering).
+              sm+: centered flex-wrap so any under-filled row centers. */}
+          <Motion.div layout ref={gridRef} className="mt-8 grid grid-cols-1 gap-5 sm:flex sm:flex-wrap sm:justify-center xl:gap-7">
             <AnimatePresence mode="popLayout" onExitComplete={correctFilterScroll}>
               {liveFilteredTemplates.map((template, index) => (
                 <ThemeCard
@@ -416,7 +461,7 @@ const Themes = () => {
                     : "More themes for this category are on the way."}
                 </h3> */}
               </div>
-              <div className="mt-8 flex flex-wrap justify-center gap-5 xl:gap-7">
+              <div className="mt-8 grid grid-cols-1 gap-5 sm:flex sm:flex-wrap sm:justify-center xl:gap-7">
                 {comingSoonFilteredTemplates.map((template, index) => (
                   <ThemeCard
                     key={template.id}
@@ -429,41 +474,46 @@ const Themes = () => {
               </div>
             </div>
           ) : null}
-        </div>
+          </div>
+        </AiAlignBox>
       </section>
 
       <section className="border-y border-black/10 py-14 sm:py-16">
-        <div className="mx-auto grid max-w-[80rem] gap-10 px-6 md:grid-cols-3 md:gap-0">
-          {proofPoints.map((item, index) => (
-            <div
-              key={item.number}
-              className={`md:px-8 ${index === 0 ? "md:pl-0" : "md:border-l md:border-black/10"}`}
-            >
-              <span className="text-xs font-semibold tracking-[0.18em] text-primary-blue">{item.number}</span>
-              <h3 className="mt-4 text-xl font-semibold tracking-[-0.025em] text-secondary-dark">{item.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-black/60">{item.description}</p>
-            </div>
-          ))}
-        </div>
+        <AiAlignBox>
+          <div className="grid gap-10 md:grid-cols-3 md:gap-0">
+            {proofPoints.map((item, index) => (
+              <div
+                key={item.number}
+                className={`md:px-8 ${index === 0 ? "md:pl-0" : "md:border-l md:border-black/10"}`}
+              >
+                <span className="text-xs font-semibold tracking-[0.18em] text-primary-blue">{item.number}</span>
+                <h3 className="mt-4 text-xl font-semibold tracking-[-0.025em] text-secondary-dark">{item.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-black/60">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </AiAlignBox>
       </section>
 
-      <section className="py-16 sm:py-10 lg:py-10">
-        <div className="mx-auto flex max-w-[80rem] flex-col items-start justify-between gap-8 bg-white p-7 sm:p-10 lg:flex-row lg:items-end lg:p-14">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">Your website, your way</p>
-            <h2 className="mt-4 text-[clamp(2.2rem,4.5vw,4.5rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark">
-              Choose a strong starting point. Make every detail yours.
-            </h2>
+      <section className="pb-12 sm:pb-14 lg:pb-16 pt-8 lg:pt-10">
+        <AiAlignBox>
+          <div className="flex flex-col items-start justify-between gap-8 bg-white py-8 sm:py-12 lg:flex-row lg:items-end lg:py-14">
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-blue">Your website, your way</p>
+              <h2 className="mt-4 text-[clamp(2.2rem,4.5vw,4.5rem)] font-medium leading-[1] tracking-[-0.045em] text-secondary-dark">
+                Choose a strong starting point. Make every detail yours.
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/signup?step=1")}
+              className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-black px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
+            >
+              Start building
+              <FiArrowUpRight aria-hidden="true" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => navigate("/signup?step=1")}
-            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-black px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue focus-visible:ring-offset-2"
-          >
-            Start building
-            <FiArrowUpRight aria-hidden="true" />
-          </button>
-        </div>
+        </AiAlignBox>
       </section>
     </div>
   );

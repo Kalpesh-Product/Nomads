@@ -1,5 +1,5 @@
 import { ReactFitty } from "react-fitty";
-import Container from "../../components/Container";
+import AiAlignBox from "../../components/AiAlignBox";
 import GetStartedButton from "../../components/GetStartedButton";
 import SaaSFeatureBlock from "../../components/SaaSFeatured";
 import FinanceImage from "../../assets/images-service/finance-final.png";
@@ -55,24 +55,34 @@ export default function Modules() {
   const isMobile = useIsMobile();
   const onBack = () => navigate("/");
   return (
-    <>
-      <div className="sticky top-0 z-[100] -mx-1 flex min-w-[11rem] items-center gap-3 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-          aria-label="Go back to search results"
-        >
-          <HiOutlineArrowLeft size={18} />
-        </button>
-        <span className="text-lg font-medium text-primary-blue">Modules</span>
-        {/* {stateLabel && (
-          <span className="text-lg font-medium text-primary-blue">
-            {stateLabel}
-          </span>
-        )} */}
+    // Full-bleed: cancels AiHostLayout's px-1/md:px-6/lg:px-10/xl:px-24 so
+    // this page spans the same width as the header row above it, letting
+    // AiAlignBox reproduce the header's exact left/right alignment.
+    <div className="mt-px -mx-1 md:-mx-6 lg:-mx-10 xl:-mx-24 w-[calc(100%+0.5rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+5rem)] xl:w-[calc(100%+12rem)]">
+      {/* Breadcrumb bar — sits below the mobile sidebar overlay (z-70) and
+          below the header (z-50), and aligns with the header's edges via
+          AiAlignBox at every breakpoint. */}
+      <div className="sticky top-0 isolate z-30 bg-white">
+        <AiAlignBox>
+          <div className="flex min-h-11 w-full min-w-0 items-center gap-3 bg-white py-1.5 pb-3 md:h-11 md:pb-4">
+            <button
+              type="button"
+              onClick={onBack}
+              className="ml-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 md:ml-0"
+              aria-label="Go back to search results"
+            >
+              <HiOutlineArrowLeft size={18} />
+            </button>
+            <span className="text-lg font-medium text-primary-blue">Modules</span>
+            {/* {stateLabel && (
+              <span className="text-lg font-medium text-primary-blue">
+                {stateLabel}
+              </span>
+            )} */}
+          </div>
+        </AiAlignBox>
       </div>
-      <Container padding={false}>
+      <AiAlignBox>
         <div className="flex flex-col gap-8 w-full">
           <div className="flex flex-col gap-8">
             <div className="text-center">
@@ -148,7 +158,7 @@ export default function Modules() {
           </div>
           <hr className="border-t-4 mb-2 lg:mt-10" />
         </div>
-        <Container padding={false}>
+        <AiAlignBox>
           <div data-aos="fade-up" className="flex flex-col gap-8">
             <SaaSFeatureBlock
               title="Frontend"
@@ -236,7 +246,7 @@ export default function Modules() {
             </div>
           </div> */}
           </div>
-        </Container>
+        </AiAlignBox>
         <div className="text-center">
           <h1 className="text-[clamp(1.7rem,3.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
             … More coming soon
@@ -254,7 +264,7 @@ export default function Modules() {
             handleSubmit={() => navigate("/signup?step=1")}
           />
         </div>
-      </Container>
-    </>
+      </AiAlignBox>
+    </div>
   );
 }
