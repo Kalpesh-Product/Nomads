@@ -478,19 +478,21 @@ const Themes = () => {
         </AiAlignBox>
       </section>
 
-      <section className="border-y border-black/10 py-14 sm:py-16">
+      <section>
         <AiAlignBox>
-          <div className="grid gap-10 md:grid-cols-3 md:gap-0">
-            {proofPoints.map((item, index) => (
-              <div
-                key={item.number}
-                className={`md:px-8 ${index === 0 ? "md:pl-0" : "md:border-l md:border-black/10"}`}
-              >
-                <span className="text-xs font-semibold tracking-[0.18em] text-primary-blue">{item.number}</span>
-                <h3 className="mt-4 text-xl font-semibold tracking-[-0.025em] text-secondary-dark">{item.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-black/60">{item.description}</p>
-              </div>
-            ))}
+          <div className="border-y border-black/30 py-14 sm:py-16">
+            <div className="grid gap-10 md:grid-cols-3 md:gap-0">
+              {proofPoints.map((item, index) => (
+                <div
+                  key={item.number}
+                  className={`md:px-8 ${index === 0 ? "md:pl-0" : "md:border-l md:border-black/30"}`}
+                >
+                  <span className="text-xs font-semibold tracking-[0.18em] text-primary-blue">{item.number}</span>
+                  <h3 className="mt-4 text-xl font-semibold tracking-[-0.025em] text-secondary-dark">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-black/60">{item.description}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </AiAlignBox>
       </section>

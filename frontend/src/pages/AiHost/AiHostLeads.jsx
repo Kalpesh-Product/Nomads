@@ -188,9 +188,9 @@ const Leads = () => {
         </div>
       </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30" />
+      </AiAlignBox>
       {/* Automated Google Leads Section */}
       <AiAlignBox>
         <div className="pt-10 pb-12">
@@ -212,9 +212,9 @@ const Leads = () => {
         </div>
       </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30" />
+      </AiAlignBox>
 
       {/* Run & Scale Grid Section */}
       <AiAlignBox>
@@ -246,9 +246,9 @@ const Leads = () => {
         </div>
       </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30  " />
+      </AiAlignBox>
 
       {/* Get better ROI Section */}
       <AiAlignBox>
@@ -271,9 +271,9 @@ const Leads = () => {
         </div>
       </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30  " />
+      </AiAlignBox>
 
       {/* Get a Complete View Section */}
       <AiAlignBox>
@@ -295,9 +295,9 @@ const Leads = () => {
         </div>
       </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30  " />
+      </AiAlignBox>
 
       {/* The finer points Section */}
       <AiAlignBox>
