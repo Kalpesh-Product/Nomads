@@ -34,6 +34,7 @@ export default function useContentFavorites(enabled = true) {
         return isFavorited ? [...others, { kind, item }] : others;
       });
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["contributionFavoriteCounts"] });
     },
     onError: (error) => showErrorAlert(
       error?.response?.data?.message || "Failed to update favorites.",

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getContentFavorites, updateContentFavorite } from "../controllers/contentFavoriteControllers.js";
+import { getContentFavorites, updateContentFavorite, getContributionFavoriteCounts } from "../controllers/contentFavoriteControllers.js";
 
 import {
   changePassword,
@@ -20,6 +20,7 @@ import {
 
 const router = Router();
 router.get("/content-favorites", getContentFavorites);
+router.get("/content-favorites/counts", getContributionFavoriteCounts);
 router.patch("/content-favorites", updateContentFavorite);
 
 router.get("/", getUsers);

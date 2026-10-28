@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import {
   HiArrowRight,
   HiHeart,
@@ -21,6 +21,7 @@ import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Seo from "../components/Seo";
 import humanDate from "../utils/humanDate";
+import { rankContributionsByFavorites } from "../utils/contributionFavorites";
 
 const contributionTypes = [
   {
@@ -112,19 +113,6 @@ const getDestination = (item) =>
 
 const getItemDate = (item) => item?.date || item?.updatedAt || item?.createdAt;
 
-const getLikeCount = (item, fallback) => {
-  const value =
-    item?.likesCount ?? item?.likeCount ?? item?.totalLikes ?? item?.likes;
-
-  if (Array.isArray(value)) return value.length;
-  if (typeof value === "number") return value;
-  if (typeof value === "string" && value.trim() && !Number.isNaN(Number(value))) {
-    return Number(value);
-  }
-
-  return fallback;
-};
-
 const sortRecent = (items) =>
   [...items].sort(
     (a, b) =>
@@ -189,7 +177,7 @@ const TopContributionRow = ({ entry, index }) => {
       </div>
       <span className="hidden items-center justify-center gap-1.5 text-sm font-semibold text-black/75 md:inline-flex">
         <HiHeart className="text-rose-500" size={18} />
-        {getLikeCount(item, `${Math.max(1, index + 2)}.${index + 1}K`)}
+        {entry.favoritesCount.toLocaleString()}
       </span>
       <span className="hidden items-center justify-center gap-1.5 text-sm font-semibold text-black/75 md:inline-flex">
         <MdRateReview className="text-primary-blue" size={18} />
@@ -221,6 +209,17 @@ const AiContributionsHubTwo = () => {
       enabled: Boolean(userId) && Boolean(auth?.user?.[config.flag]),
       staleTime: 1000 * 60,
     })),
+  });
+
+  const favoriteCountsQuery = useQuery({
+    queryKey: ["contributionFavoriteCounts", userId],
+    queryFn: async () => {
+      const { data } = await axiosPrivate.get("/user/content-favorites/counts");
+      return data;
+    },
+    enabled: Boolean(userId) && accessibleTypes.length > 0,
+    refetchOnMount: "always",
+    refetchInterval: 30000,
   });
 
   useEffect(() => {
@@ -272,7 +271,7 @@ const AiContributionsHubTwo = () => {
   const communityRank = auth.user.rank ?? Math.max(7, 72 - rankScore * 5);
   const hasRank = auth.user.rank != null && auth.user.rank !== "";
   const recentItems = sortRecent(allItems);
-  const topItems = recentItems.slice(0, 5);
+  const topItems = rankContributionsByFavorites(recentItems, favoriteCountsQuery.data || []).slice(0, 5);
   const recentListItems = recentItems.slice(0, 5);
   const isLoading = sections.some((section) => section.query?.isLoading);
 
@@ -447,12 +446,17 @@ const AiContributionsHubTwo = () => {
                     Top contributions
                   </h2>
                   <p className="mt-1 text-xs text-black/55">
-                    The most engaged items across blogs, news, events, and places.
+                    Your most favorited items across blogs, news, events, and places.
                   </p>
 
-                  {isLoading ? (
+                  {isLoading || favoriteCountsQuery.isLoading ? (
                     <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
                       Loading contributions...
+                    </div>
+                  ) : favoriteCountsQuery.isError ? (
+                    <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
+                      Could not load favorite counts.
+                      <button type="button" className="ml-2 underline" onClick={() => favoriteCountsQuery.refetch()}>Retry</button>
                     </div>
                   ) : topItems.length > 0 ? (
                     <div className="mt-5">

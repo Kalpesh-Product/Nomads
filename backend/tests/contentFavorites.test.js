@@ -5,7 +5,7 @@ import Blog from "../models/Blog.js";
 import News from "../models/News.js";
 import Place from "../models/Place.js";
 import Event from "../models/Event.js";
-import { getContentFavorites, updateContentFavorite } from "../controllers/contentFavoriteControllers.js";
+import { getContentFavorites, updateContentFavorite, getContributionFavoriteCounts } from "../controllers/contentFavoriteControllers.js";
 
 const userId = "507f1f77bcf86cd799439011";
 const contentId = "507f1f77bcf86cd799439012";
@@ -17,11 +17,69 @@ const response = () => ({
 const next = (error) => { throw error; };
 
 test("content favorites require an authenticated account", async () => {
-  for (const handler of [getContentFavorites, updateContentFavorite]) {
+  for (const handler of [getContentFavorites, updateContentFavorite, getContributionFavoriteCounts]) {
     const res = response();
     await handler({ body: {} }, res, next);
     assert.equal(res.statusCode, 401);
   }
+});
+
+test("contribution counts cover all types, include zeroes and only query the authenticated contributor", async (t) => {
+  const otherContentId = "507f1f77bcf86cd799439013";
+  for (const model of [Blog, News, Place, Event]) {
+    t.mock.method(model, "find", (filter) => {
+      assert.deepEqual(filter, { contributor: userId });
+      return { select(fields) {
+        assert.equal(fields, "_id");
+        return { lean: async () => [{ _id: contentId }, { _id: otherContentId }] };
+      } };
+    });
+  }
+  const aggregation = t.mock.method(NomadUser, "aggregate", async (pipeline) => {
+    const field = Object.keys(pipeline[0].$match)[0];
+    assert.ok(["favoriteBlogs", "favoriteNews", "favoritePlaces", "favoriteEvents"].includes(field));
+    assert.deepEqual(pipeline[0].$match[field], { $in: [contentId, otherContentId] });
+    assert.deepEqual(pipeline[1], { $project: { favorites: {
+      $setIntersection: [{ $ifNull: [`$${field}`, []] }, [contentId, otherContentId]],
+    } } });
+    assert.deepEqual(pipeline[2], { $unwind: "$favorites" });
+    assert.deepEqual(pipeline[3], { $group: { _id: "$favorites", favoritesCount: { $sum: 1 } } });
+    return [{ _id: contentId, favoritesCount: 12 }];
+  });
+  const res = response();
+  await getContributionFavoriteCounts({ userData: { _id: userId }, query: { userId: "another-user" } }, res, next);
+  assert.equal(aggregation.mock.callCount(), 4);
+  assert.equal(res.body.length, 8);
+  for (const kind of ["blog", "news", "place", "event"]) {
+    assert.deepEqual(res.body.filter((row) => row.kind === kind), [
+      { kind, contentId, favoritesCount: 12 },
+      { kind, contentId: otherContentId, favoritesCount: 0 },
+    ]);
+  }
+});
+
+test("contributors with no content get empty counts without scanning users", async (t) => {
+  for (const model of [Blog, News, Place, Event]) {
+    t.mock.method(model, "find", () => ({ select: () => ({ lean: async () => [] }) }));
+  }
+  const aggregation = t.mock.method(NomadUser, "aggregate", () => { throw new Error("Unexpected scan"); });
+  const res = response();
+  await getContributionFavoriteCounts({ userData: { _id: userId } }, res, next);
+  assert.deepEqual(res.body, []);
+  assert.equal(aggregation.mock.callCount(), 0);
+});
+
+test("count query failures reach the error handler instead of returning false zeroes", async (t) => {
+  const failure = new Error("Database unavailable");
+  t.mock.method(Blog, "find", () => { throw failure; });
+  for (const model of [News, Place, Event]) {
+    t.mock.method(model, "find", () => ({ select: () => ({ lean: async () => [] }) }));
+  }
+  let caught;
+  const res = response();
+  await getContributionFavoriteCounts({ userData: { _id: userId } }, res, (error) => { caught = error; });
+  assert.equal(caught, failure);
+  assert.equal(res.body, undefined);
 });
 
 test("invalid types, IDs and non-boolean flags are rejected", async () => {

@@ -17,6 +17,33 @@ const publishedContent = {
   $or: [{ status: "approved" }, { status: { $exists: false } }],
 };
 
+export const getContributionFavoriteCounts = async (req, res, next) => {
+  try {
+    const userId = req.userData?._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    // Only expose totals for the signed-in contributor's own content.
+    const counts = await Promise.all(Object.entries(contentTypes).map(async ([kind, { field, model }]) => {
+      const contributions = await model.find({ contributor: userId }).select("_id").lean();
+      const ids = contributions.map((item) => item._id);
+      if (!ids.length) return [];
+
+      const totals = await NomadUser.aggregate([
+        { $match: { [field]: { $in: ids } } },
+        // Intersection deduplicates each account's favorites before counting.
+        { $project: { favorites: { $setIntersection: [{ $ifNull: [`$${field}`, []] }, ids] } } },
+        { $unwind: "$favorites" },
+        { $group: { _id: "$favorites", favoritesCount: { $sum: 1 } } },
+      ]);
+      const totalsById = new Map(totals.map((row) => [String(row._id), row.favoritesCount]));
+      return ids.map((id) => ({ kind, contentId: String(id), favoritesCount: totalsById.get(String(id)) || 0 }));
+    }));
+    return res.json(counts.flat());
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getContentFavorites = async (req, res, next) => {
   try {
     const userId = req.userData?._id;
