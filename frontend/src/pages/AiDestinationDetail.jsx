@@ -8,6 +8,7 @@ import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 import { CalendarDays, MapPin, Star } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Map from "../components/Map";
+import ContentFavoriteButton from "../components/ContentFavoriteButton";
 import MuiModal from "../components/Modal";
 import SecondaryButton from "../components/SecondaryButton";
 import { annualEvents, popularPlaces } from "../data/aiDestinationHighlights";
@@ -58,6 +59,17 @@ const normalizePlaceItem = (place = {}) => ({
   googleMapsLink: place.googleMapsLink || place.googleMap || "",
 });
 
+const normalizeEventItem = (event = {}) => ({
+  ...event,
+  id: event._id || event.id,
+  title: event.eventName || event.title,
+  image: event.mainImage || event.image,
+  location: event.venue || event.destination || event.location,
+  meta: event.month || event.meta,
+  subtitle: event.month || event.subtitle,
+  description: event.shortDescription || event.description,
+});
+
 const getStoredPreviewItem = (search = "") => {
   const previewKey = new URLSearchParams(search).get("previewKey");
   if (!previewKey) return null;
@@ -85,6 +97,16 @@ const AiDestinationDetail = ({ type }) => {
   const isRestaurant = type === "restaurant";
   const isReviewEnabled = !isRestaurant;
   const fallback = type === "event" ? annualEvents[0] : popularPlaces[0];
+  const isPreview = new URLSearchParams(location.search).has("previewKey");
+  const { data: eventDetails } = useQuery({
+    queryKey: ["eventDetails", eventId],
+    queryFn: async () => {
+      const response = await axios.get(`/events/${eventId}`);
+      return response.data;
+    },
+    enabled: isEvent && !!eventId && !isPreview,
+    refetchOnWindowFocus: false,
+  });
   const { data: placeDetails } = useQuery({
     queryKey: ["placeDetails", placeId],
     queryFn: async () => {
@@ -94,9 +116,11 @@ const AiDestinationDetail = ({ type }) => {
     enabled: type === "place" && !!placeId,
     refetchOnWindowFocus: false,
   });
-  const item = placeDetails
-    ? normalizePlaceItem(placeDetails)
-    : location.state?.item || getStoredPreviewItem(location.search) || fallback;
+  const item = eventDetails
+    ? normalizeEventItem(eventDetails)
+    : placeDetails
+      ? normalizePlaceItem(placeDetails)
+      : location.state?.item || getStoredPreviewItem(location.search) || fallback;
   const mapLatitude = toValidCoordinate(item.lat ?? item.latitude);
   const mapLongitude = toValidCoordinate(item.lng ?? item.longitude);
   const hasMapCoordinates =
@@ -449,6 +473,9 @@ const AiDestinationDetail = ({ type }) => {
           <h1 className="text-2xl font-bold text-black md:text-title">
             {item.title}
           </h1>
+          {(type === "place" || isEvent) && item._id && !isPreview && (
+            <ContentFavoriteButton item={item} kind={type} variant="detail" />
+          )}
           {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
           {type === "place" && (
             <button

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "driver.js/dist/driver.css";
 import { useLocation } from "react-router-dom";
 import humanDate from "../utils/humanDate";
+import ContentFavoriteButton from "../components/ContentFavoriteButton";
 import { createDriverGuide } from "../utils/driverGuide";
 
 const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX =
@@ -240,11 +241,16 @@ const AiBlogDetails = () => {
       </button> */}
       <div className="flex flex-col gap-8">
         <section className="clear-both flow-root">
-          <h1 className="mb-8 text-title leading-normal font-bold">
-            {content?.mainTitle ||
-              content?.title ||
-              "Lorem ipsum dolor sit amet consectetur adipisicing elit."}
-          </h1>
+          <div className="mb-8 flex items-start justify-between gap-4">
+            <h1 className="min-w-0 text-title leading-normal font-bold">
+              {content?.mainTitle ||
+                content?.title ||
+                "Lorem ipsum dolor sit amet consectetur adipisicing elit."}
+            </h1>
+            {content._id && !new URLSearchParams(location.search).has("previewKey") && (
+              <ContentFavoriteButton item={content} kind={contentType} variant="detail" />
+            )}
+          </div>
           {renderFloatingImage(
             content?.mainImage ||
               content?.image ||
