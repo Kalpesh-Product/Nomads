@@ -17,7 +17,7 @@ export default function ContentFavoriteButton({ item, kind, showRemoveFavoriteIc
     <button
       type="button"
       className={isDetail
-        ? "inline-flex shrink-0 items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:text-gray-900 disabled:cursor-wait"
+        ? "inline-flex shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white p-2 text-gray-700 transition hover:border-gray-400 hover:text-gray-900 disabled:cursor-wait"
         : "absolute right-2 top-2 z-10 cursor-pointer disabled:cursor-wait"}
       aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
       aria-pressed={isFavorited}
@@ -44,7 +44,6 @@ export default function ContentFavoriteButton({ item, kind, showRemoveFavoriteIc
       ) : isFavorited ? (
         <AiFillHeart className="text-[#ff5757]" size={22} />
       ) : isDetail ? <AiOutlineHeart size={22} /> : <AiTwotoneHeart className="text-white" size={22} />}
-      {isDetail && <span>{isFavorited ? "Saved" : "Save"}</span>}
     </button>
   );
 }
