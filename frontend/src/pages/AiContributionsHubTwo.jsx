@@ -269,7 +269,8 @@ const AiContributionsHubTwo = () => {
   const draftItems = allItems.filter(({ item }) => item.isDraft);
   const rankScore =
     approvedItems.length * 4 + pendingItems.length * 2 + draftItems.length;
-  const communityRank = Math.max(7, 72 - rankScore * 5);
+  const communityRank = auth.user.rank ?? Math.max(7, 72 - rankScore * 5);
+  const hasRank = auth.user.rank != null && auth.user.rank !== "";
   const recentItems = sortRecent(allItems);
   const topItems = recentItems.slice(0, 5);
   const recentListItems = recentItems.slice(0, 5);
@@ -284,7 +285,9 @@ const AiContributionsHubTwo = () => {
             <div className="relative overflow-hidden rounded-[1.5rem] border border-sky-100 bg-gradient-to-br from-white via-[#f8fdff] to-[#eef9ff] p-6">
               <div className="absolute -right-12 -top-14 h-48 w-48 rounded-full bg-sky-100/70" />
               <div className="absolute right-40 bottom-0 h-24 w-24 rounded-t-full bg-cyan-100/55" />
-              <div className="relative z-10 grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_9rem]">
+              <div
+                className={`relative z-10 grid items-center gap-6 ${hasRank ? "lg:grid-cols-[minmax(0,1fr)_9rem]" : ""}`}
+              >
                 <div>
                   <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold text-primary-blue ring-1 ring-sky-100">
                     <HiOutlineSparkles size={15} />
@@ -294,25 +297,33 @@ const AiContributionsHubTwo = () => {
                     {getGreeting()}, {firstName}
                   </h1>
                   <p className="mt-3 max-w-2xl text-sm leading-6 text-black/65">
-                    You are currently ranked{" "}
-                    <span className="font-bold text-black">#{communityRank}</span>{" "}
-                    in the contributor community. Keep publishing approved
-                    stories and moving drafts into review to climb the
-                    leaderboard.
+                    {hasRank ? (
+                      <>
+                        You are currently ranked{" "}
+                        <span className="font-bold text-black">#{communityRank}</span>{" "}
+                        in the contributor community. Keep publishing approved
+                        stories and moving drafts into review to climb the
+                        leaderboard.
+                      </>
+                    ) : (
+                      "You can add your blogs, news, events, and places here. Share your stories and local discoveries to help the community explore more and stay informed."
+                    )}
                   </p>
                 </div>
 
-                <div className="flex h-36 w-full flex-col items-center justify-center rounded-[1.5rem] border border-white/80 bg-white/90 text-center backdrop-blur sm:w-36">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_12px_26px_rgba(73,159,222,0.24)]">
-                    <MdMilitaryTech size={20} />
-                  </span>
-                  <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-black/40">
-                    Community Rank
-                  </p>
-                  <p className="mt-1 text-2xl font-bold leading-none text-black">
-                    #{communityRank}
-                  </p>
-                </div>
+                {hasRank && (
+                  <div className="flex h-36 w-full flex-col items-center justify-center rounded-[1.5rem] border border-white/80 bg-white/90 text-center backdrop-blur sm:w-36">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_12px_26px_rgba(73,159,222,0.24)]">
+                      <MdMilitaryTech size={20} />
+                    </span>
+                    <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-black/40">
+                      Community Rank
+                    </p>
+                    <p className="mt-1 text-2xl font-bold leading-none text-black">
+                      #{communityRank}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
