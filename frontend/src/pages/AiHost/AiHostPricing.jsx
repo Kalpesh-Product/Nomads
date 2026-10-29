@@ -455,7 +455,7 @@ const AiHostPricing = ({
                 className={`${
                   recommendationCards.length > 3
                     ? "flex gap-4 sm:gap-5 lg:gap-6 overflow-x-auto px-4 sm:px-6 pt-10 pb-6 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                    : "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
+                    : "grid grid-cols-1 items-start gap-8 sm:grid-cols-2 lg:grid-cols-3"
                 }`}
               >
                 {cards.map((card, index) => {
