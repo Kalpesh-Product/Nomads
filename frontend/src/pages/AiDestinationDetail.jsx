@@ -8,6 +8,7 @@ import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 import { CalendarDays, MapPin, Star } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Map from "../components/Map";
+import ContentShareButton from "../components/ContentShareButton";
 import ContentFavoriteButton from "../components/ContentFavoriteButton";
 import MuiModal from "../components/Modal";
 import SecondaryButton from "../components/SecondaryButton";
@@ -473,8 +474,11 @@ const AiDestinationDetail = ({ type }) => {
           <h1 className="text-2xl font-bold text-black md:text-title">
             {item.title}
           </h1>
-          {(type === "place" || isEvent) && item._id && !isPreview && (
-            <ContentFavoriteButton item={item} kind={type} variant="detail" />
+          {(type === "place" || isEvent) && !isPreview && (
+            <div className="flex shrink-0 items-center gap-2">
+              <ContentShareButton title={item.title} url={window.location.href} kind={type} />
+              {item._id && <ContentFavoriteButton item={item} kind={type} variant="detail" />}
+            </div>
           )}
           {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
           {type === "place" && (

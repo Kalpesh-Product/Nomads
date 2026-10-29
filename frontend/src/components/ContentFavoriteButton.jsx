@@ -2,6 +2,7 @@ import { AiFillHeart, AiOutlineHeart, AiTwotoneHeart } from "react-icons/ai";
 import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useIsMutating } from "@tanstack/react-query";
+import DetailIconButton from "./DetailIconButton";
 import Swal from "sweetalert2";
 import useContentFavorites from "../hooks/useContentFavorites";
 
@@ -13,11 +14,12 @@ export default function ContentFavoriteButton({ item, kind, showRemoveFavoriteIc
     favorite.kind === kind && favorite.item._id === item._id,
   );
   const isDetail = variant === "detail";
+  const Button = isDetail ? DetailIconButton : "button";
   return (
-    <button
+    <Button
       type="button"
       className={isDetail
-        ? "inline-flex shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white p-2 text-gray-700 transition hover:border-gray-400 hover:text-gray-900 disabled:cursor-wait"
+        ? ""
         : "absolute right-2 top-2 z-10 cursor-pointer disabled:cursor-wait"}
       aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
       aria-pressed={isFavorited}
@@ -44,6 +46,6 @@ export default function ContentFavoriteButton({ item, kind, showRemoveFavoriteIc
       ) : isFavorited ? (
         <AiFillHeart className="text-[#ff5757]" size={22} />
       ) : isDetail ? <AiOutlineHeart size={22} /> : <AiTwotoneHeart className="text-white" size={22} />}
-    </button>
+    </Button>
   );
 }
