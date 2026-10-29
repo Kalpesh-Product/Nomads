@@ -8,7 +8,7 @@ const userId = "507f1f77bcf86cd799439012";
 const commentId = "507f1f77bcf86cd799439013";
 const response = () => ({ statusCode: 200, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; return this; } });
 const next = (error) => { throw error; };
-const req = (extra = {}) => ({ params: { kind: "blog", articleId }, query: {}, body: { text: "  A helpful article.  " }, userData: { _id: userId }, ...extra });
+const req = (extra = {}) => ({ params: { kind: "blog", articleId }, query: {}, body: { text: "  A helpful article.  ", starCount: 5 }, userData: { _id: userId }, ...extra });
 const query = (rows) => ({ select() { return this; }, sort() { return this; }, skip() { return this; }, limit() { return this; }, lean: async () => rows });
 const setup = (overrides = {}) => createContentCommentController({
   articles: { blog: { exists: async () => true }, news: { exists: async () => true } },
@@ -69,9 +69,9 @@ test("persists trimmed comments with server-resolved author identity for blogs a
     let stored;
     const controller = setup({ Comment: { create: async (entry) => { stored = entry; return { ...entry, _id: commentId }; } } });
     const res = response();
-    await controller.create(req({ params: { kind, articleId }, body: { text: " Hello ", authorName: "Impostor", author: "other" } }), res, next);
+    await controller.create(req({ params: { kind, articleId }, body: { text: " Hello ", starCount: 4, authorName: "Impostor", author: "other" } }), res, next);
     assert.equal(res.statusCode, 201);
-    assert.deepEqual(stored, { kind, articleId, author: userId, authorName: "Real User", text: "Hello" });
+    assert.deepEqual(stored, { kind, articleId, starCount: 4, author: userId, authorName: "Real User", text: "Hello" });
     assert.equal(res.body.data.author, undefined);
   }
 });
@@ -101,13 +101,32 @@ test("lists paginated article comments with only their scoped replies", async ()
     Comment: {
       find(filter) { assert.deepEqual(filter, scope); const chain = query([{ _id: commentId, text: "Hello" }]); chain.skip = (count) => { assert.equal(count, 20); return chain; }; chain.limit = (count) => { assert.equal(count, 20); return chain; }; return chain; },
       countDocuments: async (filter) => { assert.deepEqual(filter, scope); return 21; },
+      aggregate: async (pipeline) => {
+        assert.equal(pipeline[0].$match.kind, "blog");
+        assert.equal(String(pipeline[0].$match.articleId), articleId);
+        assert.deepEqual(pipeline[0].$match.starCount, { $type: "number", $gte: 1, $lte: 5 });
+        assert.deepEqual(pipeline[1], { $group: { _id: null, averageRating: { $avg: "$starCount" } } });
+        return [{ averageRating: 4.25 }];
+      },
     },
     Reply: { find: (filter) => { assert.deepEqual(filter, { ...scope, commentId: { $in: [commentId] } }); return query([{ _id: "reply", commentId, text: "Reply" }]); } },
   });
   const res = response();
   await controller.list(req({ query: { page: "2" } }), res, next);
   assert.equal(res.body.totalPages, 2);
+  assert.equal(res.body.averageRating, 4.25);
   assert.equal(res.body.data[0].replies[0].text, "Reply");
+});
+
+test("unrated articles return no average instead of a zero rating", async () => {
+  for (const total of [0, 1]) {
+    const controller = setup({ Comment: {
+      find: () => query([]), countDocuments: async () => total, aggregate: async () => [],
+    } });
+    const res = response();
+    await controller.list(req(), res, next);
+    assert.equal(res.body.averageRating, null);
+  }
 });
 
 test("database failures reach the error handler", async () => {
@@ -116,4 +135,20 @@ test("database failures reach the error handler", async () => {
   let received;
   await controller.list(req(), response(), (error) => { received = error; });
   assert.equal(received, failure);
+});
+
+
+test("new comments require a whole star rating from 1 to 5", async () => {
+  const controller = setup();
+  for (const starCount of [undefined, null, 0, 6, 2.5, "5", true]) {
+    const res = response();
+    await controller.create(req({ body: { text: "Hello", starCount } }), res, next);
+    assert.equal(res.statusCode, 400);
+  }
+});
+
+test("legacy comments remain valid without a rating, and invalid ratings fail schema validation", () => {
+  const entry = { kind: "blog", articleId, author: userId, authorName: "User", text: "Existing comment" };
+  assert.equal(new ContentComment(entry).validateSync(), undefined);
+  for (const starCount of [0, 6, 2.5]) assert.ok(new ContentComment({ ...entry, starCount }).validateSync());
 });

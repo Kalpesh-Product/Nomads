@@ -8,7 +8,10 @@ const fields = {
   text: { type: String, required: true, trim: true, maxlength: 2000 },
 };
 
-const commentSchema = new mongoose.Schema(fields, { timestamps: true });
+const commentSchema = new mongoose.Schema({
+  ...fields,
+  starCount: { type: Number, min: 1, max: 5, validate: Number.isInteger },
+}, { timestamps: true });
 commentSchema.index({ kind: 1, articleId: 1, createdAt: -1 });
 
 const replySchema = new mongoose.Schema({

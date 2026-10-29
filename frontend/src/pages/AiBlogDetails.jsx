@@ -328,7 +328,7 @@ const AiBlogDetails = () => {
       </div>
       <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
       {content._id && !searchParams.has("previewKey") && (
-        <ArticleComments key={`${contentType}-${content._id}`} articleId={content._id} kind={contentType} />
+        <ArticleComments key={`${contentType}-${content._id}`} articleId={content._id} kind={contentType} title={content.mainTitle} />
       )}
 
       {activeImage && (
