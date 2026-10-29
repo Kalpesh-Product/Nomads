@@ -43,6 +43,12 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
     location.pathname.startsWith("/places/") ||
     location.pathname.startsWith("/events/") ||
     location.pathname.startsWith("/listings/");
+  const activeDetailCategory = [
+    { type: "blog", path: "/blog/blog-details" },
+    { type: "news", path: "/news/news-details" },
+    { type: "places", path: "/places/" },
+    { type: "events", path: "/events/" },
+  ].find(({ path }) => location.pathname.startsWith(path))?.type;
   const shouldCheckNewsBlogLinks =
     showToggle ||
     isAiEditorialPage ||
@@ -476,12 +482,13 @@ const AiHeader = ({ onMobileSidebarToggle, forceMobileNavigation = false }) => {
                         <Link
                           key={item.id}
                           to={item.to}
+                          aria-current={activeDetailCategory === item.type ? "page" : undefined}
                           className="group relative text-md text-black font-semibold whitespace-nowrap"
                         >
                           <span className="relative z-10 group-hover:font-bold mb-2 text-sm whitespace-nowrap">
                             {item.text}
                           </span>
-                          <span className="absolute left-0 bottom-0 top-6 w-0 h-[2px] bg-primary-blue transition-all duration-300 group-hover:w-full"></span>
+                          <span className={`absolute left-0 bottom-0 top-6 h-[2px] bg-primary-blue transition-all duration-300 ${activeDetailCategory === item.type ? "w-full" : "w-0 group-hover:w-full"}`}></span>
                         </Link>
                       ))}
 
