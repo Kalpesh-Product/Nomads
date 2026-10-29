@@ -6,6 +6,7 @@ import axios from "../utils/axios";
 import ContentShareButton from "../components/ContentShareButton";
 import humanDate from "../utils/humanDate";
 import ContentFavoriteButton from "../components/ContentFavoriteButton";
+import ArticleComments from "../components/ArticleComments";
 import { createDriverGuide } from "../utils/driverGuide";
 
 const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX =
@@ -326,6 +327,9 @@ const AiBlogDetails = () => {
         </footer>
       </div>
       <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
+      {content._id && !searchParams.has("previewKey") && (
+        <ArticleComments key={`${contentType}-${content._id}`} articleId={content._id} kind={contentType} />
+      )}
 
       {activeImage && (
         <div

@@ -47,6 +47,7 @@ import restaurantReviewRoutes from "./routes/restaurantReviewRoutes.js";
 import restaurantPocRoutes from "./routes/restaurantPocRoutes.js";
 import eventReviewRoutes from "./routes/eventReviewRoutes.js";
 import placeReviewRoutes from "./routes/placeReviewRoutes.js";
+import contentCommentRoutes from "./routes/contentCommentRoutes.js";
 import editorRoutes from "./routes/editorRoutes.js";
 import leadsRoutes from "./routes/leadsRoutes.js";
 import specialAccessRoutes from "./routes/specialAccessRoutes.js";
@@ -114,6 +115,7 @@ app.use("/api/restaurantpocs", restaurantPocRoutes);
 app.use("/api/restaurant-pocs", restaurantPocRoutes);
 app.use("/api/event-reviews", eventReviewRoutes);
 app.use("/api/place-reviews", placeReviewRoutes);
+app.use("/api/content-comments", contentCommentRoutes);
 
 app.all("/*splat", (req, res) => {
   if (req.accepts("html")) {
