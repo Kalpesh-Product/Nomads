@@ -8,6 +8,7 @@ import { TbAward } from "react-icons/tb";
 import useNomadLoginState from "../../hooks/useNomadLoginState";
 import { FaCheck } from "react-icons/fa";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import AiAlignBox from "../../components/AiAlignBox";
 
 // Kept only as the fallback shown while the live price loads (or if the
 // request fails) — the real number comes from
@@ -363,9 +364,9 @@ const AiHostPricing = ({
 
   return (
     <>
-      <div className="flex min-h-[calc(100vh-100px)] flex-col bg-white">
-        <main className="flex-1 px-3 py-6 sm:px-6 lg:px-0">
-          <div className="mx-auto max-w-5xl lg:max-w-full text-center">
+      <div className="flex flex-col bg-white">
+        <main className="flex-1 py-6">
+          <AiAlignBox className="text-center">
             {!compact && (
               <>
                 <h1 className="text-3xl font-medium text-black/90 font-play">
@@ -596,7 +597,7 @@ const AiHostPricing = ({
                 })}
               </div>
             </div>
-          </div>
+          </AiAlignBox>
         </main>
       </div>
     </>

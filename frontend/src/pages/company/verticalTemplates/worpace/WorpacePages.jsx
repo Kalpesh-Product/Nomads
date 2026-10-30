@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AnimatePresence, motion } from "../motion";
+import { AnimatePresence, motion as Motion } from "../motion";
 import { groupOpeningHours, priceWithUnit } from "../templateKit";
 import {
   getCareersJobMeta,
@@ -17,6 +17,23 @@ import {
   SpaceCard,
 } from "./WorpaceUI";
 const src = (value) => (typeof value === "string" ? value : value?.url || "");
+const googleMapSrc = (address, configuredUrl) => {
+  const value = String(configuredUrl || "").trim();
+  const queryUrl = (query) =>
+    `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+  const fallback = String(address || "").trim();
+  if (!value) return fallback ? queryUrl(fallback) : "";
+  try {
+    const url = new URL(value);
+    const isGoogleMap = /(^|\.)google\.[a-z.]+$/i.test(url.hostname) || url.hostname === "maps.google.com";
+    const isEmbed = url.pathname.includes("/maps/embed") || url.searchParams.get("output") === "embed";
+    if (isGoogleMap && isEmbed) return value;
+    const query = url.searchParams.get("q") || url.searchParams.get("query") || fallback;
+    return query ? queryUrl(query) : "";
+  } catch {
+    return queryUrl(fallback || value);
+  }
+};
 export const ServicesIndex = () => {
   const { services, draft, navLabel, goToService, c } = useWorpace();
   return (
@@ -216,7 +233,7 @@ export const ItemDetail = ({ service, item }) => {
     </>
   );
 };
-const Suggestions = ({ current, service }) => {
+const Suggestions = ({ current }) => {
   const { services } = useWorpace();
   const list = services
     .flatMap((s) => s.items.map((item) => ({ service: s, item })))
@@ -270,17 +287,17 @@ export const WorpaceFaq = ({ faqs }) => {
                   onClick={() => setOpen(active ? null : index)}
                 >
                   <span>{item.question}</span>
-                  <motion.i
+                  <Motion.i
                     aria-hidden="true"
                     animate={{ rotate: active ? 45 : 0 }}
                     transition={{ duration: 0.25 }}
                   >
                     +
-                  </motion.i>
+                  </Motion.i>
                 </button>
                 <AnimatePresence initial={false}>
                   {active ? (
-                    <motion.div
+                    <Motion.div
                       className="wp-about-faq-answer"
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
@@ -288,7 +305,7 @@ export const WorpaceFaq = ({ faqs }) => {
                       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     >
                       <p>{item.answer}</p>
-                    </motion.div>
+                    </Motion.div>
                   ) : null}
                 </AnimatePresence>
               </article>
@@ -485,6 +502,7 @@ export const WorpaceContact = () => {
   const { t, draft, primary, navLabel, c } = useWorpace();
   const hours = groupOpeningHours(draft?.openingHours);
   const showForm = draft?.contactEnableInquiryForm !== false;
+  const map = googleMapSrc(t.contactAddress, draft?.mapUrl);
   return (
     <>
       <PageHero
@@ -557,9 +575,17 @@ export const WorpaceContact = () => {
           </div>
         </div>
       </section>
-      {draft?.mapUrl ? (
+      {map ? (
         <section className="wp-map">
-          <iframe title="Map" src={draft.mapUrl} loading="lazy" />
+          <div className="wp-shell">
+            <iframe
+              title={`${draft?.companyName || "Business"} location on Google Maps`}
+              src={map}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
         </section>
       ) : null}
       <WorpaceFaq faqs={draft?.faqs} />

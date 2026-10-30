@@ -80,7 +80,7 @@ const verticalTypeOptions = [
   "Co-working",
   "Co-living",
   "Hostel",
-  "Workation",
+  // "Workation",
   "Meetings",
   "Cafe",
 ];

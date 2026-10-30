@@ -16,6 +16,7 @@ import BackToTopButton from "../components/BackToTopButton";
 import AiStickyBackBreadcrumb from "../components/AiStickyBackBreadcrumb";
 import { navigateBackWithinApp } from "../utils/navigationHistory";
 import { buildSearchResultsReturnTarget } from "../utils/aiSearchResultsNavigation";
+import "../contributions.css";
 
 const EXCLUDED_STICKY_BAR_PATHS = new Set([]);
 
@@ -89,12 +90,38 @@ const normalizeBreadcrumbLabel = (segment) => {
   return toTitle(segment);
 };
 
+const contributionBreadcrumbLabels = {
+  all: "All Contributions",
+  blog: "Blogs",
+  news: "News",
+  event: "Events",
+  places: "Places",
+};
+
+const contributionEditBreadcrumbLabels = {
+  blog: "Edit Blog",
+  news: "Edit News",
+  event: "Edit Event",
+  places: "Edit Place",
+};
+
+const contributionListPaths = new Set([
+  "/contributions",
+  "/contributions/all",
+  "/contributions/blog",
+  "/contributions/news",
+  "/contributions/event",
+  "/contributions/places",
+]);
+
 const NomadAiLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const navigationType = useNavigationType();
   const contentRef = useRef(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const isContributionPage = /^\/contributions(?:\/|$)/.test(location.pathname);
+  const [isTabletWidth, setIsTabletWidth] = useState(() => window.innerWidth < 1024);
   const [isManualSearchCompact, setIsManualSearchCompact] = useState(
     () =>
       typeof window !== "undefined" &&
@@ -103,6 +130,13 @@ const NomadAiLayout = () => {
   );
 
   const formData = useSelector((state) => state.location.formValues);
+  const useCompactNavigation = isManualSearchCompact || (isContributionPage && isTabletWidth);
+
+  useEffect(() => {
+    const updateTabletWidth = () => setIsTabletWidth(window.innerWidth < 1024);
+    window.addEventListener("resize", updateTabletWidth);
+    return () => window.removeEventListener("resize", updateTabletWidth);
+  }, []);
   console.log("formData from layout : ", formData);
 
   useEffect(() => {
@@ -214,7 +248,9 @@ const NomadAiLayout = () => {
       return [];
     }
 
-    const customBreadcrumbs = location.state?.stickyBreadcrumbs;
+    const customBreadcrumbs = contributionListPaths.has(location.pathname)
+      ? null
+      : location.state?.stickyBreadcrumbs;
     if (Array.isArray(customBreadcrumbs) && customBreadcrumbs.length > 0) {
       return customBreadcrumbs
         .map((item, index) => {
@@ -244,10 +280,23 @@ const NomadAiLayout = () => {
     return segments
       .map((segment, index) => {
         const isLast = index === segments.length - 1;
+        const isContributionChild =
+          segments[0] === "contributions" &&
+          index === 1 &&
+          contributionBreadcrumbLabels[segment];
+        const isContributionEditItem =
+          segments[0] === "contributions" &&
+          index === 2 &&
+          segment !== "add" &&
+          contributionEditBreadcrumbLabels[segments[1]];
         return {
           label:
             isLast && isContentDetailPage && detailStateName
               ? toTitle(detailStateName)
+              : isContributionEditItem
+                ? contributionEditBreadcrumbLabels[segments[1]]
+              : isContributionChild
+                ? contributionBreadcrumbLabels[segment]
               : normalizeBreadcrumbLabel(segment),
           onClick: isLast
             ? null
@@ -313,15 +362,15 @@ const NomadAiLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white">
-      <div className={isManualSearchCompact ? "hidden" : "hidden sm:block"}>
+    <div className={`flex h-screen bg-white ${isContributionPage ? "contributions-layout" : ""}`}>
+      <div className={useCompactNavigation ? "hidden" : "hidden sm:block"}>
         <AiSidebar />
       </div>
 
       {isMobileSidebarOpen && (
         <div
           className={`fixed inset-0 z-[2100] bg-black/35 ${
-            isManualSearchCompact ? "" : "sm:hidden"
+            useCompactNavigation ? "" : "sm:hidden"
           }`}
           onClick={() => setIsMobileSidebarOpen(false)}
           aria-hidden="true"
@@ -337,7 +386,7 @@ const NomadAiLayout = () => {
         <div className="sticky top-0 z-50 w-full">
           <AiHeader
             onMobileSidebarToggle={() => setIsMobileSidebarOpen(true)}
-            forceMobileNavigation={isManualSearchCompact}
+            forceMobileNavigation={useCompactNavigation}
           />
         </div>
         {shouldShowStickyBar && (
@@ -346,7 +395,7 @@ const NomadAiLayout = () => {
               className={
                 isProductAlignedPage
                   ? "px-3 lg:px-20"
-                  : "px-1 md:px-20"
+                  : `px-1 md:px-20 ${isContributionPage ? "contributions-breadcrumb" : ""}`
               }
             >
               <div
@@ -377,9 +426,11 @@ const NomadAiLayout = () => {
         >
           <div
             className={
-              isProductAlignedPage
-                ? "px-1 lg:px-20 min-h-[calc(100vh-100px)]"
-                : "px-1 md:px-6 lg:px-6 xl:px-10 2xl:px-12 min-h-[calc(100vh-100px)]"
+              isContributionPage
+                ? "contributions-body min-h-[calc(100vh-100px)] px-1 md:px-6 lg:px-20"
+                : isProductAlignedPage
+                  ? "px-1 lg:px-20 min-h-[calc(100vh-100px)]"
+                  : "px-1 md:px-6 lg:px-6 xl:px-10 2xl:px-12 min-h-[calc(100vh-100px)]"
             }
           >
             <Outlet />

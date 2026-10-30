@@ -146,6 +146,19 @@ const AiManualSearch = lazyPage(() => import("./pages/AiManualSearch"));
 const AiBecomeContributor = lazyPage(() =>
   import("./pages/AiBecomeContributor"),
 );
+const AiContributionDashboard = lazyPage(() =>
+  import("./pages/AiContributionDashboard"),
+);
+const AiContributionsHub = lazyPage(() => import("./pages/AiContributionsHub"));
+const AiContributionsHubTwo = lazyPage(() =>
+  import("./pages/AiContributionsHubTwo"),
+);
+const AiBlogContributionAdd = lazyPage(() =>
+  import("./pages/AiBlogContributionAdd"),
+);
+const AiBlogContributionPreview = lazyPage(() =>
+  import("./pages/AiBlogContributionPreview"),
+);
 const AiBlogsFetch = lazyPage(() => import("./components/AiBlogsFetch"));
 const AiNewsFetch = lazyPage(() => import("./components/AiNewsFetch"));
 const AiBlogDetails = lazyPage(() => import("./pages/AiBlogDetails"));
@@ -182,6 +195,7 @@ const AiHostVerifyEmail = lazyPage(() =>
 );
 const AiHostModules = lazyPage(() => import("./pages/AiHost/AiHostModules"));
 const AiHostThemes = lazyPage(() => import("./pages/AiHost/AiHostThemes"));
+const AiHostPreview = lazyPage(() => import("./pages/AiHost/AiHostPreview"));
 const AiHostLeads = lazyPage(() => import("./pages/AiHost/AiHostLeads"));
 const AiHostCareer = lazyPage(() => import("./pages/AiHost/AiHostCareer"));
 const AiHostAbout = lazyPage(() => import("./pages/AiHost/AiHostAbout"));
@@ -338,6 +352,118 @@ if (tenant === "main") {
               element: withDatePickerProvider(<AiWorkation />),
             },
             { path: "profile", element: <AiProfile /> },
+            {
+              path: "contributions",
+              element: <AiContributionsHubTwo />,
+            },
+            {
+              path: "contributions/all",
+              element: <AiContributionDashboard type="all" initialFilter="all" />,
+            },
+            {
+              path: "contributions/blog",
+              element: <AiContributionDashboard type="all" initialFilter="blog" />,
+            },
+            {
+              path: "contributions/blog/add",
+              element: <AiBlogContributionAdd type="blog" />,
+            },
+            {
+              path: "contributions/blog/:blogId",
+              element: <AiBlogContributionPreview />,
+            },
+            {
+              path: "contributions/news",
+              element: <AiContributionDashboard type="all" initialFilter="news" />,
+            },
+            {
+              path: "contributions/news/add",
+              element: <AiBlogContributionAdd type="news" />,
+            },
+            {
+              path: "contributions/news/:newsId",
+              element: <AiBlogContributionPreview type="news" />,
+            },
+            {
+              path: "contributions/event",
+              element: <AiContributionDashboard type="all" initialFilter="event" />,
+            },
+            {
+              path: "contributions/event/add",
+              element: <AiBlogContributionAdd type="event" />,
+            },
+            {
+              path: "contributions/event/:eventId",
+              element: <AiBlogContributionPreview type="event" />,
+            },
+            {
+              path: "contributions/places",
+              element: <AiContributionDashboard type="all" initialFilter="places" />,
+            },
+            {
+              path: "contributions/places/add",
+              element: <AiBlogContributionAdd type="places" />,
+            },
+            {
+              path: "contributions/places/:placeId",
+              element: <AiBlogContributionPreview type="places" />,
+            },
+            {
+              path: "contributions-2",
+              element: <AiContributionsHub />,
+            },
+            {
+              path: "all-contributions",
+              element: <AiContributionDashboard type="all" />,
+            },
+            {
+              path: "blog-contributions",
+              element: <AiContributionDashboard type="blog" />,
+            },
+            {
+              path: "blog-contributions/add",
+              element: <AiBlogContributionAdd type="blog" />,
+            },
+            {
+              path: "blog-contributions/:blogId",
+              element: <AiBlogContributionPreview />,
+            },
+            {
+              path: "news-contributions",
+              element: <AiContributionDashboard type="news" />,
+            },
+            {
+              path: "news-contributions/add",
+              element: <AiBlogContributionAdd type="news" />,
+            },
+            {
+              path: "news-contributions/:newsId",
+              element: <AiBlogContributionPreview type="news" />,
+            },
+            {
+              path: "event-contributions",
+              element: <AiContributionDashboard type="event" />,
+            },
+            {
+              path: "event-contributions/add",
+              element: <AiBlogContributionAdd type="event" />,
+            },
+            {
+              path: "event-contributions/:eventId",
+              element: <AiBlogContributionPreview type="event" />,
+            },
+            {
+              path: "places-contributions",
+              element: <AiContributionDashboard type="places" />,
+            },
+            {
+              path: "places-contributions/add",
+              element: <AiBlogContributionAdd type="places" />,
+            },
+            {
+              path: "places-contributions/:placeId",
+              element: <AiBlogContributionPreview type="places" />,
+            },
             {
               path: "become-a-contributor",
               element: <AiBecomeContributor />,
@@ -730,6 +856,9 @@ if (tenant === "main") {
             },
           ],
         },
+        // Deliberately not nested under AiHostLayout — a full-screen iframe
+        // preview (see AiHostPreview), not a page with our own nav around it.
+        { path: "/preview/:templateId", element: <AiHostPreview /> },
         {
           path: "/hostold",
           element: <HostLayout />,

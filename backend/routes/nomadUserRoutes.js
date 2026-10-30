@@ -13,6 +13,7 @@ import {
   saveListings,
   trackDestinationView,
   trackListingView,
+  getContributorRoles,
   updateProfile,
 } from "../controllers/nomadUserControllers.js";
 
@@ -21,6 +22,7 @@ const router = Router();
 router.get("/", getUsers);
 router.patch("/profile/:userId", updateProfile);
 router.patch("/password/:userId", changePassword);
+router.get("/contributor-roles", getContributorRoles);
 router.patch("/favorite-destination", favoriteDestinations);
 router.get("/favorite-destination/:userId", getUserFavoriteDestinations);
 router.patch("/like", likeListings);
