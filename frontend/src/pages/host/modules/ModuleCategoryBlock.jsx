@@ -1,9 +1,10 @@
-const planBadgeStyles = {
+export const planBadgeStyles = {
   basic: "bg-emerald-50 text-emerald-700 border border-emerald-200",
   professional: "bg-blue-50 text-blue-700 border border-blue-200",
   custom: "bg-purple-50 text-purple-700 border border-purple-200",
 };
-const planLabels = { basic: "Basic", professional: "Professional", custom: "Custom" };
+const verticalBadgeStyles = "border border-sky-200 bg-sky-50 text-sky-700";
+export const planLabels = { basic: "Basic", professional: "Professional", custom: "Custom" };
 const planOrder = { basic: 0, professional: 1, custom: 2 };
 
 // Flattens a category's modules (including nested sub-pages like Website
@@ -28,6 +29,54 @@ const flattenModules = (modules, sortByPlan) => {
     : flat;
 };
 
+// One module's full write-up — icon/label/plan badge, summary, bullets,
+// screenshot. Shared between this category-scroll block and
+// AiHostModules.jsx's single-module detail page so both stay visually
+// identical without duplicating the markup.
+export const ModuleDetailTile = ({ tile, planBadgeLabel }) => {
+  const Icon = tile.icon;
+  return (
+    <div className="flex w-full flex-col items-start gap-5 sm:gap-6 lg:flex-row lg:gap-8 2xl:gap-12">
+      <div className="flex w-full flex-1 flex-col gap-3 lg:basis-5/12">
+        <div className="flex items-center gap-2 flex-wrap">
+          {Icon && <Icon size={22} className="text-primary-blue shrink-0" />}
+          <h3 className="text-lg md:text-xl font-semibold text-secondary-dark">{tile.label}</h3>
+          {tile.plan && (
+            <span
+              className={`text-[0.65rem] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${planBadgeStyles[tile.plan] || ""}`}
+            >
+              {planBadgeLabel || planLabels[tile.plan] || tile.plan}
+            </span>
+          )}
+          {tile.verticals?.map((vertical) => (
+            <span
+              key={vertical}
+              className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide ${verticalBadgeStyles}`}
+            >
+              {vertical} vertical
+            </span>
+          ))}
+        </div>
+        <p className="text-sm leading-relaxed text-secondary-dark/90 sm:text-base">{tile.summary}</p>
+        {tile.bullets?.length > 0 && (
+          <ul className="flex flex-col gap-1.5 mt-1">
+            {tile.bullets.map((bullet, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm leading-relaxed sm:text-base lg:text-sm 2xl:text-base">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-blue" />
+                {bullet}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="w-full flex-1 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 lg:basis-7/12">
+        <img src={tile.image} alt={tile.label} className="h-auto max-h-[18rem] min-h-[13rem] w-full object-contain sm:max-h-[24rem] sm:min-h-[18rem] lg:h-[22rem] lg:max-h-none 2xl:h-[26rem]" />
+      </div>
+    </div>
+  );
+};
+
 // One full-width page section per sidebar category (Common Modules, Extra
 // Common Modules, Key Apps, Core Modules, Custom / Enterprise). Every module
 // gets its own stacked block — text + plan badge on the left, screenshot on
@@ -50,7 +99,6 @@ const ModuleCategoryBlock = ({ category, sortByPlan = true }) => {
       </div>
 
       {tiles.map((tile, index) => {
-        const Icon = tile.icon;
         const ParentIcon = tile.parentIcon;
         const isNewGroup = Boolean(tile.parentLabel) && tile.parentLabel !== lastGroupLabel;
         lastGroupLabel = tile.parentLabel || null;
@@ -75,41 +123,8 @@ const ModuleCategoryBlock = ({ category, sortByPlan = true }) => {
                 )}
               </div>
             )}
-            <div id={tile.id} className="flex flex-col lg:flex-row gap-8 items-start w-full scroll-mt-24">
-              <div className="flex-1 flex flex-col gap-3 w-full">
-                <div className="flex items-center gap-2 flex-wrap">
-                  {Icon && <Icon size={22} className="text-primary-blue shrink-0" />}
-                  <h3 className="text-lg md:text-xl font-semibold text-secondary-dark">
-                    {tile.label}
-                  </h3>
-                  {!tile.parentLabel && tile.plan && (
-                    <span
-                      className={`text-[0.65rem] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${planBadgeStyles[tile.plan] || ""}`}
-                    >
-                      {planLabels[tile.plan] || tile.plan}
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm md:text-base text-secondary-dark/90">{tile.summary}</p>
-                {tile.bullets && (
-                  <ul className="flex flex-col gap-1.5 mt-1">
-                    {tile.bullets.map((bullet, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-blue" />
-                        {bullet}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              <div className="flex-1 w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
-                <img
-                  src={tile.image}
-                  alt={tile.label}
-                  className="h-[16rem] md:h-[20rem] w-full object-contain"
-                />
-              </div>
+            <div id={tile.id} className="scroll-mt-24">
+              <ModuleDetailTile tile={tile} />
             </div>
           </div>
         );

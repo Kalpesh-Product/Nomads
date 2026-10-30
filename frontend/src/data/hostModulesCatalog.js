@@ -159,6 +159,7 @@ export const hostModuleCategories = [
         label: "Meeting Room Booking",
         icon: MdMeetingRoom,
         plan: "professional",
+        verticals: ["Meeting Rooms"],
         summary:
           "Reserve meeting rooms, manage bookings for members, external visitors and tenant companies.",
         bullets: [
@@ -194,6 +195,51 @@ export const hostModuleCategories = [
           "Track Pending, In Progress, Completed, Rejected or Cancelled",
         ],
         image: printouts,
+      },
+      {
+        id: "cafe-orders",
+        label: "Café Orders",
+        icon: HiOutlineClipboardList,
+        plan: "professional",
+        verticals: ["Café"],
+        summary:
+          "Receive and manage café orders from the workspace, with clear preparation and fulfilment tracking.",
+        bullets: [
+          "Review new, preparing, ready and completed orders",
+          "Track ordered items, quantities and customer details",
+          "Keep the café service queue current throughout the day",
+        ],
+        image: financeManagement,
+      },
+      {
+        id: "hostel-booking",
+        label: "Hostel Booking",
+        icon: HiOutlineOfficeBuilding,
+        plan: "professional",
+        verticals: ["Hostel"],
+        summary:
+          "Book hostel beds and rooms using the availability and pricing configured for the workspace.",
+        bullets: [
+          "Check room and bed availability for selected dates",
+          "Create and review guest reservations",
+          "Use the hostel inventory configured by the management team",
+        ],
+        image: meetingRoomBooking,
+      },
+      {
+        id: "room-booking",
+        label: "Room Booking",
+        icon: MdMeetingRoom,
+        plan: "professional",
+        verticals: ["Co-living"],
+        summary:
+          "Reserve co-living rooms and accommodation using live availability, dates and configured rates.",
+        bullets: [
+          "Search available rooms by stay dates",
+          "Create and manage accommodation reservations",
+          "Use room types and rates maintained in Resource & Pricing",
+        ],
+        image: meetingRoomBooking,
       },
       {
         id: "attendance",
@@ -266,6 +312,19 @@ export const hostModuleCategories = [
           "Track stock by item, category and owning department",
           "Increase for purchases, decrease for consumption, transfer between departments",
           "Monthly stock balances, ledger activity, export",
+        ],
+        image: inventory,
+      },
+      {
+        id: "department-inventory",
+        label: "Department Inventory",
+        icon: HiOutlineCollection,
+        plan: "custom",
+        summary:
+          "Department-scoped stock management for tracking items, requests, issues, and balances within each operational team.",
+        bullets: [
+          "Review stock and movement records for the selected department",
+          "Track item requests, issues, returns, and current balances",
         ],
         image: inventory,
       },
@@ -475,6 +534,51 @@ export const hostModuleCategories = [
             bullets: ["New Visitor or Existing Visitor lookup", "Check-in generates a printable badge"],
             image: visitorManagement,
           },
+          {
+            id: "visitor-bookings",
+            label: "Visitor Bookings",
+            icon: HiOutlineCalendar,
+            plan: "professional",
+            summary: "Schedule and manage upcoming visitor bookings before arrival.",
+            bullets: ["Review expected visitors, booking status and visit information"],
+            image: visitorManagement,
+          },
+          {
+            id: "external-clients",
+            label: "External Clients",
+            icon: HiOutlineUsers,
+            plan: "professional",
+            summary: "Maintain reusable external-client records for faster repeat bookings.",
+            bullets: ["Create, search and reuse client information across visitor workflows"],
+            image: visitorManagement,
+          },
+          {
+            id: "workspace-tour",
+            label: "Workspace Tour",
+            icon: HiOutlineMap,
+            plan: "professional",
+            summary: "Register and coordinate visitors arriving for a workspace or unit tour.",
+            bullets: ["Capture tour interest, schedule details and visitor information"],
+            image: visitorManagement,
+          },
+          {
+            id: "walk-in-booking",
+            label: "Walk-in Booking",
+            icon: HiOutlineIdentification,
+            plan: "professional",
+            summary: "Create a booking for an unscheduled visitor directly from the front desk.",
+            bullets: ["Register the visitor and complete an immediate walk-in booking"],
+            image: visitorManagement,
+          },
+          {
+            id: "verify-booking",
+            label: "Verify Booking",
+            icon: HiOutlineBadgeCheck,
+            plan: "professional",
+            summary: "Find and verify an existing visitor booking during arrival and check-in.",
+            bullets: ["Validate booking information before issuing access or a visitor pass"],
+            image: visitorManagement,
+          },
         ],
       },
     ],
@@ -490,12 +594,29 @@ export const hostModuleCategories = [
         plan: "basic",
         summary:
           "The Founder manages platform users, departments, department managers, employees and org-level access.",
-        bullets: [
-          "Add users, review invitations, manage permitted user access",
-          "View departments, members and managers",
-          "Change department managers, add employees, create custom departments",
-        ],
         image: organizationManagement,
+        children: [
+          {
+            id: "organization-users-access",
+            label: "Users & Access",
+            icon: HiOutlineUsers,
+            summary: "Manage workspace users, invitations, roles and permitted access.",
+            bullets: ["Add users, review invitations and manage permitted user access"],
+            image: organizationManagement,
+          },
+          {
+            id: "organization-departments",
+            label: "Departments",
+            icon: HiOutlineOfficeBuilding,
+            plan: "professional",
+            summary: "Manage departments, department managers and employee membership.",
+            bullets: [
+              "View departments, members and managers",
+              "Change managers, add employees and create custom departments",
+            ],
+            image: organizationManagement,
+          },
+        ],
       },
       {
         id: "access-grants",
@@ -528,7 +649,9 @@ export const hostModuleCategories = [
         id: "unit-settings",
         label: "Unit Settings",
         icon: HiOutlineAdjustments,
-        plan: "basic",
+        // Matches WoNoMasterPanel's workspaceModuleCatalog PROFESSIONAL_DEFAULT_IDS
+        // ("workspace-settings") — Basic doesn't include this.
+        plan: "professional",
         summary:
           "The Founder manages business units linked to the account and configures settings per location.",
         bullets: [
@@ -541,7 +664,9 @@ export const hostModuleCategories = [
         id: "unit-management",
         label: "Unit Management",
         icon: HiOutlineOfficeBuilding,
-        plan: "basic",
+        // Matches WoNoMasterPanel's workspaceModuleCatalog PROFESSIONAL_DEFAULT_IDS
+        // ("workspace-management") — Basic doesn't include this.
+        plan: "professional",
         summary:
           "The Founder reviews and compares operational activity across linked business units.",
         bullets: [
@@ -562,9 +687,17 @@ export const hostModuleCategories = [
         icon: HiOutlineTrendingUp,
         plan: "professional",
         summary:
-          "Leads, tenant companies, virtual offices, resource pricing, and the workspace's sales architecture.",
+          "The Sales dashboard and its operational pages: leads, vertical management, resource pricing, virtual offices, and sales architecture.",
         image: salesLeadsManagement,
         children: [
+          {
+            id: "sales-dashboard",
+            label: "Sales Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A department overview of sales activity, leads, occupancy and team performance.",
+            bullets: ["Review Sales KPIs, live status, summaries, charts and recent activity"],
+            image: salesLeadsManagement,
+          },
           {
             id: "sales-leads-management",
             label: "Leads Management",
@@ -578,21 +711,49 @@ export const hostModuleCategories = [
             image: salesLeadsManagement,
           },
           {
-            id: "sales-tenant-companies",
-            label: "Tenant Companies",
-            icon: HiOutlineOfficeBuilding,
-            summary:
-              "Onboard and manage companies occupying workspace resources — contracts, allocation, billing.",
-            bullets: ["Tenant Companies list", "Extra Credits Requests"],
-            image: salesTenantCompanies,
+            id: "cafe-management",
+            label: "Café Management",
+            icon: HiOutlineClipboardCheck,
+            verticals: ["Café"],
+            summary: "Manage café tables, orders, reservations, menu items and daily sales activity.",
+            bullets: ["Dashboard, table management, reservations, orders and menu operations"],
+            image: financeManagement,
           },
           {
-            id: "sales-virtual-offices",
-            label: "Virtual Offices",
-            icon: HiOutlineGlobeAlt,
-            summary: "Onboard and manage companies using Virtual Office services.",
-            bullets: ["Virtual Office Companies: rental plans, contracts, space allocation", "Rent Collections & Payments"],
-            image: salesVirtualOffices,
+            id: "hostel-management",
+            label: "Hostel Management",
+            icon: HiOutlineOfficeBuilding,
+            verticals: ["Hostel"],
+            summary: "Manage dorms, beds, guests, occupancy, collections and hostel stay revenue.",
+            bullets: ["Dashboard, dorm management, bookings and hostel resource pricing"],
+            image: unitManagement,
+          },
+          {
+            id: "co-living-management",
+            label: "Co-living Management",
+            icon: HiOutlineOfficeBuilding,
+            verticals: ["Co-living"],
+            summary: "Manage rooms, residents, occupancy, collections and co-living stay revenue.",
+            bullets: ["Dashboard, room management, bookings and co-living resource pricing"],
+            image: unitManagement,
+          },
+          {
+            id: "co-working-management",
+            label: "Co-working Management",
+            icon: HiOutlineBriefcase,
+            verticals: ["Co-working"],
+            summary: "Manage desks, cabins, tenants, occupancy, renewals and co-working operations.",
+            bullets: ["Operational dashboard, workspace inventory and resource pricing"],
+            image: unitManagement,
+          },
+          {
+            id: "meeting-room-management",
+            label: "Meeting Room Management",
+            icon: MdMeetingRoom,
+            verticals: ["Meeting Rooms"],
+            summary: "Manage meeting rooms, bookings, availability, utilisation and room revenue.",
+            bullets: ["Operational dashboard, booking activity and meeting-room resource pricing"],
+            image: meetingRoomBooking,
           },
           {
             id: "sales-resource-pricing",
@@ -601,6 +762,15 @@ export const hostModuleCategories = [
             summary: "Configure the resources that can be booked or assigned to tenant companies.",
             bullets: ["Resources: rooms, desks, pricing, credits, availability", "Tenant Packages"],
             image: salesResourcePricing,
+          },
+          {
+            id: "sales-virtual-offices",
+            label: "Virtual Offices",
+            icon: HiOutlineGlobeAlt,
+            verticals: ["Co-working"],
+            summary: "Onboard and manage companies using Virtual Office services.",
+            bullets: ["Virtual Office Companies: rental plans, contracts, space allocation", "Rent Collections & Payments"],
+            image: salesVirtualOffices,
           },
           {
             id: "sales-architecture",
@@ -620,6 +790,14 @@ export const hostModuleCategories = [
         summary: "Budgets, billing & payments, and full accounting for the workspace.",
         image: financeExpensesBudget,
         children: [
+          {
+            id: "finance-dashboard",
+            label: "Finance Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A department overview of budgets, payments, accounting and finance activity.",
+            bullets: ["Review Finance KPIs, live status, summaries, charts and recent activity"],
+            image: financeExpensesBudget,
+          },
           {
             id: "finance-expenses-budget",
             label: "Expenses & Budget",
@@ -658,6 +836,24 @@ export const hostModuleCategories = [
         image: adminPrintoutManagement,
         children: [
           {
+            id: "administration-dashboard",
+            label: "Administration Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A department overview of bookings, visitors, resources and daily operations.",
+            bullets: ["Review Administration KPIs, live status, summaries and operational activity"],
+            image: adminPrintoutManagement,
+          },
+          {
+            id: "admin-tenant-companies",
+            label: "Tenant Companies",
+            icon: HiOutlineOfficeBuilding,
+            verticals: ["Co-working", "Meeting Rooms", "Workation"],
+            summary:
+              "Review tenant companies from the Administration workspace and coordinate their operational requirements.",
+            bullets: ["Tenant company directory", "Company workspace and allocation information"],
+            image: salesTenantCompanies,
+          },
+          {
             id: "admin-printout-management",
             label: "Printout Management",
             icon: HiOutlineDocumentText,
@@ -670,6 +866,7 @@ export const hostModuleCategories = [
             id: "admin-bookings",
             label: "Bookings",
             icon: MdMeetingRoom,
+            verticals: ["Meeting Rooms", "Workation"],
             summary: "Uses the Meeting Room Booking workflow already documented under Common Modules.",
             bullets: ["Create, view, reschedule and manage bookings"],
             image: meetingRoomBooking,
@@ -714,6 +911,14 @@ export const hostModuleCategories = [
           "Employee lifecycle management — records, recruitment, leave, attendance, payroll and resignations.",
         image: hrCompanyManagement,
         children: [
+          {
+            id: "hr-dashboard",
+            label: "HR Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A department overview of employees, attendance, leave and recruitment activity.",
+            bullets: ["Review HR KPIs, team status, summaries, charts and recent activity"],
+            image: hrCompanyManagement,
+          },
           {
             id: "hr-company-management",
             label: "Company Management",
@@ -796,12 +1001,29 @@ export const hostModuleCategories = [
         image: itRepairLogs,
         children: [
           {
+            id: "it-dashboard",
+            label: "IT Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A department overview of IT repairs, assets, access and service activity.",
+            bullets: ["Review IT KPIs, team status, repair summaries and recent activity"],
+            image: itRepairLogs,
+          },
+          {
             id: "it-repair-logs",
             label: "IT Repair Logs",
             icon: HiOutlineChip,
             summary: "Record, monitor, assign and track IT-related repair activity.",
             bullets: ["Active Logs", "History"],
             image: itRepairLogs,
+          },
+          {
+            id: "it-system-access",
+            label: "System Access",
+            icon: HiOutlineKey,
+            summary:
+              "Review and manage access to company systems, applications, devices, and other IT-controlled resources.",
+            bullets: ["System and application access records", "Access assignment and review"],
+            image: accessGrants,
           },
         ],
       },
@@ -813,6 +1035,14 @@ export const hostModuleCategories = [
         summary: "Repair work orders and preventive maintenance scheduling for company assets.",
         image: maintenanceRepairLogs,
         children: [
+          {
+            id: "maintenance-dashboard",
+            label: "Maintenance Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A department overview of work orders, repairs and preventive maintenance.",
+            bullets: ["Review Maintenance KPIs, team status, schedules and recent activity"],
+            image: maintenanceRepairLogs,
+          },
           {
             id: "maintenance-repair-logs",
             label: "Maintenance Repair Logs",
@@ -844,6 +1074,14 @@ export const hostModuleCategories = [
         summary: "The company website and the activity it generates, managed by the Tech team.",
         image: createEditWebsite,
         children: [
+          {
+            id: "tech-dashboard",
+            label: "Tech Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A department overview of website operations, leads, reviews and team activity.",
+            bullets: ["Review Tech KPIs, team status, summaries and recent activity"],
+            image: techDepartment,
+          },
           {
             id: "tech-website-builder",
             label: "Website Builder",
@@ -927,6 +1165,30 @@ export const hostModuleCategories = [
             summary: "Replace the account password after verifying the current one.",
             bullets: ["Verify current password before new-password fields unlock"],
             image: changePasswordBasic,
+          },
+          {
+            id: "assigned-assets",
+            label: "Assigned Assets",
+            icon: HiOutlineBriefcase,
+            summary: "Review company assets currently assigned to the signed-in member.",
+            bullets: ["Assigned asset details, status, and ownership information"],
+            image: assets,
+          },
+          {
+            id: "payslips",
+            label: "Payslips",
+            icon: HiOutlineCash,
+            summary: "Access the signed-in member's available payroll statements.",
+            bullets: ["Review and download available monthly payslips"],
+            image: hrPayrollManagement,
+          },
+          {
+            id: "resignation-request",
+            label: "Resignation Request",
+            icon: HiOutlineLogout,
+            summary: "Submit and track the signed-in member's resignation or exit request.",
+            bullets: ["Create an exit request and review its current status"],
+            image: hrResignationManagement,
           },
         ],
       },

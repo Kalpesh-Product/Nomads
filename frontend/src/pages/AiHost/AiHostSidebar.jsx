@@ -6,7 +6,7 @@ import {
 } from "../../hooks/useNomadLoginState";
 import useAuth from "../../hooks/useAuth";
 import useLogout from "../../hooks/useLogout";
-import { findModuleByLabel } from "../../data/hostModulesCatalog";
+import { findModuleByLabel, findModule } from "../../data/hostModulesCatalog";
 import logo from "../../assets/WONO_LOGO_Black_TP.svg";
 import {
   HiChevronDown,
@@ -93,6 +93,38 @@ const modulesOverviewTargets = {
     categoryId: "department-accesses",
     moduleId: "maintenance-repair-logs",
   },
+};
+
+// Plan badge shown next to every nav item that maps to a real catalog
+// module, site-wide, so browsing the sidebar itself shows which tier
+// unlocks what — same lookup handleSidebarItemClick uses to deep-link.
+const planForLabel = (label) => {
+  const target = modulesOverviewTargets[label] || findModuleByLabel(label);
+  if (!target) return null;
+  const found = findModule(target.categoryId, target.moduleId);
+  return found?.module?.plan || found?.parent?.plan || null;
+};
+
+const SIDEBAR_PLAN_RANK = { basic: 0, professional: 1, custom: 2 };
+const filterSidebarItemsForPlan = (items, activePlan) => {
+  if (!activePlan) return items;
+  const activeRank = SIDEBAR_PLAN_RANK[activePlan];
+
+  return items.reduce((visibleItems, item) => {
+    const requiredPlan = planForLabel(item.label);
+    const children = item.children
+      ? filterSidebarItemsForPlan(item.children, activePlan)
+      : null;
+    const itemIsIncluded = requiredPlan
+      ? (SIDEBAR_PLAN_RANK[requiredPlan] ?? 0) <= activeRank
+      : item.children
+        ? children.length > 0
+        : true;
+
+    if (!itemIsIncluded) return visibleItems;
+    visibleItems.push(children ? { ...item, children } : item);
+    return visibleItems;
+  }, []);
 };
 
 const recommendationItems = [
@@ -309,19 +341,6 @@ const SidebarSection = ({
   const ChevronIcon = isOpen ? HiChevronUp : HiChevronDown;
   const shouldShowItems = !isExpandable || isOpen;
   const navigate = useNavigate();
-  const [openChildLabel, setOpenChildLabel] = useState(null);
-
-  // Keep the manually-toggled open item in sync with whichever item is
-  // actually active (e.g. navigated to from elsewhere, like the Modules
-  // overview section). Without this, a stale manual toggle and the
-  // navigation-driven active state can disagree about which item's
-  // children should be showing, making the list jump around instead of
-  // predictably expanding downward.
-  const activeChildLabel =
-    items.find((item) => item.children?.some((c) => c.active))?.label ?? null;
-  useEffect(() => {
-    if (activeChildLabel) setOpenChildLabel(activeChildLabel);
-  }, [activeChildLabel]);
 
   return (
     <div className={`px-4 ${compact ? "pt-0" : "pt-3"}`}>
@@ -376,21 +395,12 @@ const SidebarSection = ({
               const isChildActive =
                 hasChildren && item.children.some((c) => c.active);
               const isActive = !!item.active || isChildActive;
-              const isChildrenOpen = openChildLabel === item.label || isChildActive;
 
               return (
                 <div key={item.label}>
                   <button
                     type="button"
-                    onClick={() => {
-                      if (hasChildren) {
-                        setOpenChildLabel((prev) =>
-                          prev === item.label ? null : item.label,
-                        );
-                        return;
-                      }
-                      onItemClick?.(item);
-                    }}
+                    onClick={() => onItemClick?.(item)}
                     onMouseEnter={(event) => {
                       if (!collapsed) return;
 
@@ -440,44 +450,9 @@ const SidebarSection = ({
                             </button>
                           </span>
                         )}
-                        {hasChildren &&
-                          (isChildrenOpen ? (
-                            <HiChevronUp size={14} className="shrink-0" />
-                          ) : (
-                            <HiChevronDown size={14} className="shrink-0" />
-                          ))}
                       </>
                     )}
                   </button>
-
-                  {!collapsed && hasChildren && isChildrenOpen && (
-                    <div className="ml-6 mt-0.5 flex flex-col gap-0.5 border-l border-black/10 pl-2">
-                      {item.children.map((child) => {
-                        const ChildIcon = child.icon;
-                        const isChildSelected = !!child.active;
-                        return (
-                          <button
-                            key={child.label}
-                            type="button"
-                            onClick={() => onItemClick?.(child)}
-                            className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[0.7rem] transition-colors hover:bg-white ${
-                              isChildSelected
-                                ? "font-semibold text-black"
-                                : "text-black/70"
-                            }`}
-                          >
-                            <ChildIcon
-                              size={14}
-                              className={`shrink-0 ${isChildSelected ? "text-primary-blue" : ""}`}
-                            />
-                            <span className="min-w-0 flex-1 truncate whitespace-nowrap">
-                              {child.label}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -490,16 +465,13 @@ const SidebarSection = ({
 
 const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const [collapsed, setCollapsed] = useState(true);
-  // Sidebar width changes (duration-300 below) without ever firing a window
-  // resize — so react-fitty, which only recalculates on "resize"/
-  // "orientationchange" (see its source), keeps rendering text sized for the
-  // old, wider container and it overflows off-screen. Fire one once the
-  // width transition has settled.
+  // The sidebar transition changes available width without a window resize.
+  // Recalculate responsive text once that transition has settled.
   useEffect(() => {
     const timer = setTimeout(() => window.dispatchEvent(new Event("resize")), 320);
     return () => clearTimeout(timer);
   }, [collapsed]);
-  const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
+  const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
   const [isCommonFeaturesOpen, setIsCommonFeaturesOpen] = useState(false);
   const [isExtraCommonModulesOpen, setIsExtraCommonModulesOpen] = useState(false);
@@ -510,6 +482,12 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
+  const requestedModulesPlan = new URLSearchParams(location.search).get("plan");
+  const selectedModulesPlan =
+    normalizedPath === "/modules" && requestedModulesPlan in SIDEBAR_PLAN_RANK
+      ? requestedModulesPlan
+      : null;
 
   const { auth } = useAuth();
   const logout = useLogout();
@@ -574,20 +552,28 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   // section (and pre-selects it when its label matches a real module from
   // hostModulesCatalog.js). Falls back to the section's default category,
   // or the top of the page, when there's no exact match yet.
+  // /modules is plan-scoped — a deep link needs ?plan= too, or the target
+  // module may be filtered out of the selected plan's module index.
   const handleSidebarItemClick = (item, defaultCategoryId) => {
     const override = modulesOverviewTargets[item?.label];
     if (override) {
-      navigate(`/modules?category=${override.categoryId}&module=${override.moduleId}`);
+      const plan = planForLabel(item?.label) || selectedModulesPlan || "basic";
+      navigate(`/modules?plan=${plan}&category=${override.categoryId}&module=${override.moduleId}`);
       return;
     }
 
     const match = findModuleByLabel(item?.label);
     if (match) {
-      navigate(`/modules?category=${match.categoryId}&module=${match.moduleId}`);
+      const plan = planForLabel(item?.label) || selectedModulesPlan || "basic";
+      navigate(`/modules?plan=${plan}&category=${match.categoryId}&module=${match.moduleId}`);
       return;
     }
     if (defaultCategoryId) {
-      navigate(`/modules?category=${defaultCategoryId}`);
+      navigate(
+        selectedModulesPlan
+          ? `/modules?plan=${selectedModulesPlan}&category=${defaultCategoryId}`
+          : `/modules?category=${defaultCategoryId}`,
+      );
       return;
     }
     navigate("/modules");
@@ -657,7 +643,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
 
   const isCollapsed = isMobileOverlay ? false : collapsed;
 
-  const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
   const redirectGoal = location.pathname
     .replace(/\/$/, "")
     .match(/^\/ai-login\/([^/]+)$/)?.[1];
@@ -678,7 +663,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   };
 
   // Active state logic for recommendations
-  const recommendationItemsWithActivePath = recommendationItems.map((item) => {
+  const recommendationItemsWithActivePath = filterSidebarItemsForPlan(recommendationItems.map((item) => {
     const moduleActive = isModuleActive(item);
     if (!item.path) return { ...item, active: moduleActive };
 
@@ -695,10 +680,10 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       ...item,
       active: isActivePath || moduleActive,
     };
-  });
+  }), null);
 
   // Active state logic for value additions
-  const valueAdditionItemsWithActivePath = valueAdditionItems.map((item) => {
+  const valueAdditionItemsWithActivePath = filterSidebarItemsForPlan(valueAdditionItems.map((item) => {
     const moduleActive = isModuleActive(item);
     if (!item.path) return { ...item, active: moduleActive };
 
@@ -711,9 +696,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       ...item,
       active: isActivePath || moduleActive,
     };
-  });
+  }), null);
 
-  const commonFeaturesWithActivePath = commonFeatures.map((item) => {
+  const commonFeaturesWithActivePath = filterSidebarItemsForPlan(commonFeatures.map((item) => {
     const moduleActive = isModuleActive(item);
     if (!item.path) return { ...item, active: moduleActive };
 
@@ -726,9 +711,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       ...item,
       active: isActivePath || moduleActive,
     };
-  });
+  }), null);
 
-  const coreModulesWithActivePath = coreModules.map((item) => {
+  const coreModulesWithActivePath = filterSidebarItemsForPlan(coreModules.map((item) => {
     const moduleActive = isModuleActive(item);
     if (!item.path) return { ...item, active: moduleActive };
 
@@ -741,9 +726,9 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       ...item,
       active: isActivePath || moduleActive,
     };
-  });
+  }), null);
 
-  const departmentAccessWithActivePath = departmentAccess.map((item) => {
+  const departmentAccessWithActivePath = filterSidebarItemsForPlan(departmentAccess.map((item) => {
     const children = item.children?.map((child) => ({
       ...child,
       active: isModuleActive(child),
@@ -762,10 +747,10 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       active: isActivePath || moduleActive,
       children,
     };
-  });
+  }), null);
 
   // Extra Common Modules — locked-until-Custom-plan modules.
-  const extraCommonModulesWithActivePath = extraCommonModules.map((item) => {
+  const extraCommonModulesWithActivePath = filterSidebarItemsForPlan(extraCommonModules.map((item) => {
     const moduleActive = isModuleActive(item);
     if (!item.path) return { ...item, active: moduleActive };
 
@@ -778,7 +763,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       ...item,
       active: isActivePath || moduleActive,
     };
-  });
+  }), null);
 
   return (
     <aside
@@ -841,56 +826,66 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         onTooltipChange={setTooltip}
       />
 
-      <SidebarSection
-        title="Common Modules"
-        items={commonFeaturesWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isCommonFeaturesOpen}
-        onToggle={() => setIsCommonFeaturesOpen((prev) => !prev)}
-        onItemClick={(item) => handleSidebarItemClick(item, "common-modules")}
-        onTooltipChange={setTooltip}
-      />
-      <SidebarSection
-        title="Extra Common Modules"
-        items={extraCommonModulesWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isExtraCommonModulesOpen}
-        onToggle={() => setIsExtraCommonModulesOpen((prev) => !prev)}
-        onItemClick={(item) => handleSidebarItemClick(item, "extra-common-modules")}
-        onTooltipChange={setTooltip}
-      />
-      <SidebarSection
-        title="Key Apps"
-        items={valueAdditionItemsWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isValueAdditionsOpen}
-        onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
-        onItemClick={(item) => handleSidebarItemClick(item, "key-apps")}
-        onTooltipChange={setTooltip}
-      />
-      <SidebarSection
-        title="Core Modules"
-        items={coreModulesWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isCoreModulesOpen}
-        onToggle={() => setIsCoreModulesOpen((prev) => !prev)}
-        onItemClick={(item) => handleSidebarItemClick(item, "core-modules")}
-        onTooltipChange={setTooltip}
-      />
-      <SidebarSection
-        title="Department Accesses"
-        items={departmentAccessWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isDepartmentAccessOpen}
-        onToggle={() => setIsDepartmentAccessOpen((prev) => !prev)}
-        onItemClick={(item) => handleSidebarItemClick(item, "department-accesses")}
-        onTooltipChange={setTooltip}
-      />
+      {commonFeaturesWithActivePath.length > 0 && (
+        <SidebarSection
+          title="Common Modules"
+          items={commonFeaturesWithActivePath}
+          collapsed={isCollapsed}
+          isExpandable
+          isOpen={isCommonFeaturesOpen}
+          onToggle={() => setIsCommonFeaturesOpen((prev) => !prev)}
+          onItemClick={(item) => handleSidebarItemClick(item, "common-modules")}
+          onTooltipChange={setTooltip}
+        />
+      )}
+      {extraCommonModulesWithActivePath.length > 0 && (
+        <SidebarSection
+          title="Extra Common Modules"
+          items={extraCommonModulesWithActivePath}
+          collapsed={isCollapsed}
+          isExpandable
+          isOpen={isExtraCommonModulesOpen}
+          onToggle={() => setIsExtraCommonModulesOpen((prev) => !prev)}
+          onItemClick={(item) => handleSidebarItemClick(item, "extra-common-modules")}
+          onTooltipChange={setTooltip}
+        />
+      )}
+      {valueAdditionItemsWithActivePath.length > 0 && (
+        <SidebarSection
+          title="Key Apps"
+          items={valueAdditionItemsWithActivePath}
+          collapsed={isCollapsed}
+          isExpandable
+          isOpen={isValueAdditionsOpen}
+          onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
+          onItemClick={(item) => handleSidebarItemClick(item, "key-apps")}
+          onTooltipChange={setTooltip}
+        />
+      )}
+      {coreModulesWithActivePath.length > 0 && (
+        <SidebarSection
+          title="Core Modules"
+          items={coreModulesWithActivePath}
+          collapsed={isCollapsed}
+          isExpandable
+          isOpen={isCoreModulesOpen}
+          onToggle={() => setIsCoreModulesOpen((prev) => !prev)}
+          onItemClick={(item) => handleSidebarItemClick(item, "core-modules")}
+          onTooltipChange={setTooltip}
+        />
+      )}
+      {departmentAccessWithActivePath.length > 0 && (
+        <SidebarSection
+          title="Department Accesses"
+          items={departmentAccessWithActivePath}
+          collapsed={isCollapsed}
+          isExpandable
+          isOpen={isDepartmentAccessOpen}
+          onToggle={() => setIsDepartmentAccessOpen((prev) => !prev)}
+          onItemClick={(item) => handleSidebarItemClick(item, "department-accesses")}
+          onTooltipChange={setTooltip}
+        />
+      )}
 
       {isMobileOverlay && (
         <>

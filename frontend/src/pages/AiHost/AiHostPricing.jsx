@@ -26,11 +26,6 @@ const goalSlugByTitle = {
   "Find Your Community": "findyourcommunity",
 };
 
-const getSearchPathForGoal = (goalTitle) => {
-  const goalSlug = goalSlugByTitle[goalTitle];
-  return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
-};
-
 const recommendationCards = [
   {
     title: "BASIC",
@@ -122,6 +117,7 @@ const AiHostPricing = ({
   startStep = 1,
   onSelectPlan,
   initialBillingCycle = "monthly",
+  ctaLabel,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -321,6 +317,10 @@ const AiHostPricing = ({
     });
   };
 
+  // The compact pricing block is already inside the Modules page's
+  // AiAlignBox. Avoid applying that wide responsive gutter a second time.
+  const PricingContent = compact ? "div" : AiAlignBox;
+
   const handleCardClick = (card) => {
     setSelectedPlanTitle(card.title);
 
@@ -365,8 +365,8 @@ const AiHostPricing = ({
   return (
     <>
       <div className="flex flex-col bg-white">
-        <main className="flex-1 py-6">
-          <AiAlignBox className="text-center">
+        <main className={`flex-1 ${compact ? "py-4 sm:py-6" : "py-6"}`}>
+          <PricingContent className="text-center">
             {!compact && (
               <>
                 <h1 className="text-3xl font-medium text-black/90 font-play">
@@ -384,15 +384,15 @@ const AiHostPricing = ({
             )}
 
             <div
-              className={`relative mt-8 ${areCardsVisible ? "visible" : "invisible"}`}
+              className={`relative ${compact ? "mt-4" : "mt-8"} ${areCardsVisible ? "visible" : "invisible"}`}
             >
               <div className="mb-8 flex items-center justify-center">
-                <div className="inline-flex items-center rounded-full border border-[#dfe5ef] bg-[#f5f7fb] p-1">
+                <div className="inline-flex max-w-full items-center rounded-full border border-[#dfe5ef] bg-[#f5f7fb] p-1">
                   <button
                     type="button"
                     onClick={() => setBillingCycle("monthly")}
                     className={[
-                      "rounded-full px-5 py-2 text-sm font-semibold transition-all",
+                      "rounded-full px-3 py-2 text-xs font-semibold transition-all sm:px-5 sm:text-sm",
                       billingCycle === "monthly"
                         ? "bg-white text-[#0f1730] shadow"
                         : "text-[#60708b] hover:text-[#0f1730]",
@@ -404,7 +404,7 @@ const AiHostPricing = ({
                     type="button"
                     onClick={() => setBillingCycle("annual")}
                     className={[
-                      "flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-all",
+                      "flex items-center gap-1 rounded-full px-3 py-2 text-xs font-semibold transition-all sm:gap-2 sm:px-5 sm:text-sm",
                       billingCycle === "annual"
                         ? "bg-white text-[#0f1730] shadow"
                         : "text-[#60708b] hover:text-[#0f1730]",
@@ -412,7 +412,7 @@ const AiHostPricing = ({
                   >
                     Annual
                     {annualSavePercent > 0 && (
-                      <span className="rounded-full bg-[#dff5ea] px-2 py-0.5 text-[10px] font-bold text-[#16b26a]">
+                      <span className="rounded-full bg-[#dff5ea] px-1.5 py-0.5 text-[9px] font-bold text-[#16b26a] sm:px-2 sm:text-[10px]">
                         Save up to {annualSavePercent}%
                       </span>
                     )}
@@ -455,12 +455,12 @@ const AiHostPricing = ({
                 className={`${
                   recommendationCards.length > 3
                     ? "flex gap-4 sm:gap-5 lg:gap-6 overflow-x-auto px-4 sm:px-6 pt-10 pb-6 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                    : "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
+                    : compact
+                      ? "grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3 lg:gap-6 xl:gap-8"
+                      : "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
                 }`}
               >
                 {cards.map((card, index) => {
-                  const isGated = gatedRecommendationTitles.has(card.title);
-
                   return (
                     <div
                       key={card.title}
@@ -468,10 +468,16 @@ const AiHostPricing = ({
                         index < visibleCardCount
                           ? "translate-y-0 opacity-100"
                           : "translate-y-4 opacity-0 pointer-events-none"
-                      } ${recommendationCards.length > 3 ? "min-w-[86%] sm:min-w-[46%] lg:min-w-[31%] snap-start" : ""}`}
+                      } ${recommendationCards.length > 3 ? "min-w-[86%] sm:min-w-[46%] lg:min-w-[31%] snap-start" : ""} ${
+                        compact && cards.length === 3 && index === cards.length - 1
+                          ? "sm:col-span-2 sm:mx-auto sm:w-[calc(50%-1rem)] lg:col-span-1 lg:mx-0 lg:w-auto"
+                          : ""
+                      }`}
                     >
                       <article
-                        className={`relative flex h-full flex-col rounded-[34px] border bg-[#f5f7fb] p-6 text-left transition-all duration-300 sm:p-7 ${
+                        className={`relative flex h-full min-w-0 flex-col rounded-3xl border bg-[#f5f7fb] text-left transition-all duration-300 sm:rounded-[34px] ${
+                          compact ? "p-5 sm:p-6 lg:p-5 xl:p-7" : "p-6 sm:p-7"
+                        } ${
                           selectedPlanTitle === card.title
                             ? "border-primary-blue -translate-y-2 shadow-[0_16px_32px_rgba(15,23,48,0.12)] ring-2 ring-primary-blue/18"
                             : card.highlight
@@ -582,7 +588,7 @@ const AiHostPricing = ({
                                 : "bg-[#e6ebf2] text-[#1e2b45]"
                             }`}
                           >
-                            {compact ? "Select" : card.ctaText}
+                            {compact ? ctaLabel || "Select" : card.ctaText}
                           </button>
                         </div>
                       </article>
@@ -597,7 +603,7 @@ const AiHostPricing = ({
                 })}
               </div>
             </div>
-          </AiAlignBox>
+          </PricingContent>
         </main>
       </div>
     </>

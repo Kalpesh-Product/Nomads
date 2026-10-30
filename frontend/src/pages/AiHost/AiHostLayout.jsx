@@ -13,10 +13,11 @@ const AiHostLayout = () => {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     useEffect(() => {
+        if (location.state?.preserveScroll) return;
         if (contentRef.current) {
-            contentRef.current.scrollTo({ behavior: "smooth", top: "0" });
+            contentRef.current.scrollTo({ behavior: "auto", top: 0 });
         }
-    }, [location.pathname]);
+    }, [location.pathname, location.search, location.state]);
 
     useEffect(() => {
         setIsMobileSidebarOpen(false);
@@ -30,7 +31,7 @@ const AiHostLayout = () => {
 
             {isMobileSidebarOpen && (
                 <div
-                    className="fixed inset-0 z-[70] bg-black/35 sm:hidden"
+                    className="fixed inset-0 z-[2100] bg-black/35 sm:hidden"
                     onClick={() => setIsMobileSidebarOpen(false)}
                     aria-hidden="true"
                 >

@@ -1,170 +1,419 @@
-import FitText from "../../components/FitText";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { HiChevronDown, HiChevronUp, HiOutlineArrowLeft } from "react-icons/hi";
 import AiAlignBox from "../../components/AiAlignBox";
+import FitText from "../../components/FitText";
 import GetStartedButton from "../../components/GetStartedButton";
 import FinanceImage from "../../assets/images-service/finance-final.png";
 import useIsMobile from "../../hooks/useIsMobile.js";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
-import { HiOutlineArrowLeft } from "react-icons/hi";
-import { hostModuleCategories } from "../../data/hostModulesCatalog";
-import ModuleCategoryBlock from "../host/modules/ModuleCategoryBlock";
+import { findModule, hostModuleCategories } from "../../data/hostModulesCatalog";
+import {
+  ModuleDetailTile,
+  planBadgeStyles,
+  planLabels,
+} from "../host/modules/ModuleCategoryBlock";
 
-// MOCK IMPLEMENTATION for manager review: module data in
-// data/hostModulesCatalog.js is placeholder content, sourced from the dev
-// team's Basic-plan doc. Navigation into a module stays with the site's own
-// sidebar — this page just lists every category as its own section, in
-// order: Common Modules, Extra Common Modules, Key Apps, Core Modules.
-// Clicking a sidebar item (?category=&module=) jumps straight to and
-// pre-selects that section. Once signed off, this moves to the master
-// (editable) config.
+const PLAN_IDS = ["basic", "professional", "custom"];
+const PLAN_RANK = { basic: 0, professional: 1, custom: 2 };
+const PLAN_ACCESS_LABELS = {
+  basic: "Basic+",
+  professional: "Professional+",
+  custom: "Custom only",
+};
+const INITIAL_CARD_COUNT = 8;
+const verticalBadgeStyles = "border border-sky-200 bg-sky-50 text-sky-700";
+
+const planIncludesModule = (modulePlan, activePlan) =>
+  (PLAN_RANK[modulePlan] ?? 0) <= (PLAN_RANK[activePlan] ?? 0);
+
+const orderedCategories = [
+  ...hostModuleCategories.filter((category) => category.id === "key-apps"),
+  ...hostModuleCategories.filter((category) => category.id !== "key-apps"),
+];
+
+const ModuleCard = ({ module, onClick }) => {
+  const Icon = module.icon;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex min-h-[8.5rem] flex-col gap-2 rounded-xl border border-gray-200 bg-white p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary-blue hover:shadow-md sm:min-h-[9rem]"
+    >
+      <div className="flex items-start gap-2">
+        {Icon && <Icon size={20} className="mt-0.5 shrink-0 text-primary-blue" />}
+        <span className="text-sm font-semibold leading-snug text-secondary-dark sm:text-base">
+          {module.label}
+        </span>
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span
+          className={`rounded-full px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase ${planBadgeStyles[module.plan] || ""}`}
+        >
+          {PLAN_ACCESS_LABELS[module.plan] || module.plan}
+        </span>
+        {module.verticals?.map((vertical) => (
+          <span
+            key={vertical}
+            className={`rounded-full px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase ${verticalBadgeStyles}`}
+          >
+            {vertical} vertical
+          </span>
+        ))}
+      </div>
+      {module.summary && (
+        <p className="line-clamp-2 text-xs leading-relaxed text-secondary-dark/70 sm:text-sm">
+          {module.summary}
+        </p>
+      )}
+    </button>
+  );
+};
+
 export default function Modules() {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const onBack = () => navigate("/");
+  const { key: locationKey } = useLocation();
   const [searchParams] = useSearchParams();
-  const targetCategoryId = searchParams.get("category");
-  const targetModuleId = searchParams.get("module");
+  const isMobile = useIsMobile();
+  const [expandedCategories, setExpandedCategories] = useState({});
 
-  useEffect(() => {
-    const anchorId = targetModuleId || targetCategoryId;
-    if (!anchorId) return;
-    const section = document.getElementById(anchorId);
-    section?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [targetCategoryId, targetModuleId]);
+  const categoryParam = searchParams.get("category");
+  const moduleParam = searchParams.get("module");
+  const requestedPlan = searchParams.get("plan");
+  const activePlan = PLAN_IDS.includes(requestedPlan) ? requestedPlan : "basic";
+  const resolved = moduleParam ? findModule(categoryParam, moduleParam) : null;
+  const activeModule = resolved ? resolved.parent || resolved.module : null;
+  const onBack = () =>
+    locationKey !== "default" ? navigate(-1) : navigate("/modules");
+
+  const categoriesForPlan = useMemo(
+    () =>
+      orderedCategories
+        .map((category) => ({
+          ...category,
+          modules: category.modules.filter((module) =>
+            planIncludesModule(module.plan, activePlan),
+          ),
+        }))
+        .filter((category) => category.modules.length > 0),
+    [activePlan],
+  );
+  const requiredPlan = activeModule?.plan || resolved?.module?.plan || "basic";
+  const moduleAvailable = activeModule
+    ? planIncludesModule(requiredPlan, activePlan)
+    : true;
+  const availablePlans = PLAN_IDS.filter(
+    (plan) => PLAN_RANK[plan] >= PLAN_RANK[requiredPlan],
+  );
+
+  useEffect(() => setExpandedCategories({}), [activePlan]);
+
+  const buildPlanHref = (plan) => {
+    if (!resolved) return `/modules?plan=${plan}`;
+    return `/modules?plan=${plan}&category=${resolved.category.id}&module=${activeModule.id}`;
+  };
+
+  const navigateToPlan = (plan) =>
+    navigate(buildPlanHref(plan), { state: { preserveScroll: true } });
+
+  const breadcrumbItems = resolved
+    ? [
+        { label: "Modules", href: `/modules?plan=${activePlan}` },
+        { label: activeModule.label, href: null },
+        { label: `${planLabels[activePlan]} Plan`, href: null },
+      ]
+    : [{ label: "Modules", href: null }];
+
+  const detailTiles = activeModule?.children?.length
+    ? activeModule.children.filter((child) =>
+        planIncludesModule(child.plan || requiredPlan, activePlan),
+      )
+    : activeModule
+      ? [activeModule]
+      : [];
 
   return (
-    // Full-bleed: cancels AiHostLayout's px-1/md:px-6/lg:px-10/xl:px-24 so
-    // this page spans the same width as the header row above it, letting
-    // AiAlignBox reproduce the header's exact left/right alignment.
-    <div className="mt-px -mx-1 md:-mx-6 lg:-mx-10 xl:-mx-24 w-[calc(100%+0.5rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+5rem)] xl:w-[calc(100%+12rem)]">
-      {/* Breadcrumb bar — sits below the mobile sidebar overlay (z-70) and
-          below the header (z-50), and aligns with the header's edges via
-          AiAlignBox at every breakpoint. */}
-      <div className="sticky top-0 isolate z-30 bg-white">
+    <div className="-mx-1 w-[calc(100%+0.5rem)] overflow-x-clip text-secondary-dark md:-mx-6 md:w-[calc(100%+3rem)] lg:-mx-10 lg:w-[calc(100%+5rem)] xl:-mx-24 xl:w-[calc(100%+12rem)]">
+      <div className="sticky top-0 isolate z-[100] -mt-px bg-white">
         <AiAlignBox>
-          <div className="flex min-h-11 w-full min-w-0 items-center gap-3 bg-white py-1.5 pb-3 md:h-11 md:pb-4">
+          <div className="flex h-11 w-full min-w-0 items-center gap-2 bg-white py-1.5 pb-3 md:pb-4">
             <button
               type="button"
               onClick={onBack}
-              className="ml-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 md:ml-0"
-              aria-label="Go back to search results"
+              className="ml-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 transition-colors hover:bg-sky-50 md:ml-0"
+              aria-label="Go back"
             >
               <HiOutlineArrowLeft size={18} />
             </button>
-            <span className="text-lg font-medium text-primary-blue">Modules</span>
-            {/* {stateLabel && (
-              <span className="text-lg font-medium text-primary-blue">
-                {stateLabel}
-              </span>
-            )} */}
+            <nav
+              className="flex min-w-0 flex-1 items-center overflow-x-auto whitespace-nowrap text-xs text-primary-blue [scrollbar-width:none] sm:text-sm md:text-base [&::-webkit-scrollbar]:hidden"
+              aria-label="Breadcrumb"
+            >
+              {breadcrumbItems.map((item, index) => (
+                <Fragment key={`${item.label}-${index}`}>
+                  {index > 0 && (
+                    <span className="mx-1 shrink-0 md:mx-2" aria-hidden="true">
+                      {">"}
+                    </span>
+                  )}
+                  {item.href ? (
+                    <button
+                      type="button"
+                      onClick={() => navigate(item.href)}
+                      className="shrink-0 text-primary-blue transition-colors hover:text-primary-dark"
+                    >
+                      {item.label}
+                    </button>
+                  ) : (
+                    <span
+                      className={
+                        index === breadcrumbItems.length - 1
+                          ? "min-w-0 truncate align-bottom"
+                          : "shrink-0 text-primary-blue"
+                      }
+                      title={item.label}
+                      aria-current={index === breadcrumbItems.length - 1 ? "page" : undefined}
+                    >
+                      {item.label}
+                    </span>
+                  )}
+                </Fragment>
+              ))}
+            </nav>
           </div>
         </AiAlignBox>
       </div>
-      <AiAlignBox>
-        <div className="flex flex-col gap-8 w-full">
-          <div className="flex flex-col gap-8">
-            <FitText
-              as="h1"
-              text="The ONLY Nomad Ecosystem SaaS Platform!"
-              className="font-semibold font-comic"
-              minFontSize={18}
-              maxFontSize={56}
-            />
-            <div>
-              <h4 className="text-lg lg:text-[1.45rem] lg:leading-[2.75rem] text-start md:text-center lg:text-center xl:text-center 2xl:text-start text-secondary-dark">
-                No Code Website <span className="text-primary-blue"></span>
-                <span className="text-primary-blue">+</span> Booking Engine{" "}
-                <span className="text-primary-blue">+</span> Payment Gateway{" "}
-                <span className="text-primary-blue">+</span> Accounting{" "}
-                <span className="text-primary-blue">+</span> Reports{" "}
-                <span className="text-primary-blue">+</span> Analytics{" "}
-                <span className="text-primary-blue">+</span> HR Support{" "}
-                <span className="text-primary-blue">+</span> Customer & Client
-                Management <span className="text-primary-blue">+</span>{" "}
-                Marketing and more.
-              </h4>
-            </div>
-            <div className="flex justify-center items-center sm:justify-end">
-              <GetStartedButton
-                title="Get Started"
-                handleSubmit={() => navigate("/signup?step=1")}
-              />
-            </div>
-          </div>
 
-          <hr className="border-t-4" />
-        </div>
-        <div className=" flex flex-col gap-4 py-0 lg:py-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-1">
-            <div className=" flex flex-col gap-2">
-              <div className="flex flex-col relative text-card-title md:text-3xl font-medium my-3 w-full">
-                Real-time operations
-                <img
-                  src="/blue-line.png"
-                  alt="greenUnderLine"
-                  className="w-3/4 md:w-1/4 h-6"
-                />
-              </div>
-              {isMobile && (
-                <div className="SaaS-featured-grid-right h-[30vh] md:h-[35vh] lg:h-[50vh] overflow-hidden border-gray-100 border-[1px] p-2 rounded-lg">
-                  <img
-                    className="h-full w-full object-cover"
-                    src={FinanceImage}
-                    alt="ServiceGridImage"
+      <AiAlignBox>
+        {!resolved && (
+          <>
+            <section className="flex w-full flex-col gap-8 px-3 pt-5 sm:px-0 sm:pt-7">
+              <div className="flex flex-col gap-5 sm:gap-8">
+                <h1 className="text-pretty text-left font-comic text-2xl font-semibold leading-[1.25] text-secondary-dark sm:hidden">
+                  The ONLY Nomad Ecosystem SaaS Platform!
+                </h1>
+                <div className="hidden sm:block">
+                  <FitText
+                    as="h1"
+                    text="The ONLY Nomad Ecosystem SaaS Platform!"
+                    className="font-semibold font-comic"
+                    minFontSize={18}
+                    maxFontSize={56}
                   />
                 </div>
-              )}
-              <span className="text-lx md:text-xl lg:text:2xl">
-                Manage your business in real-time across all business verticals.
-              </span>
-              <span className="text-lx md:text-xl lg:text:2xl">
-                Operate your business in real-time with the micro most details
-                of inventory, bookings, accounts, analytics, leads, sales,
-                reports, tasks, logs, menu, complaints, requests etc.
-              </span>
-            </div>
-            {!isMobile && (
-              <div className="SaaS-featured-grid-right h-[30vh] md:h-[35vh] lg:h-[50vh] overflow-hidden border-gray-100 border-[1px] p-2 rounded-lg">
-                <img
-                  className="h-full w-full object-cover"
-                  src={FinanceImage}
-                  alt="ServiceGridImage"
-                />
+                <p className="text-[0.95rem] leading-7 text-secondary-dark sm:text-lg sm:leading-8 md:text-center lg:text-[1.45rem] lg:leading-[2.75rem] 2xl:text-left">
+                  No Code Website <span className="text-primary-blue">+</span> Booking Engine{" "}
+                  <span className="text-primary-blue">+</span> Payment Gateway{" "}
+                  <span className="text-primary-blue">+</span> Accounting{" "}
+                  <span className="text-primary-blue">+</span> Reports{" "}
+                  <span className="text-primary-blue">+</span> Analytics{" "}
+                  <span className="text-primary-blue">+</span> HR Support{" "}
+                  <span className="text-primary-blue">+</span> Customer & Client Management{" "}
+                  <span className="text-primary-blue">+</span> Marketing and more.
+                </p>
+                <div className="flex items-center justify-center sm:justify-end">
+                  <GetStartedButton
+                    title="Get Started"
+                    handleSubmit={() => navigate("/signup?step=1")}
+                  />
+                </div>
               </div>
-            )}
-          </div>
-          <hr className="border-t-4 mb-2 lg:mt-10" />
-        </div>
-        <AiAlignBox>
-          <div data-aos="fade-up" className="flex flex-col gap-10 lg:gap-14">
-            {hostModuleCategories.map((category) => (
-              <div
-                key={category.id}
-                id={category.id}
-                className="flex flex-col gap-10 scroll-mt-24"
+              <hr className="border-t-4" />
+            </section>
+
+            <section className="flex flex-col gap-4 px-3 py-0 sm:px-0 lg:py-4">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
+                <div className="flex flex-col gap-2">
+                  <div className="relative my-3 flex w-full flex-col text-card-title font-medium md:text-3xl">
+                    Real-time operations
+                    <img
+                      src="/blue-line.png"
+                      alt=""
+                      className="h-6 w-3/4 md:w-1/4"
+                    />
+                  </div>
+                  {isMobile && (
+                    <div className="h-[30vh] overflow-hidden rounded-lg border border-gray-100 p-2 md:h-[35vh]">
+                      <img
+                        className="h-full w-full object-cover"
+                        src={FinanceImage}
+                        alt="Host operations dashboard"
+                      />
+                    </div>
+                  )}
+                  <p className="text-base leading-relaxed md:text-xl">
+                    Manage your business in real-time across all business verticals.
+                  </p>
+                  <p className="text-base leading-relaxed md:text-xl">
+                    Operate your business with detailed visibility into inventory, bookings,
+                    accounts, analytics, leads, sales, reports, tasks, logs, complaints, and requests.
+                  </p>
+                </div>
+                {!isMobile && (
+                  <div className="h-[35vh] overflow-hidden rounded-lg border border-gray-100 p-2 lg:h-[50vh]">
+                    <img
+                      className="h-full w-full object-cover"
+                      src={FinanceImage}
+                      alt="Host operations dashboard"
+                    />
+                  </div>
+                )}
+              </div>
+              <hr className="mb-2 border-t-4 lg:mt-10" />
+            </section>
+          </>
+        )}
+
+        <div className="sticky top-11 z-[90] border-b border-gray-100 bg-white py-2.5 sm:py-3 lg:py-4">
+          <div className="flex justify-center gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:gap-3 sm:pb-0 [&::-webkit-scrollbar]:hidden">
+            {PLAN_IDS.map((plan) => (
+              <button
+                key={plan}
+                type="button"
+                onClick={() => navigateToPlan(plan)}
+                className={`min-h-9 shrink-0 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors sm:px-6 sm:text-sm ${
+                  activePlan === plan
+                    ? "border-secondary-dark bg-secondary-dark text-white"
+                    : "border-gray-200 bg-white text-secondary-dark/70 hover:border-primary-blue"
+                }`}
               >
-                <ModuleCategoryBlock
-                  category={category}
-                  sortByPlan={category.id !== "department-accesses"}
-                />
-                <hr className="border-t-4" />
-              </div>
+                {planLabels[plan]}
+              </button>
             ))}
           </div>
-        </AiAlignBox>
-        <FitText
-          as="h1"
-          text="… More coming soon"
-          className="font-semibold font-comic"
-          minFontSize={18}
-          maxFontSize={56}
-        />
-        <div className="flex justify-center w-full my-6">
-          <GetStartedButton
-            title={"Get Started"}
-            handleSubmit={() => navigate("/signup?step=1")}
-          />
         </div>
+
+        {!resolved ? (
+          <section className="flex w-full flex-col gap-8 py-4 sm:gap-10 sm:py-6 lg:py-8">
+            {categoriesForPlan.map((category) => {
+              const expanded = Boolean(expandedCategories[category.id]);
+              const visibleModules = expanded
+                ? category.modules
+                : category.modules.slice(0, INITIAL_CARD_COUNT);
+              const hasMoreModules = category.modules.length > INITIAL_CARD_COUNT;
+
+              return (
+                <div key={category.id} className="flex flex-col gap-3 sm:gap-4">
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-secondary-dark/55 sm:text-sm">
+                    {category.label}
+                  </h2>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 2xl:gap-5">
+                    {visibleModules.map((module) => (
+                      <ModuleCard
+                        key={module.id}
+                        module={module}
+                        onClick={() =>
+                          navigate(
+                            `/modules?plan=${activePlan}&category=${category.id}&module=${module.id}`,
+                          )
+                        }
+                      />
+                    ))}
+                  </div>
+                  {hasMoreModules && (
+                    <div className="flex justify-center pt-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpandedCategories((current) => ({
+                            ...current,
+                            [category.id]: !expanded,
+                          }))
+                        }
+                        className="inline-flex min-h-10 items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2 text-sm font-medium text-secondary-dark transition-colors hover:border-primary-blue hover:text-primary-blue"
+                        aria-expanded={expanded}
+                      >
+                        {expanded
+                          ? "View less"
+                          : `View more (${category.modules.length - INITIAL_CARD_COUNT})`}
+                        {expanded ? <HiChevronUp size={16} /> : <HiChevronDown size={16} />}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </section>
+        ) : moduleAvailable ? (
+          <section className="flex w-full flex-col gap-8 py-4 sm:py-6 lg:gap-10 lg:py-8">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-secondary-dark/60 sm:text-sm">
+              <span className="font-medium text-secondary-dark/75">Available in:</span>
+              {availablePlans.map((plan) => (
+                <span
+                  key={plan}
+                  className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide ${planBadgeStyles[plan] || ""}`}
+                >
+                  {planLabels[plan]}
+                </span>
+              ))}
+              {activeModule.verticals?.length > 0 && (
+                <>
+                  <span className="ml-1 font-medium text-secondary-dark/75 sm:ml-2">
+                    Vertical:
+                  </span>
+                  {activeModule.verticals.map((vertical) => (
+                    <span
+                      key={vertical}
+                      className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide ${verticalBadgeStyles}`}
+                    >
+                      {vertical}
+                    </span>
+                  ))}
+                </>
+              )}
+            </div>
+            {activeModule.children?.length && (
+              <div className="border-b border-gray-200 pb-5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-xl font-semibold text-secondary-dark sm:text-2xl">
+                    {activeModule.label}
+                  </h1>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide ${planBadgeStyles[requiredPlan] || ""}`}
+                  >
+                    {PLAN_ACCESS_LABELS[requiredPlan]}
+                  </span>
+                </div>
+                {activeModule.summary && (
+                  <p className="mt-2 max-w-4xl text-sm leading-relaxed text-secondary-dark/75 sm:text-base">
+                    {activeModule.summary}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {detailTiles.map((tile, index) => (
+              <div
+                key={tile.id}
+                className={index > 0 ? "border-t border-gray-200 pt-8 lg:pt-10" : ""}
+              >
+                <ModuleDetailTile
+                  tile={{
+                    ...tile,
+                    plan: tile.plan || requiredPlan,
+                    verticals: activeModule.children?.length ? tile.verticals : undefined,
+                  }}
+                  planBadgeLabel={PLAN_ACCESS_LABELS[tile.plan || requiredPlan]}
+                />
+              </div>
+            ))}
+          </section>
+        ) : (
+          <section className="mx-auto my-8 w-full max-w-2xl rounded-2xl border border-gray-200 bg-gray-50 px-5 py-10 text-center sm:px-8">
+            <h1 className="text-xl font-semibold text-secondary-dark sm:text-2xl">
+              {activeModule.label} is not included in the {planLabels[activePlan]} Plan
+            </h1>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-secondary-dark/65 sm:text-base">
+              Select the {planLabels[requiredPlan]} Plan or a higher plan to view this module and its included pages.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigateToPlan(requiredPlan)}
+              className="mt-6 rounded-full bg-secondary-dark px-6 py-2.5 text-sm font-medium text-white"
+            >
+              View {planLabels[requiredPlan]} Plan
+            </button>
+          </section>
+        )}
       </AiAlignBox>
     </div>
   );
