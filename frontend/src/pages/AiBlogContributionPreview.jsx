@@ -234,7 +234,7 @@ const canEditContribution = (item = {}, config = {}) => {
   return !item.isDraft && ["approved", "rejected"].includes(status);
 };
 
-const PreviewHeader = ({ config, item, onEdit }) => {
+const PreviewHeader = ({ config, item, onEdit, onDelete, isDeleting }) => {
   const canEdit = canEditContribution(item, config);
   const status = String(item.status || "pending").toLowerCase();
   const isPending = status === "pending" && !item.isDraft;
@@ -255,14 +255,28 @@ const PreviewHeader = ({ config, item, onEdit }) => {
       {!isPending && <div className="flex items-center justify-between gap-4">
         {previewDetails}
         {canEdit ? (
-          <button
-            type="button"
-            onClick={onEdit}
-            className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500"
-          >
-            <HiOutlinePencil size={16} />
-            Edit
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {onDelete ? (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <HiOutlineTrash size={16} />
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={onEdit}
+              disabled={isDeleting}
+              className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <HiOutlinePencil size={16} />
+              Edit
+            </button>
+          </div>
         ) : null}
       </div>}
 
@@ -287,7 +301,7 @@ const PreviewHeader = ({ config, item, onEdit }) => {
   );
 };
 
-const ArticlePreview = ({ item, config, onEdit }) => {
+const ArticlePreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   let sectionImageIndex = 0;
   const title = item.mainTitle || `Untitled ${config.label}`;
   const sections = (item.sections || []).map((section) => {
@@ -299,7 +313,7 @@ const ArticlePreview = ({ item, config, onEdit }) => {
 
   return (
     <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
-      <PreviewHeader config={config} item={item} onEdit={onEdit} />
+      <PreviewHeader config={config} item={item} onEdit={onEdit} onDelete={onDelete} isDeleting={isDeleting} />
 
       <div className="flex flex-col gap-8">
         <section className="clear-both flow-root">
@@ -1222,6 +1236,8 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(() =>
     Boolean(location.state?.startEditing),
   );
@@ -1267,6 +1283,95 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
     }
   }, [canEdit, isEditing]);
 
+  const handleDelete = async () => {
+    if (isDeleting || type !== "blog" || !item || !canEdit) return;
+    setIsDeleting(true);
+    const dialogOptions = {
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#dc2626",
+      focusCancel: true,
+      heightAuto: false,
+      customClass: {
+        container: "swal2-container--republish",
+        popup: "swal2-popup--rounded swal2-popup--republish swal2-popup--delete",
+        title: "swal2-title--serif",
+        htmlContainer: "swal2-republish-message",
+        confirmButton: "swal2-button--pill swal2-button--republish",
+        cancelButton: "swal2-button--pill swal2-button--republish",
+      },
+    };
+
+    try {
+      const confirmation = await Swal.fire({
+        ...dialogOptions,
+        icon: "warning",
+        title: "Delete this blog?",
+        text: "This blog will be removed from your contributions and will no longer be visible to readers. You cannot undo this action.",
+        input: "checkbox",
+        inputValue: 0,
+        inputPlaceholder: "I understand and agree to delete this blog",
+        inputValidator: (value) => !value && "Please agree before continuing.",
+        confirmButtonText: "Continue",
+        didOpen: () => {
+          const checkbox = Swal.getInput();
+          const button = Swal.getConfirmButton();
+          button.disabled = true;
+          checkbox.addEventListener("change", () => {
+            button.disabled = !checkbox.checked;
+          });
+        },
+      });
+      if (!confirmation.isConfirmed) return;
+
+      const reason = await Swal.fire({
+        ...dialogOptions,
+        title: "Why do you want to delete this blog?",
+        input: "textarea",
+        inputLabel: "Reason for deleting",
+        inputPlaceholder: "Please tell us why you want to delete this blog",
+        inputAttributes: { maxlength: "500", "aria-required": "true" },
+        inputValidator: (value) => {
+          if (!value.trim()) return "Please enter a reason for deleting.";
+          if (value.trim().length > 500) return "Please use 500 characters or fewer.";
+        },
+        confirmButtonText: "Delete Blog",
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => !Swal.isLoading(),
+        allowEscapeKey: () => !Swal.isLoading(),
+        preConfirm: async (value) => {
+          try {
+            await axiosPrivate.delete(`${config.myEndpoint}/${itemId}`, {
+              data: { deletionReason: value.trim(), agreedToDelete: true },
+            });
+            return true;
+          } catch (error) {
+            Swal.showValidationMessage(
+              error?.response?.data?.message || "Could not delete this blog. Please try again.",
+            );
+            return false;
+          }
+        },
+      });
+      if (!reason.isConfirmed) return;
+
+      queryClient.setQueriesData({ queryKey: [config.queryKey] }, (current) =>
+        Array.isArray(current)
+          ? current.filter((entry) => (entry._id || entry.id) !== itemId)
+          : current,
+      );
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [config.queryKey] }),
+        queryClient.invalidateQueries({ queryKey: ["blogs"] }),
+        queryClient.invalidateQueries({ queryKey: ["blog-contribution-existing-blogs"] }),
+      ]);
+      navigate(config.dashboardPath, { replace: true });
+      showSuccessAlert("Blog deleted successfully.", { title: "Blog Deleted" });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (!auth?.user) {
     return null;
   }
@@ -1309,7 +1414,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
   return config.previewType === "destination" ? (
     <DestinationPreview item={item} config={config} onEdit={() => setIsEditing(true)} />
   ) : (
-    <ArticlePreview item={item} config={config} onEdit={() => setIsEditing(true)} />
+    <ArticlePreview item={item} config={config} onEdit={() => setIsEditing(true)} onDelete={type === "blog" ? handleDelete : undefined} isDeleting={isDeleting} />
   );
 };
 

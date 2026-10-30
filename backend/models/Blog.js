@@ -39,6 +39,16 @@ const blogSchema = new mongoose.Schema({
         default: "",
         maxlength: 500,
     },
+    deletionReason: {
+        type: String,
+        trim: true,
+        maxlength: 500,
+        default: "",
+    },
+    deletedAt: {
+        type: Date,
+        default: null,
+    },
     contributor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "NomadUser",

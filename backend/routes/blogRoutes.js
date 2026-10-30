@@ -9,6 +9,7 @@ import {
   getMyBlogs,
   updateBlogContributionStatus,
   updateMyBlog,
+  deleteMyBlog,
   updateBlog,
   deleteBlog,
 } from "../controllers/blogController.js";
@@ -26,6 +27,7 @@ router.get("/destination-counts", getBlogDestinationCounts);
 router.get("/my", verifyJwt, requireContributorRole("isBlogger"), getMyBlogs);
 router.post("/my", verifyJwt, requireContributorRole("isBlogger"), upload.any(), createMyBlog);
 router.patch("/my/:id", verifyJwt, requireContributorRole("isBlogger"), upload.any(), updateMyBlog);
+router.delete("/my/:id", verifyJwt, requireContributorRole("isBlogger"), deleteMyBlog);
 router.get("/contributions", verifyAdminApiKey, getBlogContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updateBlogContributionStatus);
 router.post("/blogs", createBlog);

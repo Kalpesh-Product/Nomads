@@ -154,6 +154,7 @@ export const getBlogs = async (req, res, next) => {
     try {
         const { keyword, destination } = req.query;
         let query = {
+            deletedAt: null,
             isDraft: { $ne: true },
             isActive: { $ne: false },
             $or: [{ status: "approved" }, { status: { $exists: false } }],
@@ -183,6 +184,7 @@ export const getBlogDestinationCounts = async (req, res, next) => {
         const counts = await Blog.aggregate([
             {
                 $match: {
+                    deletedAt: null,
                     isActive: { $ne: false },
                     isDraft: { $ne: true },
                     $or: [{ status: "approved" }, { status: { $exists: false } }],
@@ -378,7 +380,7 @@ export const createBlog = async (req, res, next) => {
 export const getMyBlogs = async (req, res, next) => {
     try {
         const user = req.userData._id;
-        const blogs = await Blog.find({ contributor: user }).sort({
+        const blogs = await Blog.find({ contributor: user, deletedAt: null }).sort({
             updatedAt: -1,
             date: -1,
         });
@@ -396,6 +398,7 @@ export const getBlogContributions = async (req, res, next) => {
     try {
         const { status, search } = req.query;
         const query = {
+            deletedAt: null,
             contributor: { $exists: true, $ne: null },
             isDraft: { $ne: true },
         };
@@ -465,6 +468,7 @@ export const updateMyBlog = async (req, res, next) => {
             {
                 _id: id,
                 contributor: user,
+                deletedAt: null,
             },
             {
                 ...payload,
@@ -511,6 +515,7 @@ export const updateBlogContributionStatus = async (req, res, next) => {
             {
                 _id: id,
                 contributor: { $exists: true, $ne: null },
+                deletedAt: null,
                 isDraft: { $ne: true },
             },
             {
@@ -529,6 +534,36 @@ export const updateBlogContributionStatus = async (req, res, next) => {
             message: `Blog ${normalizedStatus} successfully`,
             blog,
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Retain the contributor's reason while removing the blog from active lists.
+export const deleteMyBlog = async (req, res, next) => {
+    try {
+        const user = req.userData?._id;
+        if (!user) return res.status(401).json({ message: "Authentication required" });
+
+        const { deletionReason, agreedToDelete } = req.body || {};
+        if (agreedToDelete !== true) {
+            return res.status(400).json({ message: "Please agree before deleting this blog." });
+        }
+        if (typeof deletionReason !== "string" || !deletionReason.trim()) {
+            return res.status(400).json({ message: "Reason for deleting is required." });
+        }
+        const reason = deletionReason.trim();
+        if (reason.length > 500) {
+            return res.status(400).json({ message: "Deletion reason must be 500 characters or fewer." });
+        }
+
+        const blog = await Blog.findOneAndUpdate(
+            { _id: req.params.id, contributor: user, deletedAt: null },
+            { $set: { deletedAt: new Date(), deletionReason: reason, isActive: false } },
+            { new: true, runValidators: true },
+        );
+        if (!blog) return res.status(404).json({ message: "Blog contribution not found" });
+        return res.status(200).json({ message: "Blog deleted successfully" });
     } catch (error) {
         next(error);
     }
