@@ -114,15 +114,46 @@ export const hostModuleCategories = [
     modules: [
       {
         id: "dashboard",
-        label: "Dashboard",
+        label: "Basic Dashboard",
         icon: HiOutlineViewGrid,
         plan: "basic",
+        planAccessMode: "exact",
         summary:
-          "The main page after logging in — a consolidated view of activity across every enabled module without opening each one individually.",
+          "The Basic plan workspace overview with essential activity, support, listings, and quick links.",
         bullets: [
           "Review attendance, tenants, bookings, tickets, visitors, leads, leave activity and department metrics from one screen",
           "Business-unit selector to switch the location being reviewed",
           "Quick links and recent-activity cards open the related operational module",
+        ],
+        image: dashboard,
+      },
+      {
+        id: "professional-dashboard",
+        label: "Professional Dashboard",
+        icon: HiOutlineChartBar,
+        plan: "professional",
+        planAccessMode: "exact",
+        summary:
+          "The Professional plan operations dashboard with expanded metrics, bookings, tickets, visitors, and team activity.",
+        bullets: [
+          "Professional plan KPIs and operational quick links",
+          "Expanded booking, visitor, ticket, attendance, and workspace activity",
+          "Upgrade guidance for Custom plan capabilities",
+        ],
+        image: dashboard,
+      },
+      {
+        id: "custom-dashboard",
+        label: "Custom Dashboard",
+        icon: HiOutlineAdjustments,
+        plan: "custom",
+        planAccessMode: "exact",
+        summary:
+          "A dashboard assembled from the workspace's selected Custom plan modules and department access.",
+        bullets: [
+          "Metrics and quick links follow the workspace's selected modules",
+          "Department and operational cards adapt to the Custom plan configuration",
+          "Recent activity is scoped to the enabled module set",
         ],
         image: dashboard,
       },
@@ -1111,8 +1142,8 @@ export const hostModuleCategories = [
     ],
   },
   {
-    id: "add-ons",
-    label: "Add-ons",
+    id: "user-information",
+    label: "User Information",
     modules: [
       {
         id: "profile",
@@ -1120,7 +1151,7 @@ export const hostModuleCategories = [
         icon: HiOutlineUserCircle,
         plan: "basic",
         summary:
-          "Personal and workspace settings, grouped under the Profile add-on.",
+          "User, company, security, billing, and account information in one place.",
         image: myProfileBasic,
         children: [
           {
@@ -1196,6 +1227,110 @@ export const hostModuleCategories = [
   },
 ];
 
+const hostModuleIconMap = {
+  HiOutlineViewGrid,
+  HiOutlineGlobeAlt,
+  HiOutlineMap,
+  HiOutlineCollection,
+  HiOutlineKey,
+  HiOutlineChartBar,
+  HiOutlineUserCircle,
+  HiOutlineOfficeBuilding,
+  HiOutlineCash,
+  HiOutlineLockClosed,
+  HiOutlineBriefcase,
+  HiOutlinePencilAlt,
+  HiOutlineMailOpen,
+  HiOutlineStar,
+  HiOutlineClipboardList,
+  HiOutlineBadgeCheck,
+  HiOutlineIdentification,
+  HiOutlineClock,
+  HiOutlineClipboardCheck,
+  HiOutlineCalendar,
+  HiOutlineLogout,
+  HiOutlineUsers,
+  HiOutlineTrendingUp,
+  HiOutlineCurrencyDollar,
+  HiOutlineChip,
+  HiOutlineDocumentText,
+  HiOutlineCreditCard,
+  HiOutlineUserGroup,
+  HiOutlineAdjustments,
+  MdOutlineSupportAgent,
+  MdMeetingRoom,
+  MdOutlineFingerprint,
+  HiOutlineWrenchScrewdriver,
+};
+
+const findLocalModule = (category, moduleId, parentId = null) => {
+  if (!category) return null;
+  if (parentId) {
+    return category.modules
+      .find((module) => module.id === parentId)
+      ?.children?.find((child) => child.id === moduleId);
+  }
+  return category.modules.find((module) => module.id === moduleId);
+};
+
+const hydrateModule = (remoteModule, localModule) => {
+  const remoteImage =
+    typeof remoteModule?.image === "string"
+      ? remoteModule.image
+      : remoteModule?.image?.url || "";
+  const icon =
+    hostModuleIconMap[remoteModule?.iconKey] ||
+    localModule?.icon ||
+    HiOutlineViewGrid;
+
+  return {
+    ...localModule,
+    ...remoteModule,
+    icon,
+    image: remoteImage || localModule?.image || "",
+    verticals: Array.isArray(remoteModule?.verticals)
+      ? remoteModule.verticals
+      : localModule?.verticals || [],
+    bullets: Array.isArray(remoteModule?.bullets)
+      ? remoteModule.bullets
+      : localModule?.bullets || [],
+  };
+};
+
+// The API owns structure, visibility, order and copy. The checked-in catalog
+// only supplies local icon components and bundled screenshot fallbacks for
+// matching IDs. With a successful API response, removed/hidden modules do
+// not get unioned back in from this checked-in fallback.
+export const hydrateHostModuleCatalog = (remoteCategories) => {
+  if (!Array.isArray(remoteCategories) || remoteCategories.length === 0) {
+    return hostModuleCategories;
+  }
+
+  return remoteCategories.map((remoteCategory) => {
+    const localCategory = hostModuleCategories.find(
+      (category) => category.id === remoteCategory.id,
+    );
+
+    return {
+      ...localCategory,
+      ...remoteCategory,
+      modules: (remoteCategory.modules || []).map((remoteModule) => {
+        const localModule = findLocalModule(localCategory, remoteModule.id);
+        const hydrated = hydrateModule(remoteModule, localModule);
+        return {
+          ...hydrated,
+          children: (remoteModule.children || []).map((remoteChild) =>
+            hydrateModule(
+              remoteChild,
+              findLocalModule(localCategory, remoteChild.id, remoteModule.id),
+            ),
+          ),
+        };
+      }),
+    };
+  });
+};
+
 const findInModules = (modules, moduleId) => {
   for (const module of modules) {
     if (module.id === moduleId) return { module, parent: null };
@@ -1207,8 +1342,8 @@ const findInModules = (modules, moduleId) => {
   return null;
 };
 
-export const findModule = (categoryId, moduleId) => {
-  const category = hostModuleCategories.find((c) => c.id === categoryId);
+export const findModule = (categoryId, moduleId, categories = hostModuleCategories) => {
+  const category = categories.find((c) => c.id === categoryId);
   if (!category) return null;
   const found = findInModules(category.modules, moduleId);
   if (!found) return null;
@@ -1217,10 +1352,10 @@ export const findModule = (categoryId, moduleId) => {
 
 // Used to wire the real site sidebar's existing (currently static) item
 // labels into a specific module section on /modules, by matching label text.
-export const findModuleByLabel = (label) => {
+export const findModuleByLabel = (label, categories = hostModuleCategories) => {
   if (!label) return null;
   const normalized = label.trim().toLowerCase();
-  for (const category of hostModuleCategories) {
+  for (const category of categories) {
     for (const module of category.modules) {
       if (module.label.toLowerCase() === normalized) {
         // A module with children has no page block/anchor of its own

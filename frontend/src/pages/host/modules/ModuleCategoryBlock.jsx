@@ -5,6 +5,7 @@ export const planBadgeStyles = {
 };
 const verticalBadgeStyles = "border border-sky-200 bg-sky-50 text-sky-700";
 export const planLabels = { basic: "Basic", professional: "Professional", custom: "Custom" };
+const freeBadgeStyles = "bg-emerald-50 text-emerald-700 border border-emerald-200";
 const planOrder = { basic: 0, professional: 1, custom: 2 };
 
 // Flattens a category's modules (including nested sub-pages like Website
@@ -48,6 +49,11 @@ export const ModuleDetailTile = ({ tile, planBadgeLabel }) => {
               {planBadgeLabel || planLabels[tile.plan] || tile.plan}
             </span>
           )}
+          {tile.plan === "basic" && (
+            <span className={`text-[0.65rem] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${freeBadgeStyles}`}>
+              Free
+            </span>
+          )}
           {tile.verticals?.map((vertical) => (
             <span
               key={vertical}
@@ -57,7 +63,7 @@ export const ModuleDetailTile = ({ tile, planBadgeLabel }) => {
             </span>
           ))}
         </div>
-        <p className="text-sm leading-relaxed text-secondary-dark/90 sm:text-base">{tile.summary}</p>
+        <p className="text-sm leading-relaxed text-secondary-dark sm:text-base">{tile.summary}</p>
         {tile.bullets?.length > 0 && (
           <ul className="flex flex-col gap-1.5 mt-1">
             {tile.bullets.map((bullet, i) => (
@@ -70,9 +76,11 @@ export const ModuleDetailTile = ({ tile, planBadgeLabel }) => {
         )}
       </div>
 
-      <div className="w-full flex-1 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 lg:basis-7/12">
-        <img src={tile.image} alt={tile.label} className="h-auto max-h-[18rem] min-h-[13rem] w-full object-contain sm:max-h-[24rem] sm:min-h-[18rem] lg:h-[22rem] lg:max-h-none 2xl:h-[26rem]" />
-      </div>
+      {tile.image && (
+        <div className="w-full flex-1 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 lg:basis-7/12">
+          <img src={tile.image} alt={tile.label} className="h-auto max-h-[18rem] min-h-[13rem] w-full object-contain sm:max-h-[24rem] sm:min-h-[18rem] lg:h-[22rem] lg:max-h-none 2xl:h-[26rem]" />
+        </div>
+      )}
     </div>
   );
 };
@@ -119,6 +127,11 @@ const ModuleCategoryBlock = ({ category, sortByPlan = true }) => {
                     className={`text-[0.65rem] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${planBadgeStyles[tile.plan] || ""}`}
                   >
                     {planLabels[tile.plan] || tile.plan}
+                  </span>
+                )}
+                {tile.plan === "basic" && (
+                  <span className={`text-[0.65rem] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${freeBadgeStyles}`}>
+                    Free
                   </span>
                 )}
               </div>

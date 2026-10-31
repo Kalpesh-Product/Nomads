@@ -1,16 +1,45 @@
 import HostModuleCategory from "../models/HostModuleCategory.js";
 import { uploadFileToS3, deleteFileFromS3ByKey } from "../config/s3Config.js";
 
+const withoutDisabledModules = (modules = []) =>
+  modules
+    .filter((module) => module.enabled !== false)
+    .map((module) => ({
+      ...module,
+      children: withoutDisabledModules(module.children || []),
+    }));
+
 const withoutDisabled = (categories) =>
   categories.map((category) => ({
     ...category,
-    modules: (category.modules || [])
-      .filter((mod) => mod.enabled !== false)
-      .map((mod) => ({
-        ...mod,
-        children: (mod.children || []).filter((child) => child.enabled !== false),
-      })),
+    modules: withoutDisabledModules(category.modules || []),
   }));
+
+const walkModules = (modules = [], visit) => {
+  for (const module of modules) {
+    visit(module);
+    walkModules(module.children || [], visit);
+  }
+};
+
+const findModuleNode = (modules = [], moduleId) => {
+  for (const module of modules) {
+    if (module.id === moduleId) return module;
+    const nested = findModuleNode(module.children || [], moduleId);
+    if (nested) return nested;
+  }
+  return null;
+};
+
+const findModuleLocation = (modules = [], moduleId) => {
+  for (let index = 0; index < modules.length; index += 1) {
+    const module = modules[index];
+    if (module.id === moduleId) return { module, siblings: modules, index };
+    const nested = findModuleLocation(module.children || [], moduleId);
+    if (nested) return nested;
+  }
+  return null;
+};
 
 // Public: feeds host.wono.co's /modules page and sidebar directly, so the
 // marketing site never needs its own copy of this content. Disabled
@@ -32,6 +61,29 @@ const slugify = (value = "") =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "") || "item";
+
+const inferIconKey = (label = "") => {
+  const value = String(label).toLowerCase();
+  if (/website|web|listing|global/.test(value)) return "HiOutlineGlobeAlt";
+  if (/meeting/.test(value)) return "MdMeetingRoom";
+  if (/booking|calendar|schedule|leave/.test(value)) return "HiOutlineCalendar";
+  if (/support|help|ticket/.test(value)) return "MdOutlineSupportAgent";
+  if (/profile|user|visitor|member|people|team/.test(value)) return "HiOutlineUserCircle";
+  if (/company|organization|department|unit|office/.test(value)) {
+    return "HiOutlineOfficeBuilding";
+  }
+  if (/billing|payment|finance|account|budget|price|sales/.test(value)) {
+    return "HiOutlineCurrencyDollar";
+  }
+  if (/report|analytics|dashboard|metric/.test(value)) return "HiOutlineChartBar";
+  if (/asset|inventory|resource|document/.test(value)) return "HiOutlineCollection";
+  if (/security|password|access|grant/.test(value)) return "HiOutlineLockClosed";
+  if (/task|checklist|printout|order/.test(value)) return "HiOutlineClipboardList";
+  if (/maintenance|repair|infrastructure|tech|it /.test(`${value} `)) {
+    return "HiOutlineWrenchScrewdriver";
+  }
+  return "HiOutlineViewGrid";
+};
 
 // Admin: a brand-new sidebar category (e.g. a future "Integrations"
 // section), appended after every existing one.
@@ -66,7 +118,16 @@ export const createCategory = async (req, res, next) => {
 export const createModule = async (req, res, next) => {
   try {
     const { categoryId } = req.params;
-    const { label } = req.body || {};
+    const {
+      label,
+      parentModuleId,
+      iconKey = "",
+      plan = null,
+      planAccessMode = "cumulative",
+      verticals = [],
+      summary = "",
+      bullets = [],
+    } = req.body || {};
     if (!label || !String(label).trim()) {
       return res.status(400).json({ message: "label is required" });
     }
@@ -76,9 +137,8 @@ export const createModule = async (req, res, next) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    const existingIds = new Set(
-      category.modules.flatMap((mod) => [mod.id, ...(mod.children || []).map((child) => child.id)]),
-    );
+    const existingIds = new Set();
+    walkModules(category.modules, (item) => existingIds.add(item.id));
     const baseId = slugify(label);
     let id = baseId;
     let suffix = 1;
@@ -86,10 +146,42 @@ export const createModule = async (req, res, next) => {
       id = `${baseId}-${suffix++}`;
     }
 
-    category.modules.push({ id, label: String(label).trim(), bullets: [], image: {}, enabled: true });
+    const module = {
+      id,
+      label: String(label).trim(),
+      iconKey: String(iconKey || "").trim() || inferIconKey(label),
+      plan: ["basic", "professional", "custom"].includes(plan) ? plan : null,
+      planAccessMode: planAccessMode === "exact" ? "exact" : "cumulative",
+      verticals: Array.isArray(verticals)
+        ? [...new Set(verticals.map((item) => String(item || "").trim()).filter(Boolean))]
+        : [],
+      summary: String(summary || "").trim(),
+      bullets: Array.isArray(bullets)
+        ? bullets.map((item) => String(item || "").trim()).filter(Boolean)
+        : [],
+      image: {},
+      enabled: true,
+    };
+
+    if (parentModuleId) {
+      const parent = findModuleNode(category.modules, parentModuleId);
+      if (!parent) {
+        return res.status(404).json({ message: "Parent module not found" });
+      }
+      // Every module detail can be a Dashboard followed by its offered pages.
+      // Keep a newly added dashboard first; all other pages retain insertion
+      // order and can still be rearranged from the Master panel.
+      if (/dashboard/i.test(module.label)) {
+        parent.children.unshift(module);
+      } else {
+        parent.children.push(module);
+      }
+    } else {
+      category.modules.push(module);
+    }
     await category.save();
 
-    return res.status(201).json({ category });
+    return res.status(201).json({ category, moduleId: id, parentModuleId: parentModuleId || null });
   } catch (error) {
     next(error);
   }
@@ -127,7 +219,16 @@ export const replaceCategoryModules = async (req, res, next) => {
   }
 };
 
-const EDITABLE_FIELDS = ["label", "summary", "bullets", "plan", "enabled"];
+const EDITABLE_FIELDS = [
+  "label",
+  "iconKey",
+  "summary",
+  "bullets",
+  "plan",
+  "planAccessMode",
+  "verticals",
+  "enabled",
+];
 
 // Admin: the common case — edit one module or child's copy (label, summary,
 // bullets, plan tier) without touching the rest of the category document.
@@ -137,30 +238,27 @@ export const updateModuleFields = async (req, res, next) => {
   try {
     const { categoryId, moduleId } = req.params;
     const { childId, ...fields } = req.body || {};
+    const editableFields = EDITABLE_FIELDS.filter((key) => fields[key] !== undefined);
 
-    const setOps = {};
-    for (const key of EDITABLE_FIELDS) {
-      if (fields[key] === undefined) continue;
-      const path = childId ? `modules.$[mod].children.$[child].${key}` : `modules.$[mod].${key}`;
-      setOps[path] = fields[key];
-    }
-
-    if (!Object.keys(setOps).length) {
+    if (!editableFields.length) {
       return res.status(400).json({ message: "No valid fields to update" });
     }
 
-    const arrayFilters = [{ "mod.id": moduleId }];
-    if (childId) arrayFilters.push({ "child.id": childId });
-
-    const category = await HostModuleCategory.findOneAndUpdate(
-      { id: categoryId },
-      { $set: setOps },
-      { new: true, arrayFilters, runValidators: true },
-    );
+    const category = await HostModuleCategory.findOne({ id: categoryId });
 
     if (!category) {
-      return res.status(404).json({ message: "Category or module not found" });
+      return res.status(404).json({ message: "Category not found" });
     }
+
+    // childId is retained for older Master clients; newer clients can address
+    // any nested node directly with moduleId.
+    const target = findModuleNode(category.modules, childId || moduleId);
+    if (!target) return res.status(404).json({ message: "Module not found" });
+
+    editableFields.forEach((key) => {
+      target[key] = fields[key];
+    });
+    await category.save();
 
     return res.status(200).json({ category });
   } catch (error) {
@@ -169,12 +267,8 @@ export const updateModuleFields = async (req, res, next) => {
 };
 
 const findModuleAndTarget = (category, moduleId, childId) => {
-  const module = category.modules.find((mod) => mod.id === moduleId);
-  if (!module) return null;
-  if (!childId) return { module, target: module };
-  const child = module.children.find((c) => c.id === childId);
-  if (!child) return null;
-  return { module, target: child };
+  const target = findModuleNode(category.modules, childId || moduleId);
+  return target ? { module: target, target } : null;
 };
 
 // Admin: screenshot upload for one module/child. Uploads to S3 first, then
@@ -238,11 +332,9 @@ export const deleteModule = async (req, res, next) => {
 
     const imageKey = found.target.image?.key;
 
-    if (childId) {
-      found.module.children = found.module.children.filter((c) => c.id !== childId);
-    } else {
-      category.modules = category.modules.filter((mod) => mod.id !== moduleId);
-    }
+    const location = findModuleLocation(category.modules, childId || moduleId);
+    if (!location) return res.status(404).json({ message: "Module not found" });
+    location.siblings.splice(location.index, 1);
 
     await category.save();
 

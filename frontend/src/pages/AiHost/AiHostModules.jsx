@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { HiChevronDown, HiChevronUp, HiOutlineArrowLeft } from "react-icons/hi";
 import AiAlignBox from "../../components/AiAlignBox";
@@ -6,7 +6,8 @@ import FitText from "../../components/FitText";
 import GetStartedButton from "../../components/GetStartedButton";
 import FinanceImage from "../../assets/images-service/finance-final.png";
 import useIsMobile from "../../hooks/useIsMobile.js";
-import { findModule, hostModuleCategories } from "../../data/hostModulesCatalog";
+import useHostModuleCatalog from "../../hooks/useHostModuleCatalog";
+import { findModule } from "../../data/hostModulesCatalog";
 import {
   ModuleDetailTile,
   planBadgeStyles,
@@ -20,16 +21,36 @@ const PLAN_ACCESS_LABELS = {
   professional: "Professional+",
   custom: "Custom only",
 };
+const freeBadgeStyles = "border border-emerald-200 bg-emerald-50 text-emerald-700";
+const DASHBOARD_MODULE_BY_PLAN = {
+  basic: "dashboard",
+  professional: "professional-dashboard",
+  custom: "custom-dashboard",
+};
 const INITIAL_CARD_COUNT = 8;
+const MODULES_SCROLL_KEY = "aihost-modules-list-scroll";
+
+const findScrollAncestor = (el) => {
+  let node = el?.parentElement;
+  while (node && node !== document.body) {
+    const style = getComputedStyle(node);
+    if ((style.overflowY === "auto" || style.overflowY === "scroll") && node.scrollHeight > node.clientHeight) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return null;
+};
 const verticalBadgeStyles = "border border-sky-200 bg-sky-50 text-sky-700";
 
-const planIncludesModule = (modulePlan, activePlan) =>
-  (PLAN_RANK[modulePlan] ?? 0) <= (PLAN_RANK[activePlan] ?? 0);
-
-const orderedCategories = [
-  ...hostModuleCategories.filter((category) => category.id === "key-apps"),
-  ...hostModuleCategories.filter((category) => category.id !== "key-apps"),
-];
+const planIncludesModule = (moduleOrPlan, activePlan) => {
+  const modulePlan =
+    typeof moduleOrPlan === "string" ? moduleOrPlan : moduleOrPlan?.plan;
+  if (typeof moduleOrPlan === "object" && moduleOrPlan?.planAccessMode === "exact") {
+    return modulePlan === activePlan;
+  }
+  return (PLAN_RANK[modulePlan] ?? 0) <= (PLAN_RANK[activePlan] ?? 0);
+};
 
 const ModuleCard = ({ module, onClick }) => {
   const Icon = module.icon;
@@ -41,7 +62,7 @@ const ModuleCard = ({ module, onClick }) => {
     >
       <div className="flex items-start gap-2">
         {Icon && <Icon size={20} className="mt-0.5 shrink-0 text-primary-blue" />}
-        <span className="text-sm font-semibold leading-snug text-secondary-dark sm:text-base">
+        <span className="text-base font-semibold leading-snug text-secondary-dark md:text-lg">
           {module.label}
         </span>
       </div>
@@ -51,6 +72,11 @@ const ModuleCard = ({ module, onClick }) => {
         >
           {PLAN_ACCESS_LABELS[module.plan] || module.plan}
         </span>
+        {module.plan === "basic" && (
+          <span className={`rounded-full px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase ${freeBadgeStyles}`}>
+            Free
+          </span>
+        )}
         {module.verticals?.map((vertical) => (
           <span
             key={vertical}
@@ -61,7 +87,7 @@ const ModuleCard = ({ module, onClick }) => {
         ))}
       </div>
       {module.summary && (
-        <p className="line-clamp-2 text-xs leading-relaxed text-secondary-dark/70 sm:text-sm">
+        <p className="line-clamp-2 text-xs leading-relaxed text-secondary-dark sm:text-sm">
           {module.summary}
         </p>
       )}
@@ -71,16 +97,27 @@ const ModuleCard = ({ module, onClick }) => {
 
 export default function Modules() {
   const navigate = useNavigate();
+  const { categories } = useHostModuleCatalog({ liveRefresh: true });
   const { key: locationKey } = useLocation();
   const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
   const [expandedCategories, setExpandedCategories] = useState({});
+  const rootRef = useRef(null);
 
   const categoryParam = searchParams.get("category");
   const moduleParam = searchParams.get("module");
   const requestedPlan = searchParams.get("plan");
   const activePlan = PLAN_IDS.includes(requestedPlan) ? requestedPlan : "basic";
-  const resolved = moduleParam ? findModule(categoryParam, moduleParam) : null;
+  const orderedCategories = useMemo(
+    () => [
+      ...categories.filter((category) => category.id === "key-apps"),
+      ...categories.filter((category) => category.id !== "key-apps"),
+    ],
+    [categories],
+  );
+  const resolved = moduleParam
+    ? findModule(categoryParam, moduleParam, categories)
+    : null;
   const activeModule = resolved ? resolved.parent || resolved.module : null;
   const onBack = () =>
     locationKey !== "default" ? navigate(-1) : navigate("/modules");
@@ -91,24 +128,42 @@ export default function Modules() {
         .map((category) => ({
           ...category,
           modules: category.modules.filter((module) =>
-            planIncludesModule(module.plan, activePlan),
+            planIncludesModule(module, activePlan),
           ),
         }))
         .filter((category) => category.modules.length > 0),
-    [activePlan],
+    [activePlan, orderedCategories],
   );
   const requiredPlan = activeModule?.plan || resolved?.module?.plan || "basic";
   const moduleAvailable = activeModule
-    ? planIncludesModule(requiredPlan, activePlan)
+    ? planIncludesModule(activeModule, activePlan)
     : true;
-  const availablePlans = PLAN_IDS.filter(
-    (plan) => PLAN_RANK[plan] >= PLAN_RANK[requiredPlan],
-  );
+  const availablePlans = activeModule?.planAccessMode === "exact"
+    ? [requiredPlan]
+    : PLAN_IDS.filter((plan) => PLAN_RANK[plan] >= PLAN_RANK[requiredPlan]);
 
   useEffect(() => setExpandedCategories({}), [activePlan]);
 
+  // Restore the modules-list scroll position when coming back from a module's
+  // detail page (back button or the "Modules" breadcrumb), instead of always
+  // landing back at the top of the list.
+  useEffect(() => {
+    if (resolved) return;
+    const saved = sessionStorage.getItem(MODULES_SCROLL_KEY);
+    if (saved == null) return;
+    sessionStorage.removeItem(MODULES_SCROLL_KEY);
+    const scroller = findScrollAncestor(rootRef.current);
+    if (!scroller) return;
+    requestAnimationFrame(() => {
+      scroller.scrollTop = Number(saved);
+    });
+  }, [resolved]);
+
   const buildPlanHref = (plan) => {
     if (!resolved) return `/modules?plan=${plan}`;
+    if (Object.values(DASHBOARD_MODULE_BY_PLAN).includes(activeModule.id)) {
+      return `/modules?plan=${plan}&category=common-modules&module=${DASHBOARD_MODULE_BY_PLAN[plan]}`;
+    }
     return `/modules?plan=${plan}&category=${resolved.category.id}&module=${activeModule.id}`;
   };
 
@@ -125,14 +180,24 @@ export default function Modules() {
 
   const detailTiles = activeModule?.children?.length
     ? activeModule.children.filter((child) =>
-        planIncludesModule(child.plan || requiredPlan, activePlan),
+        planIncludesModule(
+          {
+            ...child,
+            plan: child.plan || requiredPlan,
+            planAccessMode: child.planAccessMode || activeModule.planAccessMode,
+          },
+          activePlan,
+        ),
       )
     : activeModule
       ? [activeModule]
       : [];
 
   return (
-    <div className="-mx-1 w-[calc(100%+0.5rem)] overflow-x-clip text-secondary-dark md:-mx-6 md:w-[calc(100%+3rem)] lg:-mx-10 lg:w-[calc(100%+5rem)] xl:-mx-24 xl:w-[calc(100%+12rem)]">
+    <div
+      ref={rootRef}
+      className="-mx-1 w-[calc(100%+0.5rem)] overflow-x-clip text-secondary-dark md:-mx-6 md:w-[calc(100%+3rem)] lg:-mx-10 lg:w-[calc(100%+5rem)] xl:-mx-24 xl:w-[calc(100%+12rem)]"
+    >
       <div className="sticky top-0 isolate z-[100] -mt-px bg-white">
         <AiAlignBox>
           <div className="flex h-11 w-full min-w-0 items-center gap-2 bg-white py-1.5 pb-3 md:pb-4">
@@ -240,13 +305,14 @@ export default function Modules() {
                       />
                     </div>
                   )}
-                  <p className="text-base leading-relaxed md:text-xl">
+                  <span className="text-[17px] md:text-[19px]">
                     Manage your business in real-time across all business verticals.
-                  </p>
-                  <p className="text-base leading-relaxed md:text-xl">
-                    Operate your business with detailed visibility into inventory, bookings,
-                    accounts, analytics, leads, sales, reports, tasks, logs, complaints, and requests.
-                  </p>
+                  </span>
+                  <span className="text-[17px] md:text-[18px]">
+                    Operate your business in real-time with the micro most details
+                    of inventory, bookings, accounts, analytics, leads, sales,
+                    reports, tasks, logs, menu, complaints, requests etc.
+                  </span>
                 </div>
                 {!isMobile && (
                   <div className="h-[35vh] overflow-hidden rounded-lg border border-gray-100 p-2 lg:h-[50vh]">
@@ -265,7 +331,7 @@ export default function Modules() {
 
         <div className="sticky top-11 z-[90] border-b border-gray-100 bg-white py-2.5 sm:py-3 lg:py-4">
           <div className="flex justify-center gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:gap-3 sm:pb-0 [&::-webkit-scrollbar]:hidden">
-            {PLAN_IDS.map((plan) => (
+            {(resolved ? availablePlans : PLAN_IDS).map((plan) => (
               <button
                 key={plan}
                 type="button"
@@ -301,11 +367,15 @@ export default function Modules() {
                       <ModuleCard
                         key={module.id}
                         module={module}
-                        onClick={() =>
+                        onClick={() => {
+                          const scroller = findScrollAncestor(rootRef.current);
+                          if (scroller) {
+                            sessionStorage.setItem(MODULES_SCROLL_KEY, String(scroller.scrollTop));
+                          }
                           navigate(
                             `/modules?plan=${activePlan}&category=${category.id}&module=${module.id}`,
-                          )
-                        }
+                          );
+                        }}
                       />
                     ))}
                   </div>
@@ -335,33 +405,39 @@ export default function Modules() {
           </section>
         ) : moduleAvailable ? (
           <section className="flex w-full flex-col gap-8 py-4 sm:py-6 lg:gap-10 lg:py-8">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-secondary-dark/60 sm:text-sm">
-              <span className="font-medium text-secondary-dark/75">Available in:</span>
-              {availablePlans.map((plan) => (
-                <span
-                  key={plan}
-                  className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide ${planBadgeStyles[plan] || ""}`}
-                >
-                  {planLabels[plan]}
-                </span>
-              ))}
-              {activeModule.verticals?.length > 0 && (
-                <>
-                  <span className="ml-1 font-medium text-secondary-dark/75 sm:ml-2">
-                    Vertical:
+            <div className="flex flex-col items-start gap-2 text-xs text-secondary-dark/60 sm:flex-row sm:flex-wrap sm:items-center sm:text-sm">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-medium text-secondary-dark/75">Available in:</span>
+                {availablePlans.map((plan) => (
+                  <span
+                    key={plan}
+                    className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide ${planBadgeStyles[plan] || ""}`}
+                  >
+                    {planLabels[plan]}
                   </span>
-                  {activeModule.verticals.map((vertical) => (
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:ml-2">
+                <span className="font-medium text-secondary-dark/75">
+                  Available in verticals:
+                </span>
+                {activeModule.verticals?.length > 0 ? (
+                  activeModule.verticals.map((vertical) => (
                     <span
                       key={vertical}
                       className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide ${verticalBadgeStyles}`}
                     >
                       {vertical}
                     </span>
-                  ))}
-                </>
-              )}
+                  ))
+                ) : (
+                  <span className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-secondary-dark/65">
+                    All verticals
+                  </span>
+                )}
+              </div>
             </div>
-            {activeModule.children?.length && (
+            {activeModule.children?.length > 0 && (
               <div className="border-b border-gray-200 pb-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-xl font-semibold text-secondary-dark sm:text-2xl">
@@ -372,15 +448,19 @@ export default function Modules() {
                   >
                     {PLAN_ACCESS_LABELS[requiredPlan]}
                   </span>
+                  {requiredPlan === "basic" && (
+                    <span className={`rounded-full px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide ${freeBadgeStyles}`}>
+                      Free
+                    </span>
+                  )}
                 </div>
                 {activeModule.summary && (
-                  <p className="mt-2 max-w-4xl text-sm leading-relaxed text-secondary-dark/75 sm:text-base">
+                  <p className="mt-2 max-w-4xl text-sm leading-relaxed text-secondary-dark sm:text-base">
                     {activeModule.summary}
                   </p>
                 )}
               </div>
             )}
-
             {detailTiles.map((tile, index) => (
               <div
                 key={tile.id}
@@ -402,7 +482,7 @@ export default function Modules() {
             <h1 className="text-xl font-semibold text-secondary-dark sm:text-2xl">
               {activeModule.label} is not included in the {planLabels[activePlan]} Plan
             </h1>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-secondary-dark/65 sm:text-base">
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-secondary-dark sm:text-base">
               Select the {planLabels[requiredPlan]} Plan or a higher plan to view this module and its included pages.
             </p>
             <button

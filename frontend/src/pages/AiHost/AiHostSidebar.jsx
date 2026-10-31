@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-  clearStoredLoginState,
   readStoredLoginState,
 } from "../../hooks/useNomadLoginState";
 import useAuth from "../../hooks/useAuth";
-import useLogout from "../../hooks/useLogout";
+import useHostModuleCatalog from "../../hooks/useHostModuleCatalog";
 import { findModuleByLabel, findModule } from "../../data/hostModulesCatalog";
 import logo from "../../assets/WONO_LOGO_Black_TP.svg";
 import {
@@ -50,239 +49,42 @@ import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { HiOutlineChip } from "react-icons/hi";
 import { HiOutlineDatabase } from "react-icons/hi";
 
-const gatedRecommendationLabels = new Set([
-  "Work From Anywhere",
-  "Increase Your Savings",
-  "Advance Your Career",
-  "Find Your Community",
-]);
-
-const goalSlugByLabel = {
-  "World Ranking": "worldranking",
-  "Work From Anywhere": "workfromanywhere",
-  "Increase Your Savings": "increaseyoursavings",
-  "Advance Your Career": "advanceyourcareer",
-  "Find Your Community": "findyourcommunity",
-};
-
-const getSearchPathForGoal = (goalLabel) => {
-  const goalSlug = goalSlugByLabel[goalLabel];
-  return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
-};
-
 const hostSignupEntryPath = "/signup?step=1";
-
-// The "Modules" overview section uses marketing-style labels that don't
-// match any catalog module/department label, so they're mapped explicitly
-// to a real anchor on /modules instead of relying on label matching.
-const modulesOverviewTargets = {
-  "Build & Manage Website": { categoryId: "key-apps", moduleId: "create-edit-website" },
-  "Nomad Listings": { categoryId: "key-apps", moduleId: "listings" },
-  "Sales Management": { categoryId: "department-accesses", moduleId: "sales-leads-management" },
-  "Finance Management": {
-    categoryId: "department-accesses",
-    moduleId: "finance-expenses-budget",
-  },
-  "Administration Management": {
-    categoryId: "department-accesses",
-    moduleId: "admin-printout-management",
-  },
-  "HR Management": { categoryId: "department-accesses", moduleId: "hr-company-management" },
-  "IT Infrastructure": { categoryId: "department-accesses", moduleId: "it-repair-logs" },
-  "Maintenance Management": {
-    categoryId: "department-accesses",
-    moduleId: "maintenance-repair-logs",
-  },
-};
 
 // Plan badge shown next to every nav item that maps to a real catalog
 // module, site-wide, so browsing the sidebar itself shows which tier
 // unlocks what — same lookup handleSidebarItemClick uses to deep-link.
-const planForLabel = (label) => {
-  const target = modulesOverviewTargets[label] || findModuleByLabel(label);
+const planForLabel = (label, categories) => {
+  const target = findModuleByLabel(label, categories);
   if (!target) return null;
-  const found = findModule(target.categoryId, target.moduleId);
+  const found = findModule(target.categoryId, target.moduleId, categories);
   return found?.module?.plan || found?.parent?.plan || null;
 };
 
 const SIDEBAR_PLAN_RANK = { basic: 0, professional: 1, custom: 2 };
-const filterSidebarItemsForPlan = (items, activePlan) => {
-  if (!activePlan) return items;
-  const activeRank = SIDEBAR_PLAN_RANK[activePlan];
 
-  return items.reduce((visibleItems, item) => {
-    const requiredPlan = planForLabel(item.label);
-    const children = item.children
-      ? filterSidebarItemsForPlan(item.children, activePlan)
-      : null;
-    const itemIsIncluded = requiredPlan
-      ? (SIDEBAR_PLAN_RANK[requiredPlan] ?? 0) <= activeRank
-      : item.children
-        ? children.length > 0
-        : true;
-
-    if (!itemIsIncluded) return visibleItems;
-    visibleItems.push(children ? { ...item, children } : item);
-    return visibleItems;
-  }, []);
+const categoryToSidebarItems = (categories, categoryId) => {
+  const category = categories.find((item) => item.id === categoryId);
+  return (category?.modules || []).map((module) => ({
+    label: module.label,
+    icon: module.icon || HiOutlineViewGrid,
+    plan: module.plan,
+    planAccessMode: module.planAccessMode,
+    categoryId,
+    moduleId: module.id,
+    children: module.children?.length
+      ? module.children.map((child) => ({
+          label: child.label,
+          icon: child.icon || module.icon || HiOutlineViewGrid,
+          plan: child.plan || module.plan,
+          planAccessMode: child.planAccessMode || module.planAccessMode,
+          categoryId,
+          moduleId: child.id,
+          parentModuleId: module.id,
+        }))
+      : undefined,
+  }));
 };
-
-const recommendationItems = [
-  {
-    label: "Build & Manage Website",
-    icon: CgWebsite,
-    // path: "/website-builder",
-  },
-  {
-    label: "Nomad Listings",
-    icon: TbWorldWww,
-    // path: "/modules",
-  },
-  {
-    label: "Sales Management",
-    icon: MdOutlineHandshake,
-    // path: "/modules",
-  },
-  {
-    label: "Finance Management",
-    icon: MdAccountBalance,
-    // path: "/themes",
-  },
-  {
-    label: "Administration Management",
-    icon: HiOutlineBriefcase,
-    // path: "/leads",
-  },
-  {
-    label: "HR Management",
-    icon: BsPeopleFill,
-    // path: "/career",
-  },
-  {
-    label: "IT Infrastructure",
-    icon: FaDesktop,
-    // path: "/calendar",
-  },
-  {
-    label: "Maintenance Management",
-    icon: TiSpanner,
-    // suffixText: "...More",
-  },
-];
-
-// Real Key Apps, per the dev team's Add-Ons plan matrix.
-const valueAdditionItems = [
-  { label: "Website Builder", icon: CgWebsite },
-  { label: "Nomad Listings", icon: TbWorldWww },
-  { label: "All Leads", icon: HiOutlineDocumentReport },
-  { label: "Visitor Management", icon: BsPersonVcard },
-];
-
-// Locked-until-Custom-plan modules, per the Add-Ons matrix's own
-// "Extra Common Modules" group.
-const extraCommonModules = [
-  { label: "Assets", icon: HiOutlineArchive },
-  { label: "Inventory", icon: HiOutlineLibrary },
-  { label: "Finance Management", icon: HiOutlineCash },
-  { label: "Team Management", icon: BsPeopleFill },
-  { label: "Reports", icon: HiOutlineDocumentReport },
-];
-
-const commonFeatures = [
-  { label: "Dashboard", icon: HiOutlineViewGrid },
-  { label: "Customer Support", icon: MdOutlineSupportAgent },
-  { label: "Tickets", icon: HiOutlineClipboardList },
-  { label: "Meeting Room Booking", icon: MdMeetingRoom },
-  { label: "Calendar", icon: TbCalendarUser },
-  { label: "Printouts", icon: HiOutlineDocumentReport },
-  { label: "Attendance", icon: MdOutlineFingerprint },
-  { label: "Tasks", icon: HiOutlineClipboardList },
-  { label: "Leave Requests", icon: HiOutlineLogout },
-];
-
-const coreModules = [
-  { label: "Organization Management", icon: HiOutlineLibrary },
-  { label: "Access Grants", icon: HiOutlineKey },
-  { label: "Analytics", icon: HiOutlineChartBar },
-  { label: "Unit Settings", icon: HiOutlineCash },
-  { label: "Unit Management", icon: HiOutlineTemplate },
-];
-
-// Each department's own module list, per "Department Accesses" in the
-// dev team's Add-Ons plan matrix and the Customise Plan doc. Ordered to
-// match the Modules overview section above (Sales, Finance,
-// Administration, HR, IT, Maintenance), with Tech appended alongside IT.
-const departmentAccess = [
-  {
-    label: "Sales Department",
-    icon: HiOutlineTrendingUp,
-    children: [
-      { label: "Leads Management", icon: HiOutlineDocumentReport },
-      { label: "Tenant Companies", icon: HiOutlineLibrary },
-      { label: "Virtual Offices", icon: CgWebsite },
-      { label: "Resource & Pricing", icon: HiOutlineCash },
-      { label: "Sales Architecture", icon: TbWorldWww },
-    ],
-  },
-  {
-    label: "Finance Department",
-    icon: HiOutlineCurrencyDollar,
-    children: [
-      { label: "Expenses & Budget", icon: HiOutlineCash },
-      { label: "Billing & Payments", icon: HiOutlineCurrencyDollar },
-      { label: "Accounting", icon: HiOutlineChartBar },
-    ],
-  },
-  {
-    label: "Administration Department",
-    icon: HiOutlineBriefcase,
-    children: [
-      { label: "Printout Management", icon: HiOutlineDocumentReport },
-      { label: "Bookings", icon: MdMeetingRoom },
-      { label: "Visitors Management", icon: BsPersonVcard },
-      { label: "Resource Management", icon: HiOutlineLibrary },
-      { label: "Housekeeping", icon: HiOutlineClipboardList },
-    ],
-  },
-  {
-    label: "HR Department",
-    icon: HiOutlineUsers,
-    children: [
-      { label: "Company Management", icon: HiOutlineLibrary },
-      { label: "Documents", icon: HiOutlineDocumentReport },
-      { label: "Recruitment", icon: HiOutlineBriefcase },
-      { label: "Leave Request Processing", icon: HiOutlineLogout },
-      { label: "Attendance Review", icon: MdOutlineFingerprint },
-      { label: "Payroll Management", icon: HiOutlineCash },
-      { label: "Resignation Management", icon: HiOutlineLogout },
-    ],
-  },
-  {
-    label: "IT Department",
-    icon: HiOutlineDatabase,
-    children: [{ label: "IT Repair Logs", icon: HiOutlineChip }],
-  },
-  {
-    label: "Maintenance Department",
-    icon: HiOutlineWrenchScrewdriver,
-    children: [
-      { label: "Maintenance Repair Logs", icon: HiOutlineWrenchScrewdriver },
-      { label: "AMC Maintenance Schedule", icon: TbCalendarUser },
-    ],
-  },
-  // Last on purpose: every item here duplicates what Key Apps > Website
-  // Builder already covers — this is that same feature surfaced again
-  // under Tech's own department access.
-  {
-    label: "Tech Department",
-    icon: HiOutlineChip,
-    children: [
-      { label: "Website Builder", icon: CgWebsite },
-      { label: "Website Leads", icon: HiOutlineDocumentReport },
-      { label: "Website Review", icon: HiOutlineHeart },
-    ],
-  },
-];
 
 const becomeNomadItem = [{ label: "Become a Nomad", icon: HiOutlineViewGrid }];
 
@@ -291,20 +93,6 @@ const hostLoginPrompt = {
     "Login to manage your host tools, listings, operations, and business setup.",
   actionLabel: "Login as Business",
 };
-
-const loggedOutPrompt = {
-  title: "Get responses tailored to you",
-  description:
-    "Login to explore your nomad lifestyle and discover where you should live, work, and save more.",
-  actionLabel: "Login",
-};
-
-const profileItems = [
-  { label: "Edit Profile", icon: HiOutlineUserCircle, tab: "profile" },
-  { label: "Change Password", icon: HiOutlineKey, tab: "password" },
-];
-
-const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
 
 const collapsedSectionLabels = {
   Modules: "MOD",
@@ -464,6 +252,23 @@ const SidebarSection = ({
 };
 
 const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
+  const { categories } = useHostModuleCatalog({ liveRefresh: true });
+  const catalogSidebarSections = useMemo(
+    () =>
+      categories.map((category) => ({
+        id: category.id,
+        label: category.label,
+        items: categoryToSidebarItems(categories, category.id),
+      })),
+    [categories],
+  );
+  const modulesOverviewItems = useMemo(
+    () => [
+      ...categoryToSidebarItems(categories, "key-apps").slice(0, 2),
+      ...categoryToSidebarItems(categories, "department-accesses"),
+    ],
+    [categories],
+  );
   const [collapsed, setCollapsed] = useState(true);
   // The sidebar transition changes available width without a window resize.
   // Recalculate responsive text once that transition has settled.
@@ -472,12 +277,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     return () => clearTimeout(timer);
   }, [collapsed]);
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
-  const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
-  const [isCommonFeaturesOpen, setIsCommonFeaturesOpen] = useState(false);
-  const [isExtraCommonModulesOpen, setIsExtraCommonModulesOpen] = useState(false);
-  const [isCoreModulesOpen, setIsCoreModulesOpen] = useState(false);
-  const [isDepartmentAccessOpen, setIsDepartmentAccessOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [openCatalogSections, setOpenCatalogSections] = useState({});
   const [tooltip, setTooltip] = useState(null);
 
   const location = useLocation();
@@ -490,59 +290,23 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       : null;
 
   const { auth } = useAuth();
-  const logout = useLogout();
   useEffect(() => {
-    const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
-    const isAiHomePage = normalizedPath === "/home";
-
-    const isValueAddedPage = valueAdditionItems.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
-    const isCommonFeaturePage = commonFeatures.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
-    const isCoreModulePage = coreModules.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
-    const isDepartmentAccessPage = departmentAccess.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
-    if (isAiHomePage) {
+    if (normalizedPath === "/home") {
       setIsRecommendationsOpen(false);
-      setIsValueAdditionsOpen(true);
       return;
     }
 
     setIsRecommendationsOpen(true);
-    if (isValueAddedPage) setIsValueAdditionsOpen(true);
-    if (isCommonFeaturePage) setIsCommonFeaturesOpen(true);
-    if (isCoreModulePage) setIsCoreModulesOpen(true);
-    if (isDepartmentAccessPage) setIsDepartmentAccessOpen(true);
-  }, [location.pathname]);
+    if (normalizedPath === "/modules") {
+      const categoryId = new URLSearchParams(location.search).get("category");
+      if (categoryId) {
+        setOpenCatalogSections((current) => ({
+          ...current,
+          [categoryId]: true,
+        }));
+      }
+    }
+  }, [location.search, normalizedPath]);
 
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
   console.log(isLoggedIn);
@@ -555,17 +319,20 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   // /modules is plan-scoped — a deep link needs ?plan= too, or the target
   // module may be filtered out of the selected plan's module index.
   const handleSidebarItemClick = (item, defaultCategoryId) => {
-    const override = modulesOverviewTargets[item?.label];
-    if (override) {
-      const plan = planForLabel(item?.label) || selectedModulesPlan || "basic";
-      navigate(`/modules?plan=${plan}&category=${override.categoryId}&module=${override.moduleId}`);
+    if (item?.categoryId && item?.moduleId) {
+      const plan = item.plan || selectedModulesPlan || "basic";
+      navigate(
+        `/modules?plan=${plan}&category=${item.categoryId}&module=${item.moduleId}`,
+      );
+      if (isMobileOverlay) onClose?.();
       return;
     }
 
-    const match = findModuleByLabel(item?.label);
+    const match = findModuleByLabel(item?.label, categories);
     if (match) {
-      const plan = planForLabel(item?.label) || selectedModulesPlan || "basic";
+      const plan = planForLabel(item?.label, categories) || selectedModulesPlan || "basic";
       navigate(`/modules?plan=${plan}&category=${match.categoryId}&module=${match.moduleId}`);
+      if (isMobileOverlay) onClose?.();
       return;
     }
     if (defaultCategoryId) {
@@ -577,26 +344,6 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       return;
     }
     navigate("/modules");
-  };
-
-  const handleProfileClick = (item) => {
-    if (!item.tab) return;
-
-    const params = new URLSearchParams(location.search);
-    params.set("tab", item.tab);
-
-    navigate({
-      pathname: "/profile",
-      search: params.toString() ? `?${params.toString()}` : "",
-    });
-  };
-
-  const handleLogInClick = () => {
-    navigate(`/ai-login${location.search}`, {
-      state: {
-        redirectTo: `${location.pathname}${location.search}`,
-      },
-    });
   };
 
   const handleBecomeNomadClick = () => {
@@ -611,41 +358,7 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     window.location.href = "https://hostpanel.wono.co";
   };
 
-  const handleSignOutClick = async () => {
-    if (auth?.user) {
-      await logout();
-    }
-
-    const nextSearchParams = new URLSearchParams(location.search);
-    nextSearchParams.delete("login");
-    clearStoredLoginState();
-
-    if (isMobileOverlay) {
-      onClose?.();
-      navigate("/ai-login");
-      return;
-    }
-
-    navigate(
-      {
-        pathname: "/ai-login",
-        search: nextSearchParams.toString()
-          ? `?${nextSearchParams.toString()}`
-          : "",
-      },
-      {
-        state: {
-          redirectTo: `${location.pathname}${location.search}`,
-        },
-      },
-    );
-  };
-
   const isCollapsed = isMobileOverlay ? false : collapsed;
-
-  const redirectGoal = location.pathname
-    .replace(/\/$/, "")
-    .match(/^\/ai-login\/([^/]+)$/)?.[1];
 
   // A module selected on /modules (?category=&module=) shows as the
   // selected item here too, by matching its label against the real
@@ -656,114 +369,38 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       : null;
   const isModuleActive = (item) => {
     if (!activeModuleParam) return false;
-    const override = modulesOverviewTargets[item.label];
-    if (override) return override.moduleId === activeModuleParam;
-    const match = findModuleByLabel(item.label);
+    if (item.moduleId) return item.moduleId === activeModuleParam;
+    const match = findModuleByLabel(item.label, categories);
     return Boolean(match && match.moduleId === activeModuleParam);
   };
 
-  // Active state logic for recommendations
-  const recommendationItemsWithActivePath = filterSidebarItemsForPlan(recommendationItems.map((item) => {
+  // Active state logic for recommendations. The sidebar is a fixed, custom
+  // menu — it does not filter items in or out as the /modules plan changes,
+  // so no plan is passed to filterSidebarItemsForPlan here.
+  const recommendationItemsWithActivePath = modulesOverviewItems.map((item) => {
     const moduleActive = isModuleActive(item);
-    if (!item.path) return { ...item, active: moduleActive };
+    return { ...item, active: moduleActive };
+  });
 
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const goalSlug = goalSlugByLabel[item.label];
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`) ||
-      (normalizedPath.startsWith("/ai-login/") &&
-        Boolean(goalSlug) &&
-        goalSlug === redirectGoal);
-
-    return {
-      ...item,
-      active: isActivePath || moduleActive,
-    };
-  }), null);
-
-  // Active state logic for value additions
-  const valueAdditionItemsWithActivePath = filterSidebarItemsForPlan(valueAdditionItems.map((item) => {
-    const moduleActive = isModuleActive(item);
-    if (!item.path) return { ...item, active: moduleActive };
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
+  const catalogSectionsWithActivePath = catalogSidebarSections.map((section) => {
+    const items = section.items.map((item) => {
+      const children = item.children?.map((child) => ({
+        ...child,
+        active: isModuleActive(child),
+      }));
+      return {
+        ...item,
+        children,
+        active:
+          isModuleActive(item) || Boolean(children?.some((child) => child.active)),
+      };
+    });
 
     return {
-      ...item,
-      active: isActivePath || moduleActive,
+      ...section,
+      items,
     };
-  }), null);
-
-  const commonFeaturesWithActivePath = filterSidebarItemsForPlan(commonFeatures.map((item) => {
-    const moduleActive = isModuleActive(item);
-    if (!item.path) return { ...item, active: moduleActive };
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-    return {
-      ...item,
-      active: isActivePath || moduleActive,
-    };
-  }), null);
-
-  const coreModulesWithActivePath = filterSidebarItemsForPlan(coreModules.map((item) => {
-    const moduleActive = isModuleActive(item);
-    if (!item.path) return { ...item, active: moduleActive };
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-    return {
-      ...item,
-      active: isActivePath || moduleActive,
-    };
-  }), null);
-
-  const departmentAccessWithActivePath = filterSidebarItemsForPlan(departmentAccess.map((item) => {
-    const children = item.children?.map((child) => ({
-      ...child,
-      active: isModuleActive(child),
-    }));
-    const moduleActive =
-      isModuleActive(item) || Boolean(children?.some((c) => c.active));
-    if (!item.path) return { ...item, active: moduleActive, children };
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-    return {
-      ...item,
-      active: isActivePath || moduleActive,
-      children,
-    };
-  }), null);
-
-  // Extra Common Modules — locked-until-Custom-plan modules.
-  const extraCommonModulesWithActivePath = filterSidebarItemsForPlan(extraCommonModules.map((item) => {
-    const moduleActive = isModuleActive(item);
-    if (!item.path) return { ...item, active: moduleActive };
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-    return {
-      ...item,
-      active: isActivePath || moduleActive,
-    };
-  }), null);
+  });
 
   return (
     <aside
@@ -826,65 +463,25 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         onTooltipChange={setTooltip}
       />
 
-      {commonFeaturesWithActivePath.length > 0 && (
-        <SidebarSection
-          title="Common Modules"
-          items={commonFeaturesWithActivePath}
-          collapsed={isCollapsed}
-          isExpandable
-          isOpen={isCommonFeaturesOpen}
-          onToggle={() => setIsCommonFeaturesOpen((prev) => !prev)}
-          onItemClick={(item) => handleSidebarItemClick(item, "common-modules")}
-          onTooltipChange={setTooltip}
-        />
-      )}
-      {extraCommonModulesWithActivePath.length > 0 && (
-        <SidebarSection
-          title="Extra Common Modules"
-          items={extraCommonModulesWithActivePath}
-          collapsed={isCollapsed}
-          isExpandable
-          isOpen={isExtraCommonModulesOpen}
-          onToggle={() => setIsExtraCommonModulesOpen((prev) => !prev)}
-          onItemClick={(item) => handleSidebarItemClick(item, "extra-common-modules")}
-          onTooltipChange={setTooltip}
-        />
-      )}
-      {valueAdditionItemsWithActivePath.length > 0 && (
-        <SidebarSection
-          title="Key Apps"
-          items={valueAdditionItemsWithActivePath}
-          collapsed={isCollapsed}
-          isExpandable
-          isOpen={isValueAdditionsOpen}
-          onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
-          onItemClick={(item) => handleSidebarItemClick(item, "key-apps")}
-          onTooltipChange={setTooltip}
-        />
-      )}
-      {coreModulesWithActivePath.length > 0 && (
-        <SidebarSection
-          title="Core Modules"
-          items={coreModulesWithActivePath}
-          collapsed={isCollapsed}
-          isExpandable
-          isOpen={isCoreModulesOpen}
-          onToggle={() => setIsCoreModulesOpen((prev) => !prev)}
-          onItemClick={(item) => handleSidebarItemClick(item, "core-modules")}
-          onTooltipChange={setTooltip}
-        />
-      )}
-      {departmentAccessWithActivePath.length > 0 && (
-        <SidebarSection
-          title="Department Accesses"
-          items={departmentAccessWithActivePath}
-          collapsed={isCollapsed}
-          isExpandable
-          isOpen={isDepartmentAccessOpen}
-          onToggle={() => setIsDepartmentAccessOpen((prev) => !prev)}
-          onItemClick={(item) => handleSidebarItemClick(item, "department-accesses")}
-          onTooltipChange={setTooltip}
-        />
+      {catalogSectionsWithActivePath.map((section) =>
+        section.items.length > 0 ? (
+          <SidebarSection
+            key={section.id}
+            title={section.label}
+            items={section.items}
+            collapsed={isCollapsed}
+            isExpandable
+            isOpen={Boolean(openCatalogSections[section.id])}
+            onToggle={() =>
+              setOpenCatalogSections((current) => ({
+                ...current,
+                [section.id]: !current[section.id],
+              }))
+            }
+            onItemClick={(item) => handleSidebarItemClick(item, section.id)}
+            onTooltipChange={setTooltip}
+          />
+        ) : null,
       )}
 
       {isMobileOverlay && (
