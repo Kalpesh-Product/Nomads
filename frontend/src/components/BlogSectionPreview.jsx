@@ -2,12 +2,12 @@ import { useId, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import { CircleAlert, X } from "lucide-react";
 
-const sampleContent = "Discover a slower pace of life by the coast. Start your morning with a walk on the beach, explore the neighbourhood cafés, and find a welcoming place to work. With beautiful surroundings and a friendly community, every day brings something new to enjoy.";
+const sampleContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
 const SampleArticleSection = ({ main = false, index = 0 }) => (
   <article className="flow-root text-slate-700">
     <h3 className={`mb-4 font-bold leading-snug ${main ? "text-2xl" : "text-xl"}`}>
-      {main ? "A nomad’s guide to life in Goa" : "Find your favourite local spot"}
+      {main ? "Lorem ipsum dolor sit amet" : "Consectetur adipiscing elit"}
     </h3>
     <img
       src={main ? "/images/goa-image.jpg" : "/images/bali-image.jpg"}
@@ -55,7 +55,7 @@ export default function BlogSectionPreview({ section = "overview", index = 0 }) 
         <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-100 p-5 sm:p-6">
           <div>
             <h2 id={titleId} className="text-lg font-semibold text-blue-950">{title}</h2>
-            <p className="mt-1 text-[10px] font-medium uppercase tracking-widest text-slate-500">How it looks on the blog page</p>
+            <p className="mt-1 text-[10px] font-medium uppercase tracking-widest text-slate-500">Sample layout with placeholder text</p>
           </div>
           <button
             type="button"

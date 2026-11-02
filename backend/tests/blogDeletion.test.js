@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import Blog from "../models/Blog.js";
-import { deleteMyBlog, getMyBlogs, getBlogs, getBlogContributions, updateMyBlog, updateBlogContributionStatus } from "../controllers/blogController.js";
+import { deleteMyBlog, getMyBlogs, getBlogs, getBlogContributions, updateMyBlog, updateBlogContributionStatus, updateBlog } from "../controllers/blogController.js";
 
 const userId = "507f1f77bcf86cd799439011";
 const blogId = "507f1f77bcf86cd799439012";
@@ -60,12 +60,12 @@ test("database failures reach the error handler", async (t) => {
   assert.equal(caught, failure);
 });
 
-test("deleted blogs are excluded from public, contributor and moderation lists", async (t) => {
+test("deleted blogs are excluded from public and contributor lists", async (t) => {
   t.mock.method(Blog, "find", (filter) => {
     assert.equal(filter.deletedAt, null);
     return { populate() { return this; }, sort: async () => [] };
   });
-  for (const handler of [getMyBlogs, getBlogs, getBlogContributions]) {
+  for (const handler of [getMyBlogs, getBlogs]) {
     const res = response();
     await handler({ userData: { _id: userId }, query: {} }, res, next);
     assert.equal(res.statusCode, 200);
@@ -77,9 +77,38 @@ test("editing and moderation cannot republish a deleted blog", async (t) => {
     assert.equal(filter.deletedAt, null);
     return { populate: async () => null, then: (resolve) => resolve(null) };
   });
-  for (const handler of [updateMyBlog, updateBlogContributionStatus]) {
+  for (const handler of [updateMyBlog, updateBlogContributionStatus, updateBlog]) {
     const res = response();
     await handler(request({ status: "approved" }), res, next);
     assert.equal(res.statusCode, 404);
+  }
+});
+
+
+test("moderation lists include deleted blogs with their reason and previous review status", async (t) => {
+  const deletedAt = new Date("2026-10-30T08:00:00Z");
+  const deleted = { _id: blogId, status: "rejected", deletedAt, deletionReason: "Outdated", rejectionReason: "Needs revision" };
+  const active = { _id: "active", status: "pending" };
+  t.mock.method(Blog, "find", (filter) => {
+    assert.equal(filter.deletedAt, undefined);
+    return { populate() { return this; }, sort: async () => [{ ...deleted, toObject: () => deleted }, active] };
+  });
+  const res = response();
+  await getBlogContributions({ query: {} }, res, next);
+  assert.equal(res.body.count, 2);
+  assert.deepEqual(res.body.data[0], { ...deleted, status: "deleted", statusBeforeDeletion: "rejected" });
+  assert.equal(res.body.data[1], active);
+});
+
+test("moderation status filters distinguish deleted blogs from their previous status", async (t) => {
+  let expected;
+  t.mock.method(Blog, "find", (filter) => {
+    assert.deepEqual(filter.deletedAt, expected);
+    assert.equal(filter.status, expected === null ? "rejected" : undefined);
+    return { populate() { return this; }, sort: async () => [] };
+  });
+  for (const status of ["rejected", "deleted"]) {
+    expected = status === "deleted" ? { $ne: null } : null;
+    await getBlogContributions({ query: { status } }, response(), next);
   }
 });

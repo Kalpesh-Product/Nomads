@@ -1869,11 +1869,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             )}
 
             <div className="mt-6">
-              {type === "blog" && (
-                <div className="mb-2 flex justify-end">
-                  <BlogSectionPreview section="main" />
-                </div>
-              )}
               <ContributionTextField
                 label={
                   isEventForm || isPlaceForm
@@ -1932,7 +1927,6 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               <>
                 <h2 className="mt-5 flex flex-wrap items-center gap-3 text-lg font-semibold text-slate-700">
                   Sections
-                  {type === "blog" && <BlogSectionPreview section="sections" />}
                 </h2>
 
                 <div className="mt-3 space-y-4">

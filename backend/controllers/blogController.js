@@ -398,13 +398,17 @@ export const getBlogContributions = async (req, res, next) => {
     try {
         const { status, search } = req.query;
         const query = {
-            deletedAt: null,
             contributor: { $exists: true, $ne: null },
             isDraft: { $ne: true },
         };
 
         if (status && status !== "all") {
-            query.status = status;
+            if (status === "deleted") {
+                query.deletedAt = { $ne: null };
+            } else {
+                query.status = status;
+                query.deletedAt = null;
+            }
         }
 
         if (search) {
@@ -424,7 +428,12 @@ export const getBlogContributions = async (req, res, next) => {
 
         return res.status(200).json({
             count: blogs.length,
-            data: blogs,
+            // Keep the stored review status for the timeline; deletion takes precedence in moderation.
+            data: blogs.map((blog) => blog.deletedAt ? {
+                ...blog.toObject(),
+                statusBeforeDeletion: blog.status,
+                status: "deleted",
+            } : blog),
         });
     } catch (error) {
         next(error);
@@ -573,7 +582,7 @@ export const deleteMyBlog = async (req, res, next) => {
 export const updateBlog = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const blog = await Blog.findByIdAndUpdate(id, req.body, { new: true });
+        const blog = await Blog.findOneAndUpdate({ _id: id, deletedAt: null }, req.body, { new: true });
         if (!blog) return res.status(404).json({ message: "Blog not found" });
         res.status(200).json({ message: "Blog updated", blog });
     } catch (error) {

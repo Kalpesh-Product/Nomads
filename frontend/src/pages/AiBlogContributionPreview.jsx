@@ -1307,39 +1307,39 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
         ...dialogOptions,
         icon: "warning",
         title: "Delete this blog?",
-        text: "This blog will be removed from your contributions and will no longer be visible to readers. You cannot undo this action.",
-        input: "checkbox",
-        inputValue: 0,
-        inputPlaceholder: "I understand and agree to delete this blog",
-        inputValidator: (value) => !value && "Please agree before continuing.",
-        confirmButtonText: "Continue",
+        html: `
+          <p>This blog will be removed from your contributions and will no longer be visible to readers. You cannot undo this action.</p>
+          <label class="blog-delete-reason-label" for="blog-delete-reason">Reason for deleting</label>
+          <textarea id="blog-delete-reason" class="blog-delete-reason" rows="3" maxlength="500" required aria-required="true" placeholder="Please tell us why you want to delete this blog"></textarea>
+          <label class="blog-delete-agreement" for="blog-delete-agreement">
+            <input id="blog-delete-agreement" type="checkbox" />
+            <span>I understand and agree to delete this blog</span>
+          </label>
+        `,
         didOpen: () => {
-          const checkbox = Swal.getInput();
-          const button = Swal.getConfirmButton();
-          button.disabled = true;
-          checkbox.addEventListener("change", () => {
-            button.disabled = !checkbox.checked;
-          });
-        },
-      });
-      if (!confirmation.isConfirmed) return;
-
-      const reason = await Swal.fire({
-        ...dialogOptions,
-        title: "Why do you want to delete this blog?",
-        input: "textarea",
-        inputLabel: "Reason for deleting",
-        inputPlaceholder: "Please tell us why you want to delete this blog",
-        inputAttributes: { maxlength: "500", "aria-required": "true" },
-        inputValidator: (value) => {
-          if (!value.trim()) return "Please enter a reason for deleting.";
-          if (value.trim().length > 500) return "Please use 500 characters or fewer.";
+          const popup = Swal.getPopup();
+          const reasonInput = popup.querySelector("#blog-delete-reason");
+          const checkbox = popup.querySelector("#blog-delete-agreement");
+          const syncButton = () => {
+            Swal.getConfirmButton().disabled = !checkbox.checked || !reasonInput.value.trim();
+            Swal.resetValidationMessage();
+          };
+          reasonInput.addEventListener("input", syncButton);
+          checkbox.addEventListener("change", syncButton);
+          syncButton();
         },
         confirmButtonText: "Delete Blog",
         showLoaderOnConfirm: true,
         allowOutsideClick: () => !Swal.isLoading(),
         allowEscapeKey: () => !Swal.isLoading(),
-        preConfirm: async (value) => {
+        preConfirm: async () => {
+          const popup = Swal.getPopup();
+          const value = popup.querySelector("#blog-delete-reason").value.trim();
+          const agreed = popup.querySelector("#blog-delete-agreement").checked;
+          if (!value || value.length > 500 || !agreed) {
+            Swal.showValidationMessage("Please enter a reason (up to 500 characters) and agree to delete.");
+            return false;
+          }
           try {
             await axiosPrivate.delete(`${config.myEndpoint}/${itemId}`, {
               data: { deletionReason: value.trim(), agreedToDelete: true },
@@ -1353,7 +1353,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
           }
         },
       });
-      if (!reason.isConfirmed) return;
+      if (!confirmation.isConfirmed) return;
 
       queryClient.setQueriesData({ queryKey: [config.queryKey] }, (current) =>
         Array.isArray(current)
