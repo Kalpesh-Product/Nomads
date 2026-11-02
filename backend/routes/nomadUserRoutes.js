@@ -8,6 +8,9 @@ import {
   getUserFavoriteDestinations,
   getUserLikes,
   getUsers,
+  getWebsiteBookings,
+  rescheduleWebsiteBooking,
+  checkWebsiteBookingRescheduleAvailability,
   getUserSaves,
   likeListings,
   saveListings,
@@ -19,6 +22,9 @@ import {
 const router = Router();
 
 router.get("/", getUsers);
+router.get("/website-bookings", getWebsiteBookings);
+router.patch("/website-bookings/:bookingId/reschedule", rescheduleWebsiteBooking);
+router.post("/website-bookings/:bookingId/reschedule-availability", checkWebsiteBookingRescheduleAvailability);
 router.patch("/profile/:userId", updateProfile);
 router.patch("/password/:userId", changePassword);
 router.patch("/favorite-destination", favoriteDestinations);

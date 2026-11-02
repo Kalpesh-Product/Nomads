@@ -25,13 +25,16 @@ export default function Signup() {
   const toggleConfirmPasswordVisibility = () =>
     setShowConfirmPassword((prev) => !prev);
 
+  const signupParams = new URLSearchParams(location.search);
+  const bookingAccess = signupParams.get("booking") || "";
+  if (bookingAccess) localStorage.setItem("wonoWebsiteBookingAccess", bookingAccess);
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      fullName: "",
-      email: "",
+      fullName: signupParams.get("name") || "",
+      email: signupParams.get("email") || "",
       password: "",
       confirmPassword: "",
-      mobile: "",
+      mobile: signupParams.get("mobile") || "",
     },
   });
 

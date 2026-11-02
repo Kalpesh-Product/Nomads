@@ -4,7 +4,7 @@ import useAuth from "../hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Favorites from "./Favorites";
 import Reviews from "./Reviews";
 import { CircularProgress } from "@mui/material";
@@ -44,6 +44,14 @@ const Profile = () => {
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
+  });
+  const bookingAccess = searchParams.get("booking") || localStorage.getItem("wonoWebsiteBookingAccess") || "";
+  if (searchParams.get("booking")) localStorage.setItem("wonoWebsiteBookingAccess", bookingAccess);
+
+  const { data: bookingData, isLoading: bookingsLoading, error: bookingsError } = useQuery({
+    queryKey: ["websiteBookings", userId, bookingAccess],
+    queryFn: async () => (await axiosPrivate.get(`/user/website-bookings?token=${encodeURIComponent(bookingAccess)}`)).data,
+    enabled: Boolean(userId) && activeTab === "bookings",
   });
 
   useEffect(() => {
@@ -147,6 +155,15 @@ const Profile = () => {
     <div className="bg-[#f8f9fc] min-h-screen p-4 sm:p-6 font-sans text-[#364D59]">
       {/* Tabs - Desktop style preserved, stacks on very small screens */}
       <div className="flex flex-col sm:flex-row mb-6 border rounded-lg overflow-hidden max-w-3xl mx-auto">
+        <button
+          className={`flex-1 py-3 font-semibold text-sm sm:text-base border-t sm:border-t-0 sm:border-l ${activeTab === "bookings"
+              ? "bg-[#ff5757] text-white"
+              : "bg-white text-[#ff5757]"
+            }`}
+          onClick={() => handleTabChange("bookings")}
+        >
+          Bookings
+        </button>
         <button
           className={`flex-1 py-3 font-semibold text-sm sm:text-base ${activeTab === "profile"
               ? "bg-[#ff5757] text-white"
@@ -382,6 +399,39 @@ const Profile = () => {
       {/* FAVORITES TAB */}
       {activeTab === "favorites" && <Favorites />}
       {activeTab === "reviews" && <Reviews />}
+      {activeTab === "bookings" && (
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm max-w-5xl mx-auto">
+          <h2 className="text-lg sm:text-xl font-bold text-[#ff5757] mb-4">MY WEBSITE BOOKINGS</h2>
+          {bookingsLoading && <CircularProgress size={28} />}
+          {bookingsError && <p className="text-red-600">{bookingsError.response?.data?.message || "Unable to load bookings."}</p>}
+          {!bookingsLoading && !bookingsError && !(bookingData?.bookings || []).length && (
+            <p className="text-gray-600">No meeting-room bookings were found for {user?.email || "this account"}.</p>
+          )}
+          <div className="grid gap-4">
+            {(bookingData?.bookings || []).map((booking) => {
+              const start = new Date(booking.start);
+              const end = new Date(booking.end);
+              return (
+                <div key={booking.id} className="border rounded-lg p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-gray-500">{booking.bookingCode}</p>
+                      <h3 className="font-semibold text-lg">{booking.roomName}</h3>
+                      <p className="text-sm text-gray-700">{start.toLocaleDateString()} · {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} – {end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
+                      <p className="text-sm text-gray-600 mt-1">{booking.attendees} people · {booking.status} · {booking.paymentStatus}</p>
+                    </div>
+                    {booking.rescheduleUrl && (
+                      <a className="inline-flex justify-center rounded-full bg-[#ff5757] px-4 py-2 text-sm font-semibold text-white" href={booking.rescheduleUrl}>
+                        Choose another slot
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

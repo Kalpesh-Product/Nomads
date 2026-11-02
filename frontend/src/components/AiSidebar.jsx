@@ -20,6 +20,7 @@ import {
   HiOutlineKey,
   HiOutlineLogout,
   HiOutlineLogin,
+  HiOutlineCalendar,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 import { FaGlobeAmericas, FaHandsHelping } from "react-icons/fa";
@@ -124,6 +125,7 @@ const loggedOutPrompt = {
 
 const profileItems = [
   { label: "userFullName", icon: HiOutlineUserCircle, tab: "profile" },
+  { label: "My Bookings", icon: HiOutlineCalendar, tab: "bookings" },
   { label: "Favorites", icon: HiOutlineHeart, tab: "favorites" },
   { label: "Reviews", icon: MdRateReview, tab: "reviews" },
   { label: "Change Password", icon: HiOutlineKey, tab: "password" },

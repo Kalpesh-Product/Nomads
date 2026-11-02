@@ -2,6 +2,34 @@ import Lead from "../models/Lead.js";
 import Company from "../models/Company.js";
 import { describeMissingNomadListingStep } from "../utils/nomadListingStatus.js";
 
+const hostPanelBaseUrl = () =>
+  String(
+    process.env.HOST_PANEL_BE ||
+      (process.env.NODE_ENV === "production" ? "https://hostpanel.wono.co" : "http://localhost:5006"),
+  ).trim().replace(/\/+$/, "");
+
+const fetchWebsiteBookingAvailability = async (payload) => {
+  const response = await fetch(`${hostPanelBaseUrl()}/api/public/booking/availability`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(payload || {}),
+    signal: typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(8_000) : undefined,
+  });
+  const data = await response.json().catch(() => ({}));
+  return { response, data };
+};
+
+export const checkWebsiteBookingAvailability = async (req, res, next) => {
+  try {
+    const { response, data } = await fetchWebsiteBookingAvailability(req.body);
+    return res.status(response.status).json(data);
+  } catch (error) {
+    error.status = 503;
+    error.message = "Live room availability is temporarily unavailable";
+    next(error);
+  }
+};
+
 export const createWebsiteLead = async (req, res, next) => {
   try {
     const {
@@ -117,8 +145,19 @@ export const createWebsiteLead = async (req, res, next) => {
       budget: budget ? String(budget) : "",
       location: location ? String(location) : "",
       message: (message || comment || "").trim(),
-      status: "Pending",
-      isEscalated: false,
+      // Website-builder leads skip the Master Panel manual-escalate step —
+      // they go straight to the host's workspace the moment they land here,
+      // since the workspace is already known from the website itself. Leads
+      // with no resolvable workspaceId fall back to the normal review flow.
+      ...(resolvedSource === "website" && workspaceId
+        ? {
+            status: "Closed",
+            isEscalated: true,
+            escalatedWorkspaceId: String(workspaceId).trim(),
+            escalatedHostCompanyId: company.companyId || "",
+            escalatedAt: new Date(),
+          }
+        : { status: "Pending", isEscalated: false }),
     });
 
     return res.status(201).json({

@@ -297,6 +297,7 @@ export const useWebsiteTemplateData = () => {
     const [leadSubmitted, setLeadSubmitted] = useState(false);
     const [leadSubmitPending, setLeadSubmitPending] = useState(false);
     const [leadSubmitError, setLeadSubmitError] = useState("");
+    const [leadAvailability, setLeadAvailability] = useState({ status: "idle", message: "" });
     // Extra lead answers the new templates collect (time slot, seating, notes, an
     // explicit inquiryType...). Empty for the older templates, so their payload is unchanged.
     const [leadExtras, setLeadExtras] = useState({});
@@ -308,6 +309,45 @@ export const useWebsiteTemplateData = () => {
         startDate: "",
         endDate: "",
     });
+    useEffect(() => {
+        const roomName = selectedLeadProduct?.name || selectedLeadProduct?.heading || "";
+        const configuredRooms = [
+            ...(Array.isArray(draft?.meetingRooms) ? draft.meetingRooms : []),
+            ...(Array.isArray(draft?.rooms) ? draft.rooms : []),
+        ];
+        const selectedRoom = configuredRooms.find((room) =>
+            String(room?.title || room?.name || room?.heading || "").trim().toLowerCase() === String(roomName).trim().toLowerCase());
+        if (!selectedRoom || !leadForm.startDate || !leadExtras.time || !leadExtras.endTime) {
+            setLeadAvailability({ status: "idle", message: "" });
+            return undefined;
+        }
+
+        let cancelled = false;
+        setLeadAvailability({ status: "checking", message: "Checking availability…" });
+        const timer = window.setTimeout(async () => {
+            try {
+                const response = await api.post("/leads/check-availability", {
+                    workspaceId: draft?.workspaceId || "",
+                    roomName,
+                    startDate: leadForm.startDate,
+                    startTime: leadExtras.time,
+                    endTime: leadExtras.endTime,
+                });
+                if (cancelled) return;
+                setLeadAvailability(response?.data?.available
+                    ? { status: "available", message: "Available for the selected date and time." }
+                    : { status: "unavailable", message: "Not available. Please select another time." });
+            }
+            catch {
+                if (!cancelled) setLeadAvailability({ status: "unknown", message: "Availability could not be checked right now." });
+            }
+        }, 250);
+
+        return () => {
+            cancelled = true;
+            window.clearTimeout(timer);
+        };
+    }, [draft?.meetingRooms, draft?.rooms, draft?.workspaceId, leadExtras.endTime, leadExtras.time, leadForm.startDate, selectedLeadProduct]);
     const [reviewModalOpen, setReviewModalOpen] = useState(false);
     const [reviewSubmitted, setReviewSubmitted] = useState(false);
     const [reviewSubmitPending, setReviewSubmitPending] = useState(false);
@@ -563,6 +603,7 @@ export const useWebsiteTemplateData = () => {
                 prevDetailItemSlugRef.current = currentSlug;
                 setLeadSubmitted(false);
                 setLeadSubmitError("");
+                setLeadAvailability({ status: "idle", message: "" });
                 setLeadForm({ fullName: "", people: "", mobile: "", email: "", startDate: "", endDate: "" });
                 setLeadExtras({});
             }
@@ -812,6 +853,7 @@ export const useWebsiteTemplateData = () => {
         setLeadSubmitError("");
         try {
             const slug = normalizeSlug(selectedLeadProduct?.slug || selectedLeadProduct?.name || "");
+            const roomName = selectedLeadProduct?.name || selectedLeadProduct?.heading || "";
             await api.post("/leads/create-lead", {
                 fullName: leadForm.fullName,
                 name: leadForm.fullName,
@@ -825,10 +867,10 @@ export const useWebsiteTemplateData = () => {
                 workspaceId: draft?.workspaceId || "",
                 searchKey: draft?.searchKey || "",
                 vertical: draft?.vertical || "",
-                productType: selectedLeadProduct?.name || selectedLeadProduct?.heading || "",
-                roomType: selectedLeadProduct?.name || selectedLeadProduct?.heading || "",
-                packageName: selectedLeadProduct?.name || selectedLeadProduct?.heading || "",
-                dormType: selectedLeadProduct?.name || selectedLeadProduct?.heading || "",
+                productType: roomName,
+                roomType: roomName,
+                packageName: roomName,
+                dormType: roomName,
                 noOfPeople: leadForm.people || 1,
                 attendees: leadForm.people || 1,
                 stayDuration: leadForm.endDate ? `${leadForm.startDate || ""} to ${leadForm.endDate}` : "",
@@ -1038,6 +1080,7 @@ export const useWebsiteTemplateData = () => {
         setLeadSubmitted,
         leadSubmitPending,
         leadSubmitError,
+        leadAvailability,
         openLeadModal,
         closeLeadModal,
         submitLeadForm,

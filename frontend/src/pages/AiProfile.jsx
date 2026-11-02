@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   InputAdornment,
   MenuItem,
   TextField,
@@ -10,7 +14,7 @@ import useAuth from "../hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Favorites from "./Favorites";
 import Reviews from "./Reviews";
 import { CircularProgress } from "@mui/material";
@@ -19,6 +23,7 @@ import { Country } from "country-state-city";
 import { HiCheck } from "react-icons/hi";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import Seo from "../components/Seo";
+import Container from "../components/Container";
 
 const floatingLabelSx = {
   color: "black",
@@ -121,7 +126,7 @@ const AiProfile = () => {
 
   const initialTab = searchParams.get("tab") || "profile";
   const [activeTab, setActiveTab] = useState(initialTab);
-  const seoTab = ["profile", "favorites", "reviews", "password"].includes(
+  const seoTab = ["profile", "favorites", "reviews", "password", "bookings"].includes(
     activeTab,
   )
     ? activeTab
@@ -170,6 +175,92 @@ const AiProfile = () => {
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
+  });
+  const [rescheduleBooking, setRescheduleBooking] = useState(null);
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleTime, setRescheduleTime] = useState("");
+  const [rescheduleEndTime, setRescheduleEndTime] = useState("");
+  const bookingAccess =
+    searchParams.get("booking") ||
+    window.localStorage.getItem("wonoWebsiteBookingAccess") ||
+    "";
+  if (searchParams.get("booking")) {
+    window.localStorage.setItem("wonoWebsiteBookingAccess", bookingAccess);
+  }
+  const {
+    data: bookingData,
+    isLoading: bookingsLoading,
+    error: bookingsError,
+  } = useQuery({
+    queryKey: ["websiteBookings", userId, bookingAccess],
+    queryFn: async () =>
+      (
+        await axiosPrivate.get(
+          `/user/website-bookings?token=${encodeURIComponent(bookingAccess)}`,
+        )
+      ).data,
+    enabled: Boolean(userId) && activeTab === "bookings",
+  });
+  const { mutate: submitReschedule, isPending: reschedulePending } = useMutation({
+    mutationFn: async () => {
+      const start = new Date(`${rescheduleDate}T${rescheduleTime}`);
+      const end = new Date(`${rescheduleDate}T${rescheduleEndTime}`);
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) {
+        throw new Error("Choose a valid start and end time");
+      }
+      return (
+        await axiosPrivate.patch(
+          `/user/website-bookings/${rescheduleBooking.id}/reschedule`,
+          { start: start.toISOString(), end: end.toISOString() },
+        )
+      ).data;
+    },
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ["websiteBookings", userId] });
+      setRescheduleBooking(null);
+      showSuccessAlert(data.message || "Booking rescheduled successfully");
+    },
+    onError: (error) => {
+      showErrorAlert(error.response?.data?.message || error.message || "Unable to reschedule booking");
+    },
+  });
+  const selectedStart = rescheduleDate && rescheduleTime
+    ? new Date(`${rescheduleDate}T${rescheduleTime}`)
+    : null;
+  const selectedEnd = rescheduleDate && rescheduleEndTime
+    ? new Date(`${rescheduleDate}T${rescheduleEndTime}`)
+    : null;
+  const selectedRangeValid = Boolean(
+    selectedStart &&
+    selectedEnd &&
+    !Number.isNaN(selectedStart.getTime()) &&
+    !Number.isNaN(selectedEnd.getTime()) &&
+    selectedEnd > selectedStart,
+  );
+  const selectedDurationMinutes = selectedRangeValid
+    ? Math.round((selectedEnd.getTime() - selectedStart.getTime()) / 60000)
+    : 0;
+  const {
+    data: availabilityData,
+    isFetching: availabilityChecking,
+    error: availabilityError,
+  } = useQuery({
+    queryKey: [
+      "bookingRescheduleAvailability",
+      rescheduleBooking?.id,
+      rescheduleDate,
+      rescheduleTime,
+      rescheduleEndTime,
+    ],
+    queryFn: async () =>
+      (
+        await axiosPrivate.post(
+          `/user/website-bookings/${rescheduleBooking.id}/reschedule-availability`,
+          { start: selectedStart.toISOString(), end: selectedEnd.toISOString() },
+        )
+      ).data,
+    enabled: Boolean(rescheduleBooking?.id) && selectedRangeValid,
+    retry: false,
   });
 
   useEffect(() => {
@@ -708,6 +799,177 @@ const AiProfile = () => {
         />
       )}
       {activeTab === "reviews" && <Reviews />}
+      {activeTab === "bookings" && (
+        <Container padding={false}>
+        <div className="min-h-screen rounded-xl bg-white p-6">
+          <h1 className="mb-6 text-xl font-semibold text-secondary-dark">My Bookings</h1>
+          {bookingsLoading && (
+            <div className="flex justify-center"><CircularProgress size={28} /></div>
+          )}
+          {bookingsError && (
+            <p className="text-center text-red-600">
+              {bookingsError.response?.data?.message || "Unable to load bookings."}
+            </p>
+          )}
+          {!bookingsLoading && !bookingsError && !(bookingData?.bookings || []).length && (
+            <p className="text-center text-gray-600">
+              No meeting-room bookings were found for {user?.email || "this account"}.
+            </p>
+          )}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            {(bookingData?.bookings || []).map((booking) => {
+              const start = new Date(booking.start);
+              const end = new Date(booking.end);
+              const normalizedStatus = String(booking.status || "confirmed").toLowerCase();
+              return (
+                <article
+                  key={booking.id}
+                  className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-all"
+                >
+                  <button
+                    type="button"
+                    className="group relative aspect-square w-full overflow-hidden rounded-3xl bg-white"
+                    disabled={['cancelled', 'completed'].includes(normalizedStatus)}
+                    onClick={() => {
+                      const current = new Date(booking.start);
+                      setRescheduleBooking(booking);
+                      setRescheduleDate(current.toISOString().slice(0, 10));
+                      setRescheduleTime(current.toTimeString().slice(0, 5));
+                      setRescheduleEndTime(new Date(booking.end).toTimeString().slice(0, 5));
+                    }}
+                  >
+                    {booking.imageUrl ? (
+                      <img
+                        src={booking.imageUrl}
+                        alt={booking.hostCompanyName || booking.roomName}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,#050505_0%,#050505_48%,#f4f4f4_48%,#f4f4f4_52%,#171717_52%,#171717_100%)] px-6 text-center">
+                        <span className="text-2xl font-semibold tracking-tight text-white mix-blend-difference">{booking.hostCompanyName || booking.roomName}</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/5" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="rounded-full bg-black/60 px-4 py-1.5 text-sm font-semibold text-white">
+                        {['cancelled', 'completed'].includes(normalizedStatus) ? "View Booking" : "Reschedule"}
+                      </span>
+                    </div>
+                    <div className="absolute inset-x-2 bottom-2 flex justify-end">
+                      <span className="rounded-lg bg-white px-2.5 py-1 text-xs font-normal text-black">Meeting Room</span>
+                    </div>
+                  </button>
+                  <div className="flex flex-col gap-1 px-4 pr-1">
+                    <p className="truncate text-xs font-semibold md:text-sm" title={booking.hostCompanyName || booking.roomName}>
+                      {booking.hostCompanyName || booking.roomName}
+                    </p>
+                    <div className="flex w-full items-center justify-between gap-2">
+                      <p className="truncate text-xs font-medium text-gray-600 md:text-sm" title={booking.roomName}>
+                        {booking.roomName}
+                      </p>
+                      <span className="shrink-0 text-xs font-medium capitalize text-gray-600 md:text-sm">{normalizedStatus}</span>
+                    </div>
+                    <p className="truncate text-xs text-gray-500">
+                      {start.toLocaleDateString()} · {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}–{end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+          <Dialog
+            open={Boolean(rescheduleBooking)}
+            onClose={() => !reschedulePending && setRescheduleBooking(null)}
+            fullWidth
+            maxWidth="sm"
+            PaperProps={{ sx: { borderRadius: 4, overflow: "hidden" } }}
+          >
+            <div className="bg-black px-6 py-5 text-white">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#00AEEF]">Meeting room booking</p>
+              <DialogTitle sx={{ p: 0, mt: 0.75, color: "white", fontWeight: 700 }}>
+                Reschedule {rescheduleBooking?.roomName}
+              </DialogTitle>
+            </div>
+            <DialogContent sx={{ p: 3 }}>
+              {rescheduleBooking && (
+                <div className="mb-5 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Current booking</p>
+                  <p className="mt-1 font-semibold text-black">{rescheduleBooking.bookingCode}</p>
+                  <p className="mt-1 text-sm text-gray-600">
+                    {new Date(rescheduleBooking.start).toLocaleDateString()} · {new Date(rescheduleBooking.start).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} – {new Date(rescheduleBooking.end).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+              )}
+              <p className="mb-5 text-sm text-gray-600">Choose a new slot. Your paid duration and price remain unchanged.</p>
+              <div className="grid gap-4 sm:grid-cols-3">
+              <TextField
+                label="New date"
+                type="date"
+                value={rescheduleDate}
+                onChange={(event) => setRescheduleDate(event.target.value)}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{ min: new Date().toISOString().slice(0, 10) }}
+                fullWidth
+              />
+              <TextField
+                label="New start time"
+                type="time"
+                value={rescheduleTime}
+                onChange={(event) => setRescheduleTime(event.target.value)}
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+              />
+              <TextField
+                label="New end time"
+                type="time"
+                value={rescheduleEndTime}
+                onChange={(event) => setRescheduleEndTime(event.target.value)}
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+              />
+              </div>
+              <div className="mt-5 rounded-2xl border p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-gray-700">Selected duration</span>
+                  <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-black">
+                    {selectedDurationMinutes ? `${selectedDurationMinutes} min` : "—"}
+                  </span>
+                </div>
+                <div className={`mt-3 rounded-xl px-4 py-3 text-sm font-semibold ${
+                  availabilityChecking
+                    ? "bg-blue-50 text-blue-700"
+                    : availabilityData?.available
+                      ? "bg-emerald-50 text-emerald-700"
+                      : "bg-amber-50 text-amber-800"
+                }`} role="status">
+                  {availabilityChecking
+                    ? "Checking live availability…"
+                    : availabilityError
+                      ? availabilityError.response?.data?.message || "Availability could not be checked."
+                      : availabilityData?.message || "Select a valid date, start time, and end time."}
+                </div>
+              </div>
+            </DialogContent>
+            <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
+              <Button
+                onClick={() => setRescheduleBooking(null)}
+                disabled={reschedulePending}
+                sx={{ borderRadius: 999, px: 3, color: "black" }}
+              >Cancel</Button>
+              <Button
+                variant="contained"
+                onClick={() => submitReschedule()}
+                disabled={!availabilityData?.available || availabilityChecking || reschedulePending}
+                sx={{ borderRadius: 999, px: 4, bgcolor: "black", "&:hover": { bgcolor: "#333" } }}
+              >
+                {reschedulePending ? "Checking…" : "Confirm reschedule"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+        </Container>
+      )}
     </div>
   );
 };

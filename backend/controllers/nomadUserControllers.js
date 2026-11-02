@@ -95,6 +95,104 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
+export const getWebsiteBookings = async (req, res, next) => {
+  try {
+    if (!req.userData?._id || !req.userData?.email) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const token = String(req.query?.token || "").trim();
+
+    const secret = String(process.env.BOOKING_SYNC_SECRET || "").trim();
+    if (!secret) {
+      return res.status(503).json({ message: "Booking sync is not configured" });
+    }
+
+    const response = await fetch(
+      `${String(process.env.HOST_PANEL_BE || (process.env.NODE_ENV === "production" ? "https://hostpanel.wono.co" : "http://localhost:5006")).replace(/\/+$/, "")}/api/public/booking/nomad-bookings?${token ? `token=${encodeURIComponent(token)}` : `email=${encodeURIComponent(String(req.userData.email).trim().toLowerCase())}`}`,
+      {
+        headers: { "x-booking-sync-secret": secret, Accept: "application/json" },
+        signal: typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(8_000) : undefined,
+      },
+    );
+    const data = await response.json().catch(() => ({}));
+    return res.status(response.status).json(data);
+  } catch (error) {
+    error.status = 503;
+    error.message = "Bookings are temporarily unavailable";
+    next(error);
+  }
+};
+
+export const rescheduleWebsiteBooking = async (req, res, next) => {
+  try {
+    const email = String(req.userData?.email || "").trim().toLowerCase();
+    if (!req.userData?._id || !email) return res.status(401).json({ message: "Unauthorized" });
+    const bookingId = String(req.params?.bookingId || "").trim();
+    const start = String(req.body?.start || "").trim();
+    const end = String(req.body?.end || "").trim();
+    if (!bookingId || !start || !end) {
+      return res.status(400).json({ message: "Booking, start time, and end time are required" });
+    }
+    const secret = String(process.env.BOOKING_SYNC_SECRET || "").trim();
+    if (!secret) return res.status(503).json({ message: "Booking sync is not configured" });
+
+    const response = await fetch(
+      `${String(process.env.HOST_PANEL_BE || (process.env.NODE_ENV === "production" ? "https://hostpanel.wono.co" : "http://localhost:5006")).replace(/\/+$/, "")}/api/public/booking/nomad-bookings/${encodeURIComponent(bookingId)}/reschedule`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "x-booking-sync-secret": secret,
+        },
+        body: JSON.stringify({ email, start, end }),
+        signal: typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(8_000) : undefined,
+      },
+    );
+    const data = await response.json().catch(() => ({}));
+    return res.status(response.status).json(data);
+  } catch (error) {
+    error.status = 503;
+    error.message = "Booking reschedule is temporarily unavailable";
+    next(error);
+  }
+};
+
+export const checkWebsiteBookingRescheduleAvailability = async (req, res, next) => {
+  try {
+    const email = String(req.userData?.email || "").trim().toLowerCase();
+    if (!req.userData?._id || !email) return res.status(401).json({ message: "Unauthorized" });
+    const bookingId = String(req.params?.bookingId || "").trim();
+    const start = String(req.body?.start || "").trim();
+    const end = String(req.body?.end || "").trim();
+    if (!bookingId || !start || !end) {
+      return res.status(400).json({ message: "Booking, start time, and end time are required" });
+    }
+    const secret = String(process.env.BOOKING_SYNC_SECRET || "").trim();
+    if (!secret) return res.status(503).json({ message: "Booking sync is not configured" });
+
+    const response = await fetch(
+      `${String(process.env.HOST_PANEL_BE || (process.env.NODE_ENV === "production" ? "https://hostpanel.wono.co" : "http://localhost:5006")).replace(/\/+$/, "")}/api/public/booking/nomad-bookings/${encodeURIComponent(bookingId)}/reschedule-availability`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "x-booking-sync-secret": secret,
+        },
+        body: JSON.stringify({ email, start, end }),
+        signal: typeof AbortSignal?.timeout === "function" ? AbortSignal.timeout(8_000) : undefined,
+      },
+    );
+    const data = await response.json().catch(() => ({}));
+    return res.status(response.status).json(data);
+  } catch (error) {
+    error.status = 503;
+    error.message = "Availability is temporarily unavailable";
+    next(error);
+  }
+};
+
 export const updateProfile = async (req, res) => {
   try {
     console.log("profile");

@@ -117,8 +117,16 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
           {t.leadSubmitError}
         </p>) : null}
 
+      {t.leadAvailability?.message ? (<p
+        className="col-span-2 text-[13px]"
+        role="status"
+        style={{ color: t.leadAvailability.status === "available" ? "#087f5b" : t.leadAvailability.status === "unavailable" ? "#c0392b" : "var(--t-muted)" }}
+      >
+          {t.leadAvailability.message}
+        </p>) : null}
+
       <div className="col-span-2">
-        <button type="submit" disabled={t.leadSubmitPending} className={`tp-btn tp-btn-primary ${compact ? "" : "w-full"}`}>
+        <button type="submit" disabled={t.leadSubmitPending || t.leadAvailability?.status === "unavailable" || t.leadAvailability?.status === "checking"} className={`tp-btn tp-btn-primary ${compact ? "" : "w-full"}`}>
           {t.leadSubmitPending ? "Sending…" : def.submitLabel}
         </button>
       </div>
