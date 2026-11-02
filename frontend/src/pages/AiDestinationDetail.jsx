@@ -8,6 +8,11 @@ import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 import { CalendarDays, MapPin, Star } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Map from "../components/Map";
+import LeafRatings from "../components/LeafRatings";
+import ReviewCard from "../components/ReviewCard";
+import renderStars from "../utils/renderStarts";
+import ContentShareButton from "../components/ContentShareButton";
+import ContentFavoriteButton from "../components/ContentFavoriteButton";
 import MuiModal from "../components/Modal";
 import SecondaryButton from "../components/SecondaryButton";
 import { annualEvents, popularPlaces } from "../data/aiDestinationHighlights";
@@ -26,7 +31,6 @@ const getInitials = (name = "") =>
     .join("")
     .slice(0, 2);
 
-const emptyReviewPromptBottomSpacing = "1.5rem";
 const PLACE_DETAIL_GUIDE_SEEN_KEY = "wono-place-detail-guide-seen";
 const EVENT_DETAIL_GUIDE_SEEN_KEY = "wono-event-detail-guide-seen";
 const ARE_GUIDES_TEMPORARILY_DISABLED = false;
@@ -58,6 +62,17 @@ const normalizePlaceItem = (place = {}) => ({
   googleMapsLink: place.googleMapsLink || place.googleMap || "",
 });
 
+const normalizeEventItem = (event = {}) => ({
+  ...event,
+  id: event._id || event.id,
+  title: event.eventName || event.title,
+  image: event.mainImage || event.image,
+  location: event.venue || event.destination || event.location,
+  meta: event.month || event.meta,
+  subtitle: event.month || event.subtitle,
+  description: event.shortDescription || event.description,
+});
+
 const getStoredPreviewItem = (search = "") => {
   const previewKey = new URLSearchParams(search).get("previewKey");
   if (!previewKey) return null;
@@ -79,12 +94,23 @@ const AiDestinationDetail = ({ type }) => {
   const axiosPrivate = useAxiosPrivate();
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
+  const [selectedReview, setSelectedReview] = useState(null);
   const hasAutoStartedPlaceDetailGuideRef = useRef(false);
   const hasAutoStartedEventDetailGuideRef = useRef(false);
   const isEvent = type === "event";
   const isRestaurant = type === "restaurant";
   const isReviewEnabled = !isRestaurant;
   const fallback = type === "event" ? annualEvents[0] : popularPlaces[0];
+  const isPreview = new URLSearchParams(location.search).has("previewKey");
+  const { data: eventDetails } = useQuery({
+    queryKey: ["eventDetails", eventId],
+    queryFn: async () => {
+      const response = await axios.get(`/events/${eventId}`);
+      return response.data;
+    },
+    enabled: isEvent && !!eventId && !isPreview,
+    refetchOnWindowFocus: false,
+  });
   const { data: placeDetails } = useQuery({
     queryKey: ["placeDetails", placeId],
     queryFn: async () => {
@@ -94,9 +120,11 @@ const AiDestinationDetail = ({ type }) => {
     enabled: type === "place" && !!placeId,
     refetchOnWindowFocus: false,
   });
-  const item = placeDetails
-    ? normalizePlaceItem(placeDetails)
-    : location.state?.item || getStoredPreviewItem(location.search) || fallback;
+  const item = eventDetails
+    ? normalizeEventItem(eventDetails)
+    : placeDetails
+      ? normalizePlaceItem(placeDetails)
+      : location.state?.item || getStoredPreviewItem(location.search) || fallback;
   const mapLatitude = toValidCoordinate(item.lat ?? item.latitude);
   const mapLongitude = toValidCoordinate(item.lng ?? item.longitude);
   const hasMapCoordinates =
@@ -197,8 +225,13 @@ const AiDestinationDetail = ({ type }) => {
     },
   });
 
-  const hasCompactEmptyReviewPrompt =
-    isReviewEnabled && !isReviewsLoading && reviews.length === 0;
+  const ratedReviews = reviews.filter((review) => {
+    const rating = Number(review.starCount);
+    return Number.isFinite(rating) && rating >= 1 && rating <= 5;
+  });
+  const averageRating = ratedReviews.length
+    ? Number((ratedReviews.reduce((sum, review) => sum + Number(review.starCount), 0) / ratedReviews.length).toFixed(1))
+    : null;
   const placeMapLocations = hasMapCoordinates
     ? [
         {
@@ -449,6 +482,12 @@ const AiDestinationDetail = ({ type }) => {
           <h1 className="text-2xl font-bold text-black md:text-title">
             {item.title}
           </h1>
+          {(type === "place" || isEvent) && !isPreview && (
+            <div className="flex shrink-0 items-center gap-2">
+              <ContentShareButton title={item.title} url={window.location.href} kind={type} />
+              {item._id && <ContentFavoriteButton item={item} kind={type} variant="detail" />}
+            </div>
+          )}
           {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
           {type === "place" && (
             <button
@@ -526,64 +565,65 @@ const AiDestinationDetail = ({ type }) => {
       </section>
 
       {isReviewEnabled && (
-        <section
-          className={`pt-8 ${hasCompactEmptyReviewPrompt ? "" : "pb-8"}`}
-          style={{
-            "--empty-review-prompt-bottom-spacing":
-              emptyReviewPromptBottomSpacing,
-          }}
-        >
-          <div className="mb-8 text-center">
+        <section className="flex w-full flex-col gap-8 pt-8 pb-8">
+          {averageRating !== null && (
+            <div className="flex flex-col justify-center items-center max-w-4xl mx-auto">
+              <h2 className="text-4xl md:text-6xl lg:text-main-header font-medium mt-5">
+                <LeafRatings ratings={averageRating} align="items-start" />
+              </h2>
+              <p className="text-subtitle my-4 font-medium">Guest Favorite</p>
+              <span className="text-content text-center">
+                This {isEvent ? "event" : "place"} is a guest favourite based on <br /> ratings, reviews
+                and reliability
+              </span>
+            </div>
+          )}
+          <div className="flex overflow-x-auto gap-6 px-4 md:px-0 scrollbar-hide snap-x snap-mandatory pb-4 w-full items-center">
+            {isReviewsLoading ? (
+              <p role="status" className="w-full text-sm text-gray-500 text-center">
+                Loading reviews...
+              </p>
+            ) : reviews.length === 0 ? (
+              <div className="border-2 border-dotted border-gray-300 rounded-xl p-6 text-center text-sm text-gray-500 h-40 flex justify-center items-center w-full">
+                Share your experience and leave a review.
+              </div>
+            ) : (
+              reviews.map((review) => (
+                <div key={review._id} className="w-full md:w-[calc((100%-3rem)/3)] flex-shrink-0 snap-center h-full">
+                  <ReviewCard
+                    review={review}
+                    handleClick={() => setSelectedReview(review)}
+                    reviewTextClassName="h-[60px]"
+                  />
+                </div>
+              ))
+            )}
+          </div>
+          <div className="flex justify-center">
             <button
               type="button"
               data-tour={isEvent ? "event-write-review" : "place-write-review"}
               onClick={handleWriteReviewClick}
-              className="rounded-full bg-primary-blue px-8 py-3 text-sm font-semibold text-white"
+              className="flex rounded-full items-center cursor-pointer justify-center gap-2 bg-primary-blue hover:bg-secondary-light text-primary text-content leading-5 px-6 py-3"
             >
               WRITE A REVIEW
             </button>
           </div>
-          <div className="space-y-7">
-            {isReviewsLoading ? (
-              <p className="text-sm text-gray-500 text-center">
-                Loading reviews...
-              </p>
-            ) : reviews.length === 0 ? (
-              <p className="mb-[var(--empty-review-prompt-bottom-spacing)] text-center text-sm text-gray-500">
-                Share your experience and leave a review.
-              </p>
-            ) : (
-              reviews.map((review) => (
-                <article key={review._id}>
-                  <div className="mb-2 flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-blue text-xs font-semibold text-white">
-                      {getInitials(review.name) || "A"}
-                    </span>
-                    <strong className="text-sm">{review.name}</strong>
-                  </div>
-                  <div className="mb-1 flex gap-1">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <Star
-                        key={index}
-                        size={14}
-                        fill={
-                          index < review.starCount ? "currentColor" : "none"
-                        }
-                        className={
-                          index < review.starCount
-                            ? "text-black"
-                            : "text-gray-300"
-                        }
-                      />
-                    ))}
-                  </div>
-                  <p className="text-sm">{review.description}</p>
-                </article>
-              ))
-            )}
-          </div>
         </section>
       )}
+
+      <MuiModal open={!!selectedReview} onClose={() => setSelectedReview(null)} title="Review">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary-blue flex items-center justify-center text-white font-semibold text-lg uppercase">
+              {getInitials(selectedReview?.name) || "A"}
+            </div>
+            <p className="font-semibold text-base">{selectedReview?.name}</p>
+          </div>
+          <div className="flex items-center gap-1 text-black text-sm">{renderStars(selectedReview?.starCount || 0)}</div>
+          <p className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">{selectedReview?.description}</p>
+        </div>
+      </MuiModal>
 
       {hasMapCoordinates && (
         <section

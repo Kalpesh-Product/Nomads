@@ -39,6 +39,28 @@ const blogSchema = new mongoose.Schema({
         default: "",
         maxlength: 500,
     },
+    deletionReason: {
+        type: String,
+        trim: true,
+        maxlength: 500,
+        default: "",
+    },
+    reviewedAt: { type: Date, default: null },
+    reviewedBy: { type: String, default: "", trim: true },
+    reviewedById: { type: String, default: "", trim: true },
+    lastEditedAt: { type: Date, default: null },
+    moderationHistory: [{
+        _id: false,
+        status: { type: String, enum: ["pending", "approved", "rejected"], required: true },
+        date: { type: Date, required: true },
+        reason: { type: String, default: "", maxlength: 500 },
+        actor: { type: String, default: "Master Panel" },
+        actorId: { type: String, default: "", trim: true },
+    }],
+    deletedAt: {
+        type: Date,
+        default: null,
+    },
     contributor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "NomadUser",

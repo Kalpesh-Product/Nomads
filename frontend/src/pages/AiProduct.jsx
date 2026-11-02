@@ -24,6 +24,7 @@ import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import DetailIconButton from "../components/DetailIconButton";
 import { FiShare2 } from "react-icons/fi";
 import { ArrowLeft, Globe } from "lucide-react";
 import {
@@ -1276,14 +1277,12 @@ const AiProduct = () => {
                   </h1>
                   <div className="items-center flex gap-2">
                     <div>
-                      <button
-                        type="button"
+                      <DetailIconButton
+                        aria-label="Share this listing"
                         onClick={() => setShareMenuOpen(true)}
-                        className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 py-1 mr-2 text-small text-gray-600 transition hover:border-gray-400 hover:text-gray-900"
                       >
-                        <FiShare2 className="text-gray-600" size={14} />
-                        Share
-                      </button>
+                        <FiShare2 size={22} aria-hidden="true" />
+                      </DetailIconButton>
                     </div>
 
                     {companyDetails?.websiteTemplateLink && (
@@ -1299,7 +1298,9 @@ const AiProduct = () => {
                       </div>
                     )}
 
-                    <div
+                    <DetailIconButton
+                      aria-label={heartClicked ? "Remove from favorites" : "Add to favorites"}
+                      aria-pressed={!!heartClicked}
                       onClick={() => {
                         if (!userId) {
                           navigate("/login");
@@ -1309,14 +1310,13 @@ const AiProduct = () => {
                         setHeartClicked(newLiked);
                         toggleLike(newLiked);
                       }}
-                      className="cursor-pointer relative"
                     >
                       {heartClicked ? (
                         <IoIosHeart className="text-[#ff5757]" size={22} />
                       ) : (
                         <IoIosHeartEmpty size={22} />
                       )}
-                    </div>
+                    </DetailIconButton>
                   </div>
                 </div>
 
@@ -2270,12 +2270,12 @@ const AiProduct = () => {
                   </h1>
 
                   <div className="flex items-center justify-center sm:justify-start gap-3 md:gap-4">
-                    <button
-                      type="button"
+                    <DetailIconButton
+                      aria-label="Share this listing"
                       onClick={() => setShareMenuOpen(true)}
                     >
-                      <FiShare2 className="text-gray-600" size={17} />
-                    </button>
+                      <FiShare2 size={22} aria-hidden="true" />
+                    </DetailIconButton>
 
                     {companyDetails?.websiteTemplateLink && (
                       <a
@@ -2291,7 +2291,9 @@ const AiProduct = () => {
                       </a>
                     )}
 
-                    <div
+                    <DetailIconButton
+                      aria-label={heartClicked ? "Remove from favorites" : "Add to favorites"}
+                      aria-pressed={!!heartClicked}
                       onClick={() => {
                         if (!userId) {
                           navigate("/login");
@@ -2301,14 +2303,13 @@ const AiProduct = () => {
                         setHeartClicked(newLiked);
                         toggleLike(newLiked);
                       }}
-                      className="cursor-pointer relative"
                     >
                       {heartClicked ? (
                         <IoIosHeart className="text-[#ff5757]" size={22} />
                       ) : (
                         <IoIosHeartEmpty size={22} />
                       )}
-                    </div>
+                    </DetailIconButton>
                   </div>
                 </div>
 
