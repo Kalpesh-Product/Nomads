@@ -7,5 +7,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0', // Allow access from other devices
     port: 5173, // Optional: Specify a port (default is 5173)
+    allowedHosts: true,
   },
 });
