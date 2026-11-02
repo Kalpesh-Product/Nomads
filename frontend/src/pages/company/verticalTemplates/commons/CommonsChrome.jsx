@@ -207,20 +207,20 @@ export const CommonsStickyBar = () => {
     t.mobileMenuOpen
   )
     return null;
-  return (
-    <div
-      className="fixed inset-x-0 bottom-0 z-40 border-t-2 p-3 lg:hidden"
-      style={{ background: "var(--t-raised)", borderColor: "var(--t-text)" }}
-    >
-      <button
-        type="button"
-        className="tp-btn tp-btn-primary w-full"
-        onClick={() => openLead(primary)}
-      >
-        {profile.labels.cta} {Icon.arrow(16)}
-      </button>
-    </div>
-  );
+  // return (
+  //   <div
+  //     className="fixed inset-x-0 bottom-0 z-40 border-t-2 p-3 lg:hidden"
+  //     style={{ background: "var(--t-raised)", borderColor: "var(--t-text)" }}
+  //   >
+  //     <button
+  //       type="button"
+  //       className="tp-btn tp-btn-primary w-full"
+  //       onClick={() => openLead(primary)}
+  //     >
+  //       {profile.labels.cta} {Icon.arrow(16)}
+  //     </button>
+  //   </div>
+  // );
 };
 export const CommonsFooter = () => {
   const { t, draft, services, primary, profile, openLead, c } = useTpl();

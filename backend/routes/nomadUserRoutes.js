@@ -16,6 +16,7 @@ import {
   saveListings,
   trackDestinationView,
   trackListingView,
+  getContributorRoles,
   updateProfile,
 } from "../controllers/nomadUserControllers.js";
 
@@ -27,6 +28,7 @@ router.patch("/website-bookings/:bookingId/reschedule", rescheduleWebsiteBooking
 router.post("/website-bookings/:bookingId/reschedule-availability", checkWebsiteBookingRescheduleAvailability);
 router.patch("/profile/:userId", updateProfile);
 router.patch("/password/:userId", changePassword);
+router.get("/contributor-roles", getContributorRoles);
 router.patch("/favorite-destination", favoriteDestinations);
 router.get("/favorite-destination/:userId", getUserFavoriteDestinations);
 router.patch("/like", likeListings);

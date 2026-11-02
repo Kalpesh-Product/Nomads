@@ -12,12 +12,17 @@ import {
   verifyHostEmailOtp,
 } from "../controllers/form-controllers/b2bFormControllers.js";
 import upload, { uploadImages } from "../config/multerConfig.js";
+import { authenticateContributorSubmission } from "../middlewares/contributorAccess.js";
 import { getVerifyBusinessClick } from "../controllers/verifyBusinessClickController.js";
 const router = Router();
 
 router.post(
   "/add-new-b2c-form-submission",
   upload.single("resumeLink"),
+  (req, res, next) =>
+    req.body?.sheetName === "AI_Become_Contributor"
+      ? authenticateContributorSubmission(req, res, next)
+      : next(),
   addB2CformSubmission,
 );
 router.post(

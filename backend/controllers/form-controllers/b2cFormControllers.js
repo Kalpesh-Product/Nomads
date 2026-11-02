@@ -1027,7 +1027,7 @@ export const addB2CformSubmission = async (req, res, next) => {
             heroSubtitle: "Thank you for your interest in contributing to WONO.",
             greetingHtml: `
               <p style="margin:0 0 4px;">Hello ${data.fullName},</p>
-              <p class="email-text" style="margin:0;">Thank you for your interest in contributing to WONO. Our team has received your details and will get back to you shortly.</p>
+              <p class="email-text" style="margin:0;">Thank you for your interest in contributing to WONO. Our team has received your details and will approve your request within 2 working days.</p>
             `,
             detailsTitle: "Request Details",
             detailRows: [
@@ -1054,6 +1054,10 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     // Build payload
     const payload = config.map(validatedData);
+    if (sheetName === "AI_Become_Contributor") {
+      payload.nomadUser = req.userData?._id || null;
+      await BecomeContributor.create(payload);
+    }
 
     if (isFastResponseSheet) {
       responseSent = true;
@@ -1092,10 +1096,6 @@ export const addB2CformSubmission = async (req, res, next) => {
 
           if (sheetName === "AI_Workation") {
             await Workation.create(payload);
-          }
-
-          if (sheetName === "AI_Become_Contributor") {
-            await BecomeContributor.create(payload);
           }
 
           let sheetsWarning = null;
@@ -1240,10 +1240,6 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     if (sheetName === "AI_Workation") {
       await Workation.create(payload);
-    }
-
-    if (sheetName === "AI_Become_Contributor") {
-      await BecomeContributor.create(payload);
     }
 
     let sheetsWarning = null;

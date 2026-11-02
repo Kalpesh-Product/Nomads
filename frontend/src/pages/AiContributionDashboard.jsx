@@ -1,0 +1,674 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useQueries } from "@tanstack/react-query";
+import { FaCheck } from "react-icons/fa";
+import { HiPlus } from "react-icons/hi";
+import { HiOutlineChevronDown } from "react-icons/hi2";
+import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import Seo from "../components/Seo";
+import humanDate from "../utils/humanDate";
+
+const contributionPageConfig = {
+  blog: {
+    label: "Blog Contributions",
+    heading: "My Blog Contributions",
+    addLabel: "Add Blog",
+    emptyText: "You haven't added any blogs yet.",
+    draftEmptyText: "You don't have any saved drafts yet.",
+    submittedHeading: "Published Blogs",
+    draftHeading: "Saved As Drafts",
+    noStatusText: (status) => `No ${status} blogs found.`,
+    contentLabel: "Blog",
+    endpoint: "/blogs/my",
+    queryKey: "myBlogContributions",
+    detailsRoute: (item) => `/contributions/blog/${item._id || item.id}`,
+    flag: "isBlogger",
+    seoPath: "/contributions/blog",
+  },
+  news: {
+    label: "News Contributions",
+    heading: "My News Contributions",
+    addLabel: "Add News",
+    emptyText: "You haven't added any news yet.",
+    draftEmptyText: "You don't have any saved drafts yet.",
+    submittedHeading: "Published News",
+    draftHeading: "Saved As Drafts",
+    noStatusText: (status) => `No ${status} news found.`,
+    contentLabel: "News",
+    endpoint: "/news/my",
+    queryKey: "myNewsContributions",
+    detailsRoute: (item) => `/contributions/news/${item._id || item.id}`,
+    flag: "isNewsWriter",
+    seoPath: "/contributions/news",
+  },
+  event: {
+    label: "Event Contributions",
+    heading: "My Event Contributions",
+    addLabel: "Add Event",
+    emptyText: "You haven't added any events yet.",
+    draftEmptyText: "You don't have any saved drafts yet.",
+    submittedHeading: "Published Events",
+    draftHeading: "Saved As Drafts",
+    noStatusText: (status) => `No ${status} events found.`,
+    contentLabel: "Event",
+    endpoint: "/events/my",
+    queryKey: "myEventContributions",
+    detailsRoute: (item) => `/contributions/event/${item._id || item.id}`,
+    flag: "isEventWriter",
+    seoPath: "/contributions/event",
+  },
+  places: {
+    label: "Places Contributions",
+    heading: "My Places Contributions",
+    addLabel: "Add Place",
+    emptyText: "You haven't added any places yet.",
+    draftEmptyText: "You don't have any saved drafts yet.",
+    submittedHeading: "Published Places",
+    draftHeading: "Saved As Drafts",
+    noStatusText: (status) => `No ${status} places found.`,
+    contentLabel: "Place",
+    endpoint: "/places/my",
+    queryKey: "myPlaceContributions",
+    detailsRoute: (item) => `/contributions/places/${item._id || item.id}`,
+    flag: "isPlaceWriter",
+    seoPath: "/contributions/places",
+  },
+};
+
+const combinedContributionTypes = ["blog", "news", "event", "places"];
+
+const contributionTypeFilters = [
+  { label: "All", value: "all" },
+  { label: "Blogs", value: "blog" },
+  { label: "News", value: "news" },
+  { label: "Events", value: "event" },
+  { label: "Places", value: "places" },
+];
+
+const contributionFilterAliases = {
+  blogs: "blog",
+  blog: "blog",
+  news: "news",
+  events: "event",
+  event: "event",
+  places: "places",
+  place: "places",
+  all: "all",
+};
+
+const contributionFilterPaths = {
+  all: "/contributions/all",
+  blog: "/contributions/blog",
+  news: "/contributions/news",
+  event: "/contributions/event",
+  places: "/contributions/places",
+};
+
+const normalizeContributionFilter = (value) => {
+  const normalizedValue = String(value || "all").toLowerCase().trim();
+
+  return contributionFilterAliases[normalizedValue] || "all";
+};
+
+const getContributionFilterFromParams = (searchParams, fallback = "all") => {
+  const rawValue =
+    searchParams.get("type") ||
+    searchParams.get("filter") ||
+    searchParams.get("tab") ||
+    fallback;
+
+  return normalizeContributionFilter(rawValue);
+};
+
+const statusOptions = [
+  { label: "Show All", value: "all" },
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
+  { label: "Rejected", value: "rejected" },
+];
+
+const statusBadgeStyles = {
+  approved: "bg-green-100 text-green-700 border-green-200",
+  rejected: "bg-red-100 text-red-700 border-red-200",
+  pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+};
+
+const fallbackImage =
+  "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp";
+
+const statusSortOrder = {
+  pending: 0,
+  approved: 1,
+  rejected: 2,
+};
+
+const getContributionDate = (item) => item?.date || item?.updatedAt || item?.createdAt;
+
+const sortByStatusAndRecent = (entries) =>
+  [...entries].sort((a, b) => {
+    const aStatus = String(a.item?.status || "pending").toLowerCase();
+    const bStatus = String(b.item?.status || "pending").toLowerCase();
+    const statusDifference =
+      (statusSortOrder[aStatus] ?? Number.MAX_SAFE_INTEGER) -
+      (statusSortOrder[bStatus] ?? Number.MAX_SAFE_INTEGER);
+
+    if (statusDifference !== 0) return statusDifference;
+
+    return (
+      new Date(getContributionDate(b.item) || 0).getTime() -
+      new Date(getContributionDate(a.item) || 0).getTime()
+    );
+  });
+
+const ContributionStatusFilter = ({ value, onChange, label = "Contribution" }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const filterRef = useRef(null);
+  const selectedLabel =
+    statusOptions.find((option) => option.value === value)?.label || "Show All";
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  return (
+    <div className="flex w-full min-w-0 flex-wrap items-start gap-3 sm:w-auto sm:flex-nowrap">
+      <span className="mt-3 whitespace-nowrap font-play text-sm text-black/80">
+        Status Options
+      </span>
+      <div ref={filterRef} className="relative min-w-0 flex-1 sm:w-48 sm:flex-none">
+        <button
+          type="button"
+          onClick={() => setIsOpen((current) => !current)}
+          className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-full border border-sky-500 bg-sky-500 px-4 py-2 text-sm font-medium text-white"
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+        >
+          <span>{selectedLabel}</span>
+          <HiOutlineChevronDown
+            size={18}
+            className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {isOpen ? (
+          <div className="absolute right-0 top-full z-40 mt-3 w-full rounded-2xl border border-sky-100 bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.12)]">
+            <ul role="listbox" aria-label={`${label} status filter`}>
+              {statusOptions.map((option) => {
+                const isSelected = option.value === value;
+
+                return (
+                  <li key={option.value}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChange(option.value);
+                        setIsOpen(false);
+                      }}
+                      className={`group flex w-full items-center rounded-xl px-3 py-2 text-left text-sm transition-colors ${
+                        isSelected
+                          ? "bg-sky-50 font-medium text-sky-600"
+                          : "text-black/80 hover:bg-slate-50"
+                      }`}
+                      role="option"
+                      aria-selected={isSelected}
+                    >
+                      <span className="mr-2 inline-flex w-4 shrink-0 items-center justify-center">
+                        <FaCheck
+                          size={13}
+                          className={`text-primary-blue transition-opacity ${
+                            isSelected
+                              ? "opacity-100"
+                              : "opacity-0 group-hover:opacity-100"
+                          }`}
+                        />
+                      </span>
+                      <span>{option.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+};
+
+const ContributionCard = ({ item, config }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const status = (item.status || "pending").toLowerCase();
+  const title =
+    item.mainTitle ||
+    item.eventName ||
+    item.placeName ||
+    `Untitled ${config.contentLabel}`;
+  const image = item.mainImage || item.image || fallbackImage;
+  const destination = item.destination || item.location || "Destination";
+  const itemDate = item.date || item.updatedAt || item.createdAt;
+  const isEditableDraft =
+    item.isDraft && ["Blog", "News", "Event", "Place"].includes(config.contentLabel);
+  const detailsRoute =
+    typeof config.detailsRoute === "function"
+      ? config.detailsRoute(item)
+      : config.detailsRoute;
+  const detailStateContent =
+    config.contentLabel === "Event"
+      ? {
+          ...item,
+          id: item._id || item.id,
+          title: item.eventName || item.title,
+          image: item.mainImage || item.image,
+          location: item.venue || item.location,
+          meta: item.month || item.meta,
+          subtitle: item.month ? `During the month of ${item.month}` : item.subtitle,
+          description: item.shortDescription || item.description,
+          region: item.destination || item.region,
+        }
+      : config.contentLabel === "Place"
+        ? {
+            ...item,
+            id: item._id || item.id,
+            title: item.placeName || item.title,
+            image: item.mainImage || item.image,
+            location: item.address || item.location,
+            meta: item.rating || item.meta,
+            description: item.shortDescription || item.description,
+            category: item.category || item.placeType,
+            region: item.destination || item.region,
+            lat: item.latitude,
+            lng: item.longitude,
+          }
+      : item;
+
+  return (
+    <article className="flex min-w-0 w-full flex-col gap-2 rounded-lg bg-white text-left transition-all">
+      <div className="relative aspect-square overflow-hidden rounded-2xl bg-slate-100">
+        <img
+          src={image}
+          alt={title}
+          className="h-full w-full object-cover"
+          loading="lazy"
+        />
+        <button
+          type="button"
+          onClick={() =>
+            navigate(detailsRoute, {
+              state: {
+                content: item,
+                item: detailStateContent,
+                selectedStateLabel: destination,
+                sourceSearch: location.search,
+                stickyBreadcrumbs: [
+                  { label: "Contributions", path: "/contributions" },
+                  {
+                    label: contributionTypeFilters.find(
+                      ({ value }) => contributionFilterPaths[value] === config.seoPath,
+                    )?.label || config.label,
+                    path: config.seoPath,
+                  },
+                  { label: title },
+                ],
+                startEditing: isEditableDraft,
+              },
+            })
+          }
+          className="absolute left-1/2 top-1/2 inline-flex w-max max-w-[calc(100%_-_1rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/55 px-4 py-1.5 text-center text-xs font-medium text-white transition hover:bg-black/70 sm:w-auto sm:max-w-none"
+        >
+          {isEditableDraft
+            ? `Edit ${config.contentLabel} Draft`
+            : `View ${config.contentLabel} Content`}
+        </button>
+        {!item.isDraft ? (
+          <div className="absolute bottom-2 right-2">
+            <span
+              className={`rounded-full border px-2 py-1 text-[10px] font-semibold ${
+                statusBadgeStyles[status] || statusBadgeStyles.pending
+              }`}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </span>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="flex min-w-0 h-[25%] flex-col gap-1 px-4 pr-1">
+        <h3
+          className="truncate text-xs font-semibold md:text-sm"
+          title={title}
+        >
+          {title}
+        </h3>
+        <div className="flex w-full items-center justify-between gap-2">
+          <span
+            className="truncate text-xs font-medium text-gray-600 md:text-sm"
+            title={destination}
+          >
+            {destination}
+          </span>
+          <time
+            className="shrink-0 text-xs font-medium text-gray-600 md:text-sm"
+            dateTime={itemDate}
+          >
+            {humanDate(itemDate)}
+          </time>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+const ContributionTypeFilter = ({ value, onChange, availableTypes }) => {
+  const options = contributionTypeFilters.filter(
+    (option) => option.value === "all" || availableTypes.includes(option.value),
+  );
+
+  return (
+    <div className="contribution-type-filters flex flex-wrap items-center gap-y-2 text-lg font-play">
+      {options.map((option, index) => {
+        const isSelected = option.value === value;
+
+        return (
+          <React.Fragment key={option.value}>
+            {index > 0 ? (
+              <span className="mx-3 text-primary-blue/80">|</span>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => onChange(option.value)}
+              className={`transition-colors ${
+                isSelected
+                  ? "font-semibold text-black"
+                  : "text-black/40 hover:text-black/70"
+              }`}
+            >
+              {option.label}
+            </button>
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
+const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const axiosPrivate = useAxiosPrivate();
+  const { auth } = useAuth();
+  const userId = auth?.user?._id || auth?.user?.id;
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [contributionFilter, setContributionFilter] = useState(() =>
+    getContributionFilterFromParams(searchParams, initialFilter),
+  );
+  const isCombinedPage = type === "all";
+  const config = useMemo(() => {
+    if (isCombinedPage) {
+      return {
+        label: "All Contributions",
+        heading: "My Contributions",
+        emptyText: "You haven't added any contributions yet.",
+        draftEmptyText: "You don't have any saved drafts yet.",
+        submittedHeading: "Published",
+        draftHeading: "Saved As Drafts",
+        noStatusText: (status) => `No ${status} contributions found.`,
+        contentLabel: "Contribution",
+        seoPath: contributionFilterPaths[normalizeContributionFilter(initialFilter)],
+      };
+    }
+
+    return contributionPageConfig[type] || contributionPageConfig.blog;
+  }, [initialFilter, isCombinedPage, type]);
+  const accessibleTypes = useMemo(
+    () =>
+      combinedContributionTypes.filter((itemType) =>
+        Boolean(auth?.user?.[contributionPageConfig[itemType].flag]),
+      ),
+    [auth?.user],
+  );
+  const queryTypes = isCombinedPage
+    ? accessibleTypes
+    : [type].filter((itemType) => contributionPageConfig[itemType]);
+  const hasAccess = isCombinedPage
+    ? accessibleTypes.length > 0
+    : Boolean(auth?.user?.[config.flag]);
+  const urlContributionFilter = getContributionFilterFromParams(
+    searchParams,
+    initialFilter,
+  );
+
+  const handleContributionFilterChange = (nextFilter) => {
+    setContributionFilter(nextFilter);
+
+    if (!isCombinedPage) return;
+    navigate(contributionFilterPaths[nextFilter] || contributionFilterPaths.all);
+  };
+
+  const contributionQueries = useQueries({
+    queries: queryTypes.map((itemType) => {
+      const itemConfig = contributionPageConfig[itemType];
+
+      return {
+        queryKey: [itemConfig.queryKey, userId],
+        queryFn: async () => {
+          const response = await axiosPrivate.get(itemConfig.endpoint);
+          const items = Array.isArray(response.data?.data)
+            ? response.data.data
+            : [];
+
+          return items;
+        },
+        enabled: Boolean(userId) && Boolean(auth?.user?.[itemConfig.flag]),
+        staleTime: 1000 * 60,
+      };
+    }),
+  });
+
+  useEffect(() => {
+    if (!auth?.user) {
+      navigate("/login", {
+        replace: true,
+        state: {
+          redirectTo: config.seoPath,
+        },
+      });
+      return;
+    }
+
+    if (!hasAccess) {
+      navigate("/profile", { replace: true });
+    }
+  }, [auth?.user, config.seoPath, hasAccess, navigate]);
+
+  useEffect(() => {
+    if (!isCombinedPage) return;
+
+    const nextFilter =
+      urlContributionFilter === "all" ||
+      accessibleTypes.includes(urlContributionFilter)
+        ? urlContributionFilter
+        : "all";
+
+    setContributionFilter(nextFilter);
+  }, [accessibleTypes, isCombinedPage, urlContributionFilter]);
+
+  if (!auth?.user || !hasAccess) {
+    return null;
+  }
+
+  const contributions = contributionQueries.flatMap((query, index) => {
+    const itemType = queryTypes[index];
+    const itemConfig = contributionPageConfig[itemType];
+    const items = Array.isArray(query.data) ? query.data : [];
+
+    return items.map((item) => ({
+      item,
+      config: itemConfig,
+      itemType,
+    }));
+  });
+  const isContributionsLoading = contributionQueries.some(
+    (query) => query.isLoading,
+  );
+  const isContributionsError = contributionQueries.some((query) => query.isError);
+  const visibleContributions =
+    isCombinedPage && contributionFilter !== "all"
+      ? contributions.filter((entry) => entry.itemType === contributionFilter)
+      : contributions;
+  const selectedFilterConfig =
+    isCombinedPage && contributionFilter !== "all"
+      ? contributionPageConfig[contributionFilter]
+      : config;
+  const submittedContributions = visibleContributions.filter(
+    ({ item }) => !item.isDraft,
+  );
+  const filteredSubmittedContributions =
+    statusFilter === "all"
+      ? submittedContributions
+      : submittedContributions.filter(
+          ({ item }) => (item.status || "pending").toLowerCase() === statusFilter,
+        );
+  const sortedSubmittedContributions = sortByStatusAndRecent(
+    filteredSubmittedContributions,
+  );
+  const draftContributions = visibleContributions.filter(({ item }) => item.isDraft);
+  const hasContributionList = isCombinedPage || ["blog", "news", "event", "places"].includes(type);
+  const shouldShowStatusFilter =
+    isCombinedPage || submittedContributions.length > 0;
+  const shouldShowAddButton = !isCombinedPage || contributionFilter !== "all";
+
+  return (
+    <>
+      <Seo path={config.seoPath} />
+      <main className="mx-auto w-full max-w-[80rem] px-4 py-2 md:px-8 lg:px-8">
+        <div className="flex flex-col items-start gap-4 border-b border-black/10 pb-6 lg:flex-row lg:items-center lg:justify-between">
+          <h1 className="text-lg font-semibold text-black">{config.heading}</h1>
+          {isCombinedPage ? (
+            <ContributionStatusFilter
+              value={statusFilter}
+              onChange={setStatusFilter}
+              label={config.contentLabel}
+            />
+          ) : shouldShowAddButton ? (
+            <button
+              type="button"
+              onClick={() =>
+                navigate(`${selectedFilterConfig.seoPath}/add`, {
+                  state: { freshAdd: true, openForm: true },
+                })
+              }
+              className="inline-flex items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500"
+            >
+              <HiPlus size={18} />
+              {selectedFilterConfig.addLabel}
+            </button>
+          ) : null}
+        </div>
+
+        {hasContributionList ? (
+          <div className="mt-6 min-h-[28rem]">
+            {isContributionsLoading ? (
+              <p className="text-center text-sm text-slate-500">Loading...</p>
+            ) : isContributionsError ? (
+              <p className="text-center text-sm text-red-500">
+                Could not load your {config.contentLabel.toLowerCase()} contributions.
+              </p>
+            ) : (
+              <>
+                {isCombinedPage ? (
+                  <div className="mb-8 flex flex-col gap-4 lg:min-h-[44px] lg:flex-row lg:items-center lg:justify-between">
+                    <ContributionTypeFilter
+                      value={contributionFilter}
+                      onChange={handleContributionFilterChange}
+                      availableTypes={accessibleTypes}
+                    />
+                    {shouldShowAddButton ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(`${selectedFilterConfig.seoPath}/add`, {
+                            state: { freshAdd: true, openForm: true },
+                          })
+                        }
+                        className="inline-flex w-fit self-center items-center gap-1 rounded-full bg-primary-blue px-6 py-3 text-sm font-semibold uppercase text-white transition hover:bg-sky-500 sm:self-end lg:self-auto"
+                      >
+                        <HiPlus size={18} />
+                        {selectedFilterConfig.addLabel}
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <h2 className="text-base font-semibold text-black">
+                    {config.submittedHeading}
+                  </h2>
+                  {!isCombinedPage && shouldShowStatusFilter ? (
+                    <ContributionStatusFilter
+                      value={statusFilter}
+                      onChange={setStatusFilter}
+                      label={config.contentLabel}
+                    />
+                  ) : null}
+                </div>
+
+                {sortedSubmittedContributions.length > 0 ? (
+                  <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-5">
+                    {sortedSubmittedContributions.map(({ item, config: itemConfig }) => (
+                      <ContributionCard
+                        key={`${itemConfig.contentLabel}-${item._id || item.id}`}
+                        item={item}
+                        config={itemConfig}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-6 rounded-lg border border-dotted p-6 text-center text-sm text-gray-500">
+                    {statusFilter === "all"
+                      ? config.emptyText
+                      : config.noStatusText(statusFilter)}
+                  </div>
+                )}
+
+                <section className="mt-10">
+                  <h2 className="text-base font-semibold text-black">
+                    {config.draftHeading}
+                  </h2>
+                  {draftContributions.length > 0 ? (
+                    <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-5">
+                      {draftContributions.map(({ item, config: itemConfig }) => (
+                        <ContributionCard
+                          key={`${itemConfig.contentLabel}-draft-${item._id || item.id}`}
+                          item={item}
+                          config={itemConfig}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-6 rounded-lg border border-dotted p-6 text-center text-sm text-gray-500">
+                      {config.draftEmptyText}
+                    </div>
+                  )}
+                </section>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="flex min-h-[28rem] items-center justify-center text-center">
+            <p className="text-base text-gray-500">{config.emptyText}</p>
+          </div>
+        )}
+      </main>
+    </>
+  );
+};
+
+export default AiContributionDashboard;

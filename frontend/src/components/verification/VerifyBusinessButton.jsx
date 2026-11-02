@@ -14,6 +14,18 @@ const HOST_PANEL_URL = String(
     : import.meta.env.VITE_HOST_PANEL_URL || "https://host.wono.co",
 ).replace(/\/+$/, "");
 
+// host.wono.co (above) is only the marketing/signup front door — it has no
+// real login of its own. An already-registered host renewing their
+// verification needs the actual app, hostpanel.wono.co (same one
+// AiHostHeader/AiHostSidebar's "Login"/"Dashboard" links send existing hosts
+// to), which in local dev is the separate HostPanel client dev server, not
+// this Nomads dev server's own "host" tenant.
+const HOSTPANEL_APP_URL = String(
+  import.meta.env.DEV
+    ? import.meta.env.VITE_HOSTPANEL_APP_URL_DEV || "http://localhost:3006"
+    : import.meta.env.VITE_HOSTPANEL_APP_URL || "https://hostpanel.wono.co",
+).replace(/\/+$/, "");
+
 const VISITOR_ID_KEY = "wono_visitor_id";
 // Never hold the visitor up for long if the tracking call is slow.
 const TRACK_TIMEOUT_MS = 2500;
@@ -40,7 +52,21 @@ const getVisitorId = () => {
 // resulting badge, or a nudge to become a host. The nudge records which
 // listing's company the visitor wants to verify and carries that to the host
 // signup (?vc=<clickId>), which pre-fills the company from it.
-const VerifyBusinessButton = ({ companyId, businessId, isVerified }) => {
+//
+// A business that was verified before but has since lapsed (verified badge
+// off, but a past verificationExpiresAt exists) gets a different nudge: it
+// sends an already-registered host straight to login instead of signup, with
+// ?renewCompanyId= so HostPanel can offer to jump straight to Renew once
+// that owner/super_admin logs in for that exact company (see
+// resolvePostLoginRoute in HostPanel). A business that's still actively
+// verified but has the badge manually hidden (verificationExpiresAt in the
+// future) is not "expired" and falls through to the ordinary signup nudge.
+const VerifyBusinessButton = ({
+  companyId,
+  businessId,
+  isVerified,
+  verificationExpiresAt,
+}) => {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   if (!companyId) return null;
@@ -55,10 +81,17 @@ const VerifyBusinessButton = ({ companyId, businessId, isVerified }) => {
     );
   }
 
+  const hasExpiredVerification =
+    Boolean(verificationExpiresAt) &&
+    new Date(verificationExpiresAt).getTime() <= Date.now();
+
   const handleClick = async () => {
     if (isRedirecting) return;
     setIsRedirecting(true);
-    let target = `${HOST_PANEL_URL}/signup`;
+    // HostPanel's login page is mounted at "/", not "/login".
+    let target = hasExpiredVerification
+      ? `${HOSTPANEL_APP_URL}/?renewCompanyId=${encodeURIComponent(companyId)}`
+      : `${HOST_PANEL_URL}/signup`;
     try {
       const { data } = await api.post(
         "/company/verify-business-click",
@@ -72,16 +105,22 @@ const VerifyBusinessButton = ({ companyId, businessId, isVerified }) => {
         { timeout: TRACK_TIMEOUT_MS },
       );
       if (data?.clickId) {
-        target = `${target}?vc=${encodeURIComponent(data.clickId)}`;
+        target = `${target}${target.includes("?") ? "&" : "?"}vc=${encodeURIComponent(data.clickId)}`;
       }
     } catch {
-      // Tracking is best-effort: still send them on to sign up.
+      // Tracking is best-effort: still send them on.
     }
     window.location.href = target;
   };
 
   return (
-    <Tooltip title="Register to become a host to get verified badge">
+    <Tooltip
+      title={
+        hasExpiredVerification
+          ? "Verification expired — click to renew"
+          : "Register to become a host to get verified badge"
+      }
+    >
       <button
         type="button"
         onClick={handleClick}

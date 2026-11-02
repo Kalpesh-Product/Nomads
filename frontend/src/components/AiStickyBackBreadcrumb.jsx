@@ -17,7 +17,7 @@ const AiStickyBackBreadcrumb = ({
 
   return (
     <div
-      className={`${stickyClassName} z-[100] bg-white pt-0 pb-4 shadow-none md:px-10 ${className}`}
+      className={`${stickyClassName} z-30 bg-white pt-0 pb-4 shadow-none md:px-10 ${className}`}
     >
       <div
         data-tour={tourId}

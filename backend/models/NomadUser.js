@@ -74,6 +74,26 @@ const userSchema = new mongoose.Schema(
         ref: "StateWiseWeight",
       },
     ],
+    isBlogger: {
+      type: Boolean,
+      default: false,
+    },
+    isNewsWriter: {
+      type: Boolean,
+      default: false,
+    },
+    isEventWriter: {
+      type: Boolean,
+      default: false,
+    },
+    isPlaceWriter: {
+      type: Boolean,
+      default: false,
+    },
+    contributionsActivationEmailSentAt: {
+      type: Date,
+      default: null,
+    },
     refreshToken: {
       type: String,
     },

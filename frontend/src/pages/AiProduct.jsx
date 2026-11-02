@@ -1120,6 +1120,7 @@ const AiProduct = () => {
                 companyId={companyDetails?.companyId}
                 businessId={companyDetails?.businessId}
                 isVerified={companyDetails?.verifiedBadgeVisible}
+                verificationExpiresAt={companyDetails?.verificationExpiresAt}
               />
             </h1>
             {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.
@@ -2061,6 +2062,7 @@ const AiProduct = () => {
                 companyId={companyDetails?.companyId}
                 businessId={companyDetails?.businessId}
                 isVerified={companyDetails?.verifiedBadgeVisible}
+                verificationExpiresAt={companyDetails?.verificationExpiresAt}
               />
             </h1>
             {/* Guide button hidden for now. Uncomment when guides should be manually accessible again.

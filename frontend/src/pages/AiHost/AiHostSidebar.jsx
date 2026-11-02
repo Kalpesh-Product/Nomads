@@ -437,6 +437,15 @@ const SidebarSection = ({
 
 const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
   const [collapsed, setCollapsed] = useState(true);
+  // Sidebar width changes (duration-300 below) without ever firing a window
+  // resize — so react-fitty, which only recalculates on "resize"/
+  // "orientationchange" (see its source), keeps rendering text sized for the
+  // old, wider container and it overflows off-screen. Fire one once the
+  // width transition has settled.
+  useEffect(() => {
+    const timer = setTimeout(() => window.dispatchEvent(new Event("resize")), 320);
+    return () => clearTimeout(timer);
+  }, [collapsed]);
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
   const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
   const [isCommonFeaturesOpen, setIsCommonFeaturesOpen] = useState(false);

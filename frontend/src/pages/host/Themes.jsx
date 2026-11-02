@@ -1,70 +1,9 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GetStartedButton from "../../components/GetStartedButton";
 import Container from "../../components/Container";
 import MySeperator from "../../components/MySeperator";
-
-const themes = [
-  {
-    src: "/hosts/themes/biznest.png",
-    mockup: "/hosts/themes/biznestProduct.png",
-    alt: "BiznestImage",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/coworkingMewo.png",
-    mockup: "/hosts/themes/coworkingMewoProduct.png",
-    alt: "CoWorkingMewo",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/coworking.png",
-    mockup: "/hosts/themes/coworkingProduct.png",
-    alt: "Co-Working Image",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/boutique.png",
-    mockup: "/hosts/themes/boutiqueProduct.png",
-    alt: "Boutique Image",
-    tag: "boutique",
-  },
-  {
-    src: "/hosts/themes/coliving.png",
-    mockup: "/hosts/themes/colivingProduct.png",
-    alt: "Co-Living Image",
-    tag: "co-living",
-  },
-  {
-    src: "/hosts/themes/coworking2.png",
-    mockup: "/hosts/themes/coworkingNomadProduct.png",
-    alt: "CoLivingImage_2",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/coworking3.png",
-    mockup: "/hosts/themes/coworking3Product.png",
-    alt: "CoLivingImage_3",
-    tag: "co-working",
-  },
-  {
-    src: "/hosts/themes/cafe2.png",
-    mockup: "/hosts/themes/cafe2Product.png",
-    alt: "Cafe_2",
-    tag: "cafe",
-  },
-  {
-    src: "/hosts/themes/cafe3.png",
-    mockup: "/hosts/themes/cafe3Product.png",
-    alt: "Cafe_3",
-    tag: "cafe",
-  },
-  {
-    src: "/hosts/themes/hostels.png",
-    mockup: "/hosts/themes/hostelsProduct.png",
-    alt: "Hostels",
-    tag: "hostels",
-  },
-];
+import { VERTICAL_TEMPLATE_CATALOG, VERTICAL_FILTERS } from "../../constants/verticalTemplateCatalog";
 
 const themeWebsiteGridData = [
   {
@@ -122,6 +61,11 @@ const supportItems = [
 
 const Themes = () => {
   const navigate = useNavigate();
+  const [verticalFilter, setVerticalFilter] = useState("all");
+  const filteredTemplates =
+    verticalFilter === "all"
+      ? VERTICAL_TEMPLATE_CATALOG
+      : VERTICAL_TEMPLATE_CATALOG.filter((template) => template.tag === verticalFilter);
   return (
     <div className="   text-secondary-dark justify-center items-center">
       <Container>
@@ -147,21 +91,37 @@ const Themes = () => {
                 business growth. Fully tech ready, integrated and responsive.
               </span>
             </div>
+            <div className="flex flex-wrap gap-3">
+              {VERTICAL_FILTERS.map((filter) => (
+                <button
+                  key={filter.value}
+                  type="button"
+                  onClick={() => setVerticalFilter(filter.value)}
+                  className={`rounded-full border px-5 py-2 text-sm font-semibold transition-colors ${
+                    verticalFilter === filter.value
+                      ? "border-black bg-black text-white"
+                      : "border-black/20 text-secondary-dark hover:border-black/60"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
             <div className="flex overflow-x-auto gap-6 snap-x snap-mandatory scrollbar-hide lg:grid lg:grid-cols-2 lg:gap-10 lg:overflow-visible">
-              {themes.map((image, index) => (
+              {filteredTemplates.map((template) => (
                 <div
                   data-aos="fade-up"
-                  className="flex-shrink-0 w-[85vw] md:w-[45vw] h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] snap-start lg:w-full"
-                  onClick={() => navigate("products", { state: { image } })}
-                  key={index}
+                  className="flex-shrink-0 w-[85vw] md:w-[45vw] h-full overflow-hidden rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] snap-start lg:w-full cursor-pointer"
+                  onClick={() => {
+                    navigate("products", { state: { template } });
+                    window.scrollTo({ top: 0, behavior: "instant" });
+                  }}
+                  key={template.id}
                 >
                   <img
                     className="rounded-xl w-full h-full object-cover transition-transform duration-500 ease hover:scale-[1.2] cursor-pointer origin-center"
-                    onClick={() => {
-                      window.scrollTo({ top: 0, behavior: "instant" });
-                    }}
-                    src={image.src}
-                    alt={image.alt}
+                    src={template.heroImage}
+                    alt={`${template.name} theme`}
                   />
                 </div>
               ))}

@@ -3,8 +3,102 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Blog from "../models/Blog.js";
 import TestBlog from "../models/TestBlog.js";
+import { uploadFileToS3 } from "../config/s3Config.js";
 
 const RSS2JSON_BASE = "https://api.rss2json.com/v1/api.json";
+
+const sanitizeS3PathSegment = (value, fallback = "untitled") => {
+    const cleaned = String(value || "")
+        .replace(/[/\\?%*:|"<>]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    return cleaned || fallback;
+};
+
+const sanitizeFileName = (value, fallback = "image") => {
+    const cleaned = String(value || "")
+        .replace(/[/\\?%*:|"<>]/g, "_")
+        .replace(/\s+/g, "_")
+        .trim();
+
+    return cleaned || fallback;
+};
+
+const getS3KeyFromUrl = (fileUrl) => {
+    try {
+        if (!fileUrl) return "";
+        const url = new URL(fileUrl);
+        return decodeURIComponent(url.pathname.slice(1));
+    } catch {
+        return "";
+    }
+};
+
+const parseSections = (sections) => {
+    if (Array.isArray(sections)) return sections;
+
+    if (typeof sections !== "string") return [];
+
+    try {
+        const parsed = JSON.parse(sections);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+};
+
+const buildBlogPayloadWithUploads = async (req) => {
+    const payload = {
+        ...req.body,
+        sections: parseSections(req.body.sections),
+    };
+    const files = Array.isArray(req.files) ? req.files : [];
+
+    if (!files.length) return payload;
+
+    const destinationFolder = sanitizeS3PathSegment(payload.destination, "Destination");
+    const blogFolder = sanitizeS3PathSegment(payload.mainTitle, "Blog");
+    const baseFolder = `nomads/blogs/${destinationFolder}/${blogFolder}`;
+    const mainImageFile = files.find((file) => file.fieldname === "mainImageFile");
+
+    if (mainImageFile) {
+        const key =
+            getS3KeyFromUrl(payload.mainImage) ||
+            `${baseFolder}/Main Image/${sanitizeFileName(mainImageFile.originalname)}`;
+        const uploaded = await uploadFileToS3(key, mainImageFile);
+        payload.mainImage = uploaded.url;
+    }
+
+    const sectionImageUploads = files
+        .map((file) => {
+            const match = file.fieldname.match(/^sectionImageFiles\[(\d+)\]$/);
+            return match ? { index: Number(match[1]), file } : null;
+        })
+        .filter(Boolean);
+
+    await Promise.all(
+        sectionImageUploads.map(async ({ index, file }) => {
+            if (!payload.sections[index]) {
+                payload.sections[index] = { title: "", content: "", image: "" };
+            }
+
+            const key =
+                getS3KeyFromUrl(payload.sections[index].image) ||
+                `${baseFolder}/Section ${index + 1} Image/${sanitizeFileName(
+                    file.originalname,
+                )}`;
+            const uploaded = await uploadFileToS3(key, file);
+
+            payload.sections[index] = {
+                ...payload.sections[index],
+                image: uploaded.url,
+            };
+        }),
+    );
+
+    return payload;
+};
 
 // RSS feeds for different locations (can expand later)
 // const RSS_FEEDS = {
@@ -59,11 +153,18 @@ const RSS_FEEDS = {
 export const getBlogs = async (req, res, next) => {
     try {
         const { keyword, destination } = req.query;
-        let query = {};
+        let query = {
+            isDraft: { $ne: true },
+            isActive: { $ne: false },
+            $or: [{ status: "approved" }, { status: { $exists: false } }],
+        };
 
         const searchKeyword = destination || keyword;
         if (searchKeyword) {
-            query.destination = { $regex: searchKeyword, $options: "i" };
+            query = {
+                ...query,
+                destination: { $regex: searchKeyword, $options: "i" },
+            };
         }
 
         const blogs = await Blog.find(query).sort({ date: -1 });
@@ -80,7 +181,13 @@ export const getBlogs = async (req, res, next) => {
 export const getBlogDestinationCounts = async (req, res, next) => {
     try {
         const counts = await Blog.aggregate([
-            { $match: { isActive: { $ne: false } } },
+            {
+                $match: {
+                    isActive: { $ne: false },
+                    isDraft: { $ne: true },
+                    $or: [{ status: "approved" }, { status: { $exists: false } }],
+                },
+            },
             { $group: { _id: "$destination", count: { $sum: 1 } } },
         ]);
         return res.status(200).json(
@@ -263,6 +370,165 @@ export const createBlog = async (req, res, next) => {
     try {
         const blog = await Blog.create(req.body);
         res.status(201).json({ message: "Blog created", blog });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getMyBlogs = async (req, res, next) => {
+    try {
+        const user = req.userData._id;
+        const blogs = await Blog.find({ contributor: user }).sort({
+            updatedAt: -1,
+            date: -1,
+        });
+
+        return res.status(200).json({
+            count: blogs.length,
+            data: blogs,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getBlogContributions = async (req, res, next) => {
+    try {
+        const { status, search } = req.query;
+        const query = {
+            contributor: { $exists: true, $ne: null },
+            isDraft: { $ne: true },
+        };
+
+        if (status && status !== "all") {
+            query.status = status;
+        }
+
+        if (search) {
+            const pattern = { $regex: search, $options: "i" };
+            query.$or = [
+                { mainTitle: pattern },
+                { mainContent: pattern },
+                { author: pattern },
+                { source: pattern },
+                { destination: pattern },
+            ];
+        }
+
+        const blogs = await Blog.find(query)
+            .populate("contributor", "firstName lastName fullName name email")
+            .sort({ updatedAt: -1, date: -1 });
+
+        return res.status(200).json({
+            count: blogs.length,
+            data: blogs,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const createMyBlog = async (req, res, next) => {
+    try {
+        const user = req.userData._id;
+        const payload = await buildBlogPayloadWithUploads(req);
+        const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
+
+        const blog = await Blog.create({
+            ...payload,
+            contributor: user,
+            status: "pending",
+            rejectionReason: "",
+            isDraft,
+            isActive: !isDraft,
+        });
+
+        res.status(201).json({
+            message: isDraft
+                ? "Blog saved as draft successfully"
+                : "Blog submitted successfully",
+            blog,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateMyBlog = async (req, res, next) => {
+    try {
+        const user = req.userData._id;
+        const { id } = req.params;
+        const payload = await buildBlogPayloadWithUploads(req);
+        const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
+
+        const blog = await Blog.findOneAndUpdate(
+            {
+                _id: id,
+                contributor: user,
+            },
+            {
+                ...payload,
+                contributor: user,
+                status: "pending",
+                rejectionReason: "",
+                isDraft,
+                isActive: !isDraft,
+            },
+            { new: true, runValidators: true },
+        );
+
+        if (!blog) {
+            return res.status(404).json({ message: "Blog contribution not found" });
+        }
+
+        return res.status(200).json({
+            message: isDraft
+                ? "Blog draft updated successfully"
+                : "Blog submitted successfully",
+            blog,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateBlogContributionStatus = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { status, rejectionReason } = req.body;
+        const normalizedStatus = String(status || "").toLowerCase();
+        const normalizedReason = String(rejectionReason || "").trim();
+
+        if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
+            return res.status(400).json({ message: "Invalid blog status" });
+        }
+
+        if (normalizedStatus === "rejected" && !normalizedReason) {
+            return res.status(400).json({ message: "Rejection reason is required" });
+        }
+
+        const blog = await Blog.findOneAndUpdate(
+            {
+                _id: id,
+                contributor: { $exists: true, $ne: null },
+                isDraft: { $ne: true },
+            },
+            {
+                status: normalizedStatus,
+                rejectionReason: normalizedStatus === "rejected" ? normalizedReason : "",
+                isActive: normalizedStatus === "approved",
+            },
+            { new: true },
+        ).populate("contributor", "firstName lastName fullName name email");
+
+        if (!blog) {
+            return res.status(404).json({ message: "Blog contribution not found" });
+        }
+
+        return res.status(200).json({
+            message: `Blog ${normalizedStatus} successfully`,
+            blog,
+        });
     } catch (error) {
         next(error);
     }
