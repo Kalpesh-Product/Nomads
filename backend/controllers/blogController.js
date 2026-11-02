@@ -444,6 +444,10 @@ export const createMyBlog = async (req, res, next) => {
     try {
         const user = req.userData._id;
         const payload = await buildBlogPayloadWithUploads(req);
+        // Review metadata is owned by moderation, not contributor form fields.
+        for (const field of ["reviewedBy", "reviewedById", "reviewedAt", "moderationHistory"]) {
+            delete payload[field];
+        }
         const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
         const blog = await Blog.create({
@@ -471,8 +475,13 @@ export const updateMyBlog = async (req, res, next) => {
         const user = req.userData._id;
         const { id } = req.params;
         const payload = await buildBlogPayloadWithUploads(req);
+        // Review metadata is owned by moderation, not contributor form fields.
+        for (const field of ["reviewedBy", "reviewedById", "reviewedAt", "moderationHistory"]) {
+            delete payload[field];
+        }
         const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
+        const editedAt = new Date();
         const blog = await Blog.findOneAndUpdate(
             {
                 _id: id,
@@ -482,6 +491,13 @@ export const updateMyBlog = async (req, res, next) => {
             {
                 ...payload,
                 contributor: user,
+                lastEditedAt: editedAt,
+                reviewedAt: null,
+                reviewedBy: "",
+                reviewedById: "",
+                ...(!isDraft ? { $push: { moderationHistory: {
+                    status: "pending", date: editedAt, actor: "Contributor",
+                } } } : {}),
                 status: "pending",
                 rejectionReason: "",
                 isDraft,
@@ -520,6 +536,11 @@ export const updateBlogContributionStatus = async (req, res, next) => {
             return res.status(400).json({ message: "Rejection reason is required" });
         }
 
+        // This endpoint is protected by the admin API key; the Master Panel
+        // supplies the identity from its verified staff session.
+        const reviewedBy = typeof req.body.reviewedBy === "string" ? req.body.reviewedBy.trim() : "";
+        const reviewedById = typeof req.body.reviewedById === "string" ? req.body.reviewedById.trim() : "";
+        const reviewedAt = new Date();
         const blog = await Blog.findOneAndUpdate(
             {
                 _id: id,
@@ -531,6 +552,18 @@ export const updateBlogContributionStatus = async (req, res, next) => {
                 status: normalizedStatus,
                 rejectionReason: normalizedStatus === "rejected" ? normalizedReason : "",
                 isActive: normalizedStatus === "approved",
+                reviewedAt,
+                reviewedBy,
+                reviewedById,
+                $push: {
+                    moderationHistory: {
+                        status: normalizedStatus,
+                        date: reviewedAt,
+                        reason: normalizedStatus === "rejected" ? normalizedReason : "",
+                        actor: reviewedBy || "Master Panel",
+                        actorId: reviewedById,
+                    },
+                },
             },
             { new: true },
         ).populate("contributor", "firstName lastName fullName name email");

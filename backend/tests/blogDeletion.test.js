@@ -112,3 +112,65 @@ test("moderation status filters distinguish deleted blogs from their previous st
     await getBlogContributions({ query: { status } }, response(), next);
   }
 });
+
+
+test("reviews store an independent timestamp and append history that deletion preserves", async (t) => {
+  const originalReview = new Date("2026-10-12T10:00:00Z");
+  const history = [{ status: "approved", date: originalReview }];
+  const doc = { reviewedAt: originalReview, moderationHistory: history };
+  t.mock.method(Blog, "findOneAndUpdate", (filter, update) => {
+    if (update.$push) {
+      assert.ok(update.reviewedAt instanceof Date);
+      assert.equal(update.$push.moderationHistory.date, update.reviewedAt);
+      assert.equal(update.$push.moderationHistory.reason, "Needs revision");
+      assert.equal(update.$push.moderationHistory.status, "rejected");
+      doc.reviewedAt = update.reviewedAt;
+      history.push(update.$push.moderationHistory);
+      return { populate: async () => doc };
+    }
+    assert.equal(update.$set.reviewedAt, undefined);
+    assert.equal(update.$set.moderationHistory, undefined);
+    assert.ok(update.$set.deletedAt instanceof Date);
+    return Promise.resolve(doc);
+  });
+  await updateBlogContributionStatus(request({ status: "rejected", rejectionReason: "Needs revision" }), response(), next);
+  const reviewedAt = doc.reviewedAt;
+  await deleteMyBlog(request({ agreedToDelete: true, deletionReason: "Outdated" }), response(), next);
+  assert.equal(doc.reviewedAt, reviewedAt);
+  assert.equal(history.length, 2);
+  assert.equal(history[0].date, originalReview);
+  assert.equal(history[1].date, reviewedAt);
+});
+
+test("resubmission records an edit and pending event without erasing review history", async (t) => {
+  t.mock.method(Blog, "findOneAndUpdate", async (filter, update) => {
+    assert.ok(update.lastEditedAt instanceof Date);
+    assert.equal(update.$push.moderationHistory.status, "pending");
+    assert.equal(update.$push.moderationHistory.date, update.lastEditedAt);
+    assert.equal(update.reviewedAt, null);
+    assert.equal(update.moderationHistory, undefined);
+    return { _id: blogId };
+  });
+  await updateMyBlog(request({ mainTitle: "Updated blog" }), response(), next);
+});
+
+
+test("approval and rejection persist the reviewer on the blog and each history entry", async (t) => {
+  const writes = [];
+  t.mock.method(Blog, "findOneAndUpdate", (filter, update) => {
+    writes.push(update);
+    return { populate: async () => ({ _id: blogId }) };
+  });
+  for (const [status, reviewer, id] of [["approved", "Alice Reviewer", "admin-1"], ["rejected", "Bob Reviewer", "admin-2"]]) {
+    const res = response();
+    await updateBlogContributionStatus(request({ status, rejectionReason: "Needs revision", reviewedBy: reviewer, reviewedById: id }), res, next);
+    assert.equal(res.statusCode, 200);
+  }
+  assert.equal(writes.length, 2);
+  for (const [index, reviewer, id] of [[0, "Alice Reviewer", "admin-1"], [1, "Bob Reviewer", "admin-2"]]) {
+    assert.equal(writes[index].reviewedBy, reviewer);
+    assert.equal(writes[index].reviewedById, id);
+    assert.equal(writes[index].$push.moderationHistory.actor, reviewer);
+    assert.equal(writes[index].$push.moderationHistory.actorId, id);
+  }
+});
