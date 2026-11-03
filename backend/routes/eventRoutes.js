@@ -11,6 +11,7 @@ import {
   getMyEvents,
   updateEventContributionStatus,
   updateMyEvent,
+  deleteMyEvent,
   updateEvent,
   updateEventStatus,
 } from "../controllers/eventController.js";
@@ -26,6 +27,7 @@ router.get("/destination/:destination", getEventsByDestination);
 router.get("/my", verifyJwt, requireContributorRole("isEventWriter"), getMyEvents);
 router.post("/my", verifyJwt, requireContributorRole("isEventWriter"), upload.any(), createMyEvent);
 router.patch("/my/:id", verifyJwt, requireContributorRole("isEventWriter"), upload.any(), updateMyEvent);
+router.delete("/my/:id", verifyJwt, requireContributorRole("isEventWriter"), deleteMyEvent);
 router.get("/contributions", verifyAdminApiKey, getEventContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updateEventContributionStatus);
 router.get("/:eventId", getEventById);

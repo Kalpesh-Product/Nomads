@@ -1,3 +1,4 @@
+import { contributionLifecycleFields } from "../utils/contributionLifecycle.js";
 import mongoose from "mongoose";
 const blogSchema = new mongoose.Schema({
   mainTitle: {
@@ -53,6 +54,8 @@ const blogSchema = new mongoose.Schema({
     default: true,
   },
 }, { timestamps: true });
+
+blogSchema.add(contributionLifecycleFields);
 
 const News = mongoose.model("News", blogSchema);
 export default News;

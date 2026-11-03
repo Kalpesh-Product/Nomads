@@ -1,3 +1,11 @@
+import {
+  applyContributionStatusFilter,
+  serializeContribution,
+  stripLifecycleFields,
+  resubmissionFields,
+  createDeleteContribution,
+  createModerateContribution,
+} from "../utils/contributionLifecycle.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
@@ -204,6 +212,7 @@ export const getPlaces = async (req, res, next) => {
     const { destination, category, month } = req.query;
     const query = {
       isDraft: { $ne: true },
+      deletedAt: null,
       isActive: { $ne: false },
       $or: [{ status: "approved" }, { status: { $exists: false } }],
     };
@@ -242,6 +251,7 @@ export const getPlacesByDestination = async (req, res, next) => {
         $options: "i",
       },
       isDraft: { $ne: true },
+      deletedAt: null,
       isActive: { $ne: false },
       $or: [{ status: "approved" }, { status: { $exists: false } }],
     }).sort({ placeName: 1 });
@@ -370,7 +380,7 @@ export const addPlace = async (req, res, next) => {
 export const getMyPlaces = async (req, res, next) => {
   try {
     const user = req.userData._id;
-    const places = await Place.find({ contributor: user }).sort({
+    const places = await Place.find({ contributor: user, deletedAt: null }).sort({
       updatedAt: -1,
       createdAt: -1,
     });
@@ -396,6 +406,7 @@ export const createMyPlace = async (req, res, next) => {
     const isDraft =
       String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
     const payload = buildPlacePayload(uploadPayload || {});
+    stripLifecycleFields(payload);
     const missingFields = validateRequiredPlaceFields(payload);
     const coordinateErrors = validateCoordinateFields(payload);
 
@@ -445,6 +456,7 @@ export const updateMyPlace = async (req, res, next) => {
     const isDraft =
       String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
     const payload = buildPlacePayload(uploadPayload || {});
+    stripLifecycleFields(payload);
     const missingFields = validateRequiredPlaceFields(payload);
     const coordinateErrors = validateCoordinateFields(payload);
 
@@ -466,9 +478,11 @@ export const updateMyPlace = async (req, res, next) => {
       {
         _id: id,
         contributor: user,
+        deletedAt: null,
       },
       {
         ...payload,
+        ...resubmissionFields(isDraft),
         contributor: user,
         status: "pending",
         isDraft,
@@ -500,9 +514,7 @@ export const getPlaceContributions = async (req, res, next) => {
       isDraft: { $ne: true },
     };
 
-    if (status && status !== "all") {
-      query.status = status;
-    }
+    applyContributionStatusFilter(query, status);
 
     if (search) {
       const pattern = { $regex: escapeRegex(search), $options: "i" };
@@ -524,48 +536,16 @@ export const getPlaceContributions = async (req, res, next) => {
 
     return res.status(200).json({
       count: places.length,
-      data: places,
+      data: places.map(serializeContribution),
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const updatePlaceContributionStatus = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-    const normalizedStatus = String(status || "").toLowerCase();
+export const updatePlaceContributionStatus = createModerateContribution(Place, "Place", "place");
 
-    if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
-      return res.status(400).json({ message: "Invalid place status" });
-    }
-
-    const place = await Place.findOneAndUpdate(
-      {
-        _id: id,
-        contributor: { $exists: true, $ne: null },
-        isDraft: { $ne: true },
-      },
-      {
-        status: normalizedStatus,
-        isActive: normalizedStatus === "approved",
-      },
-      { new: true },
-    ).populate("contributor", "firstName lastName fullName name email");
-
-    if (!place) {
-      return res.status(404).json({ message: "Place contribution not found" });
-    }
-
-    return res.status(200).json({
-      message: `Place ${normalizedStatus} successfully`,
-      place,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+export const deleteMyPlace = createDeleteContribution(Place, "Place");
 
 export const getPlaceById = async (req, res, next) => {
   try {
@@ -575,7 +555,7 @@ export const getPlaceById = async (req, res, next) => {
       return res.status(400).json({ message: "Valid place identifier is required" });
     }
 
-    const place = await Place.findById(placeId);
+    const place = await Place.findOne({ _id: placeId, deletedAt: null });
 
     if (!place) {
       return res.status(404).json({ message: "Place not found" });
@@ -623,7 +603,7 @@ export const updatePlace = async (req, res, next) => {
       });
     }
 
-    const place = await Place.findByIdAndUpdate(placeId, payload, {
+    const place = await Place.findOneAndUpdate({ _id: placeId, deletedAt: null }, payload, {
       new: true,
       runValidators: true,
     });
@@ -656,8 +636,8 @@ export const updatePlaceStatus = async (req, res, next) => {
       });
     }
 
-    const place = await Place.findByIdAndUpdate(
-      placeId,
+    const place = await Place.findOneAndUpdate(
+      { _id: placeId, deletedAt: null },
       { isActive },
       { new: true, runValidators: true },
     );

@@ -20,13 +20,31 @@ const SampleArticleSection = ({ main = false, index = 0 }) => (
   </article>
 );
 
-export default function BlogSectionPreview({ section = "overview", index = 0 }) {
+const SampleDestination = ({ contentLabel }) => (
+  <article className="text-slate-700">
+    <h3 className="text-2xl font-bold leading-snug">Lorem ipsum dolor sit amet</h3>
+    <img
+      src="/images/goa-image.jpg"
+      alt={`Sample ${contentLabel.toLowerCase()} image`}
+      className="mt-6 aspect-[3.3/1] w-full rounded-xl object-cover"
+    />
+    <div className="mt-6 grid gap-4 text-sm font-bold sm:grid-cols-3">
+      <p>Sample category</p>
+      <p className="sm:text-center">{contentLabel === "Event" ? "Sample month" : "Sample rating"}</p>
+      <p className="sm:text-right">{contentLabel === "Event" ? "Sample venue" : "Sample address"}</p>
+    </div>
+    <hr className="my-6 border-slate-200" />
+    <p className="whitespace-pre-line text-sm leading-relaxed">{sampleContent}{"\n\n"}{sampleContent}</p>
+  </article>
+);
+
+export default function BlogSectionPreview({ section = "overview", index = 0, contentLabel = "Blog", layout = "article" }) {
   const [open, setOpen] = useState(false);
   const titleId = useId();
   const descriptionId = useId();
-  const title = section === "overview" ? "Blog Preview"
+  const title = section === "overview" ? `${contentLabel} Preview`
     : section === "main" ? "Main Content"
-      : section === "sections" ? "Blog Sections" : `Section ${index + 1}`;
+      : section === "sections" ? `${contentLabel} Sections` : `Section ${index + 1}`;
 
   return (
     <>
@@ -68,6 +86,7 @@ export default function BlogSectionPreview({ section = "overview", index = 0 }) 
         </div>
         <div className="overflow-y-auto bg-slate-50/50 p-4 sm:p-6">
           <div className="space-y-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
+            {layout === "destination" ? <SampleDestination contentLabel={contentLabel} /> : <>
             {(section === "overview" || section === "main") && <SampleArticleSection main />}
             {section === "overview" && <hr className="border-slate-200" />}
             {section !== "main" && <SampleArticleSection index={index} />}
@@ -82,9 +101,10 @@ export default function BlogSectionPreview({ section = "overview", index = 0 }) 
                 <span>Author name</span><span>Publication date</span><span>Source (optional)</span>
               </footer>
             )}
+            </>}
           </div>
           <p id={descriptionId} className="mt-3 text-center text-xs font-medium text-slate-400">
-            Shown with sample images and text — your blog uses the content you enter in this section. Section images are optional.
+            Shown with sample images and text — your {contentLabel.toLowerCase()} uses the content you enter in this section.{layout === "article" ? " Section images are optional." : ""}
           </p>
         </div>
       </Dialog>

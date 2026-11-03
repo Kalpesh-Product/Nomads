@@ -1451,7 +1451,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
           <div className="w-full py-6">
             <h1 className="mb-8 flex flex-wrap items-center gap-3 text-2xl font-semibold uppercase text-slate-700">
               Add {config.contentLabel}
-              {type === "blog" && <BlogSectionPreview />}
+              <BlogSectionPreview contentLabel={config.contentLabel} layout={isArticleContribution ? "article" : "destination"} />
             </h1>
 
             <div
@@ -1935,7 +1935,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <h3 className="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
                           Section {index + 1}
-                          {type === "blog" && <BlogSectionPreview section="section" index={index} />}
+                          <BlogSectionPreview contentLabel={config.contentLabel} section="section" index={index} />
                         </h3>
                         {formValues.sections.length > 1 ? (
                           <button

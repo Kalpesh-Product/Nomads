@@ -1,0 +1,10 @@
+const fs = require('node:fs');
+const file = 'C:/BIZNest/Master-Panel/WoNoMasterPanel/server/tests/blogContributionReviewer.test.js';
+let src = fs.readFileSync(file, 'utf8');
+src = src.replace('const { updateBlogContributionStatus }', 'const { updateBlogContributionStatus, updateNewsContributionStatus, updateEventContributionStatus, updatePlaceContributionStatus }');
+src = src.replace('test("approval and rejection forward', 'for (const [label, handler] of [["Blog", updateBlogContributionStatus], ["News", updateNewsContributionStatus], ["Event", updateEventContributionStatus], ["Place", updatePlaceContributionStatus]]) {\ntest(`${label}: approval and rejection forward');
+src = src.replace('ignoring browser-supplied identity",', 'ignoring browser-supplied identity`,');
+src = src.replace('await updateBlogContributionStatus(req, res);', 'await handler(req, res);');
+src = src.replace('assert.equal(payload.reviewedBy,', 'assert.equal(payload.rejectionReason, "Needs revision");\n        assert.equal(payload.reviewedBy,');
+src += '\n}\n';
+fs.writeFileSync(file, src);

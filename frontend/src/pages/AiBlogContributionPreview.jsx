@@ -226,6 +226,7 @@ const EditableImage = ({ src, file, alt }) => {
 };
 
 const canEditContribution = (item = {}, config = {}) => {
+  if (item.deletedAt || item.status === "deleted") return false;
   if (item.isDraft && ["Blog", "News", "Event", "Place"].includes(config.label)) {
     return true;
   }
@@ -369,7 +370,7 @@ const ArticlePreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   );
 };
 
-const DestinationPreview = ({ item, config, onEdit }) => {
+const DestinationPreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   const isEvent = config.formType === "event";
   const title = isEvent
     ? item.eventName || item.title || "Untitled Event"
@@ -382,7 +383,7 @@ const DestinationPreview = ({ item, config, onEdit }) => {
 
   return (
     <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
-      <PreviewHeader config={config} item={item} onEdit={onEdit} />
+      <PreviewHeader config={config} item={item} onEdit={onEdit} onDelete={onDelete} isDeleting={isDeleting} />
 
       <section className="mt-4">
         <h2 className="text-title font-bold leading-normal">{title}</h2>
@@ -1284,7 +1285,8 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
   }, [canEdit, isEditing]);
 
   const handleDelete = async () => {
-    if (isDeleting || type !== "blog" || !item || !canEdit) return;
+    if (isDeleting || !item || !canEdit) return;
+    const contentName = config.label === "News" ? "news item" : config.label.toLowerCase();
     setIsDeleting(true);
     const dialogOptions = {
       showCancelButton: true,
@@ -1306,14 +1308,14 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
       const confirmation = await Swal.fire({
         ...dialogOptions,
         icon: "warning",
-        title: "Delete this blog?",
+        title: `Delete this ${contentName}?`,
         html: `
-          <p>This blog will be removed from your contributions and will no longer be visible to readers. You cannot undo this action.</p>
+          <p>This ${contentName} will be removed from your contributions and will no longer be visible to readers. You cannot undo this action.</p>
           <label class="blog-delete-reason-label" for="blog-delete-reason">Reason for deleting</label>
-          <textarea id="blog-delete-reason" class="blog-delete-reason" rows="3" maxlength="500" required aria-required="true" placeholder="Please tell us why you want to delete this blog"></textarea>
+          <textarea id="blog-delete-reason" class="blog-delete-reason" rows="3" maxlength="500" required aria-required="true" placeholder="Please tell us why you want to delete this ${contentName}"></textarea>
           <label class="blog-delete-agreement" for="blog-delete-agreement">
             <input id="blog-delete-agreement" type="checkbox" />
-            <span>I understand and agree to delete this blog</span>
+            <span>I understand and agree to delete this ${contentName}</span>
           </label>
         `,
         didOpen: () => {
@@ -1328,7 +1330,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
           checkbox.addEventListener("change", syncButton);
           syncButton();
         },
-        confirmButtonText: "Delete Blog",
+        confirmButtonText: `Delete ${config.label}`,
         showLoaderOnConfirm: true,
         allowOutsideClick: () => !Swal.isLoading(),
         allowEscapeKey: () => !Swal.isLoading(),
@@ -1347,7 +1349,7 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
             return true;
           } catch (error) {
             Swal.showValidationMessage(
-              error?.response?.data?.message || "Could not delete this blog. Please try again.",
+              error?.response?.data?.message || `Could not delete this ${contentName}. Please try again.`,
             );
             return false;
           }
@@ -1362,11 +1364,14 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
       );
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: [config.queryKey] }),
-        queryClient.invalidateQueries({ queryKey: ["blogs"] }),
-        queryClient.invalidateQueries({ queryKey: ["blog-contribution-existing-blogs"] }),
+        queryClient.invalidateQueries({ predicate: ({ queryKey }) => {
+          const key = String(queryKey[0] || "");
+          const contentKey = type === "places" ? "place" : type;
+          return key.toLowerCase().includes(contentKey) || key === "sharedContent" || key.startsWith("favorite");
+        } }),
       ]);
       navigate(config.dashboardPath, { replace: true });
-      showSuccessAlert("Blog deleted successfully.", { title: "Blog Deleted" });
+      showSuccessAlert(`${config.label} deleted successfully.`, { title: `${config.label} Deleted` });
     } finally {
       setIsDeleting(false);
     }
@@ -1412,9 +1417,9 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
   }
 
   return config.previewType === "destination" ? (
-    <DestinationPreview item={item} config={config} onEdit={() => setIsEditing(true)} />
+    <DestinationPreview item={item} config={config} onEdit={() => setIsEditing(true)} onDelete={handleDelete} isDeleting={isDeleting} />
   ) : (
-    <ArticlePreview item={item} config={config} onEdit={() => setIsEditing(true)} onDelete={type === "blog" ? handleDelete : undefined} isDeleting={isDeleting} />
+    <ArticlePreview item={item} config={config} onEdit={() => setIsEditing(true)} onDelete={handleDelete} isDeleting={isDeleting} />
   );
 };
 
