@@ -161,7 +161,7 @@ const HostProduct = () => {
                       </li>
                     ))}
                   </ul>
-                  <div className="flex flex-wrap gap-4">
+                  <div className="flex w-full flex-wrap justify-center gap-4 lg:justify-start">
                     <GetStartedButton
                       handleSubmit={() => navigate("/signup?step=1")}
                     />
@@ -188,8 +188,8 @@ const HostProduct = () => {
           </AiAlignBox>
           <section>
             <AiAlignBox>
-              <div className="grid grid-cols-1 py-12 lg:grid-cols-3 lg:gap-12 lg:py-16">
-                <div className="text-hero col-span-1">
+              <div className="grid grid-cols-1 gap-8 py-12 lg:grid-cols-3 lg:gap-12 lg:py-16">
+                <div className="col-span-1 text-[clamp(1.3rem,6.5vw,2rem)] leading-[1.15] sm:text-hero">
                   <h1>
                     Built with confidence — <br />
                     The theme store promise

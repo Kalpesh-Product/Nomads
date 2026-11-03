@@ -158,8 +158,7 @@ export default function Modules() {
           </div>
           <hr className="border-t-4 mb-2 lg:mt-10" />
         </div>
-        <AiAlignBox>
-          <div data-aos="fade-up" className="flex flex-col gap-8">
+        <div data-aos="fade-up" className="flex flex-col gap-8">
             <SaaSFeatureBlock
               title="Frontend"
               description1={[
@@ -246,7 +245,6 @@ export default function Modules() {
             </div>
           </div> */}
           </div>
-        </AiAlignBox>
         <div className="text-center">
           <h1 className="text-[clamp(1.7rem,3.8vw,5rem)] text-start lg:hidden lg:text-start font-semibold font-comic">
             … More coming soon
