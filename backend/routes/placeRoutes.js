@@ -11,6 +11,7 @@ import {
   getPlaceContributions,
   updatePlaceContributionStatus,
   updateMyPlace,
+  deleteMyPlace,
   updatePlace,
   updatePlaceStatus,
 } from "../controllers/placeController.js";
@@ -26,6 +27,7 @@ router.get("/destination/:destination", getPlacesByDestination);
 router.get("/my", verifyJwt, requireContributorRole("isPlaceWriter"), getMyPlaces);
 router.post("/my", verifyJwt, requireContributorRole("isPlaceWriter"), upload.any(), createMyPlace);
 router.patch("/my/:id", verifyJwt, requireContributorRole("isPlaceWriter"), upload.any(), updateMyPlace);
+router.delete("/my/:id", verifyJwt, requireContributorRole("isPlaceWriter"), deleteMyPlace);
 router.get("/contributions", verifyAdminApiKey, getPlaceContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updatePlaceContributionStatus);
 router.get("/:placeId", getPlaceById);
