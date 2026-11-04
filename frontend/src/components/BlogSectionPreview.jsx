@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import { CircleAlert, X } from "lucide-react";
+import PlaceLocation, { PlaceAddress } from "./PlaceLocation";
 
 const sampleContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
@@ -23,6 +24,7 @@ const SampleArticleSection = ({ main = false, index = 0 }) => (
 const SampleDestination = ({ contentLabel }) => (
   <article className="text-slate-700">
     <h3 className="text-2xl font-bold leading-snug">Lorem ipsum dolor sit amet</h3>
+    {contentLabel === "Place" && <PlaceAddress address="Panaji, Goa, India" />}
     <img
       src="/images/goa-image.jpg"
       alt={`Sample ${contentLabel.toLowerCase()} image`}
@@ -31,10 +33,21 @@ const SampleDestination = ({ contentLabel }) => (
     <div className="mt-6 grid gap-4 text-sm font-bold sm:grid-cols-3">
       <p>Sample category</p>
       <p className="sm:text-center">{contentLabel === "Event" ? "Sample month" : "Sample rating"}</p>
-      <p className="sm:text-right">{contentLabel === "Event" ? "Sample venue" : "Sample address"}</p>
+      <p className="sm:text-right">{contentLabel === "Event" ? "Sample venue" : "Sample venue (optional)"}</p>
     </div>
     <hr className="my-6 border-slate-200" />
     <p className="whitespace-pre-line text-sm leading-relaxed">{sampleContent}{"\n\n"}{sampleContent}</p>
+    {contentLabel === "Place" && (
+      <PlaceLocation item={{
+        placeName: "Sample place in Goa",
+        address: "Panaji, Goa, India",
+        destination: "Goa",
+        latitude: 15.501,
+        longitude: 73.8294,
+        mainImage: "/images/goa-image.jpg",
+        googleMapsLink: "https://www.google.com/maps/search/?api=1&query=15.501,73.8294",
+      }} />
+    )}
   </article>
 );
 
