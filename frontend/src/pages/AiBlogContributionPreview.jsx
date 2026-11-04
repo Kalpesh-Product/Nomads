@@ -1,4 +1,5 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
+import PlaceLocation, { PlaceAddress } from "../components/PlaceLocation";
 import CategorySelect from "../components/CategorySelect";
 import eventCategories from "../constants/eventCategories";
 import placeCategories from "../constants/placeCategories";
@@ -104,7 +105,7 @@ const buildFormState = (item = {}) => ({
   placeName: item.placeName || item.title || "",
   address: item.address || item.location || "",
   googleMapsLink: item.googleMapsLink || "",
-  rating: item.rating || "",
+  rating: String(item.rating ?? ""),
   latitude: item.latitude ?? "",
   longitude: item.longitude ?? "",
   placeType: item.placeType || item.type || "",
@@ -379,7 +380,7 @@ const DestinationPreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   const image = item.mainImage || item.image;
   const primaryMeta = isEvent ? item.category : item.category || item.placeType;
   const centerMeta = isEvent ? item.month : item.rating || item.month;
-  const rightMeta = isEvent ? item.venue : item.address || item.venue;
+  const rightMeta = item.venue;
 
   return (
     <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
@@ -387,6 +388,7 @@ const DestinationPreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
 
       <section className="mt-4">
         <h2 className="text-title font-bold leading-normal">{title}</h2>
+        {!isEvent && <PlaceAddress address={item.address || item.location} />}
         {isEvent && item.month ? (
           <p className="mt-2 flex items-center gap-2 text-base font-medium text-black">
             <CalendarDays size={17} />
@@ -414,16 +416,7 @@ const DestinationPreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
           </p>
         ) : null}
 
-        {!isEvent && item.googleMapsLink ? (
-          <a
-            href={item.googleMapsLink}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-6 inline-flex text-sm font-semibold text-primary-blue"
-          >
-            Open place link
-          </a>
-        ) : null}
+        {!isEvent && <PlaceLocation item={item} />}
 
         {isEvent && item.link ? (
           <a
@@ -483,7 +476,7 @@ const editTitleClassName =
   "w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-title font-bold leading-normal outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100";
 const editTextAreaClassName =
   "w-full resize-y rounded-lg border border-transparent bg-white/70 px-3 py-2 leading-relaxed outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100";
-const ArticleEditField = ({ maxLength, ...props }) => (
+const ArticleEditField = ({ maxLength, slotProps, ...props }) => (
   <CharacterLimitedField
     as={TextField}
     fullWidth
@@ -491,7 +484,7 @@ const ArticleEditField = ({ maxLength, ...props }) => (
     size="small"
     {...props}
     maxLength={maxLength}
-    slotProps={{ htmlInput: { maxLength } }}
+    slotProps={{ ...slotProps, htmlInput: { ...slotProps?.htmlInput, maxLength } }}
   />
 );
 
@@ -1141,7 +1134,6 @@ const DestinationInlineEdit = ({
   const isEvent = config.formType === "event";
   const titleField = isEvent ? "eventName" : "placeName";
   const titlePlaceholder = isEvent ? "Event name" : "Place name";
-  const centerMeta = isEvent ? formValues.month : formValues.rating || formValues.month;
 
   return (
     <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
@@ -1203,7 +1195,12 @@ const DestinationInlineEdit = ({
             </>
           ) : (
             <>
-              <p className="md:text-center">{centerMeta || ""}</p>
+              <ArticleEditField
+                label="Destination"
+                maxLength={contributionFieldLimits.mainTitle}
+                value={formValues.destination}
+                onChange={(event) => updateFormField("destination", event.target.value)}
+              />
               <ArticleEditField
                 label="Address"
                 maxLength={contributionFieldLimits.address}
@@ -1213,6 +1210,32 @@ const DestinationInlineEdit = ({
             </>
           )}
         </div>
+
+        {!isEvent && (
+          <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["Google Maps Link", "googleMapsLink"],
+              ["Venue (optional)", "venue"],
+              ["Latitude", "latitude"],
+              ["Longitude", "longitude"],
+              ["Rating", "rating"],
+              ["Type", "placeType"],
+              ["Month", "month"],
+            ].map(([label, field]) => (
+              <ArticleEditField
+                key={field}
+                label={label}
+                maxLength={metadataFieldLimits[field]}
+                value={formValues[field]}
+                onChange={(event) => updateFormField(field, event.target.value)}
+                slotProps={{ htmlInput: {
+                  maxLength: metadataFieldLimits[field],
+                  inputMode: ["latitude", "longitude"].includes(field) ? "decimal" : "text",
+                } }}
+              />
+            ))}
+          </div>
+        )}
 
         <hr className="my-6" />
 
