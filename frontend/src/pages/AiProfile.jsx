@@ -48,6 +48,15 @@ const primaryPillButtonSx = {
 const PROFILE_PROMPT =
   "The more details you fill in, the more customized support we can provide.";
 const PROFILE_TYPING_SEEN_KEY = "wono-ai-profile-typing-seen";
+const getBookingCategoryLabel = (serviceType) => {
+  const value = String(serviceType || "").trim();
+  const knownLabels = {
+    "meeting-room": "Meeting Room",
+    "co-living": "Co-living",
+    hostel: "Hostel",
+  };
+  return knownLabels[value] || value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+};
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const tickMenuItemSx = {
@@ -177,6 +186,7 @@ const AiProfile = () => {
     confirmPassword: "",
   });
   const [rescheduleBooking, setRescheduleBooking] = useState(null);
+  const [bookingCategory, setBookingCategory] = useState("");
   const [rescheduleDate, setRescheduleDate] = useState("");
   const [rescheduleTime, setRescheduleTime] = useState("");
   const [rescheduleEndTime, setRescheduleEndTime] = useState("");
@@ -262,6 +272,21 @@ const AiProfile = () => {
     enabled: Boolean(rescheduleBooking?.id) && selectedRangeValid,
     retry: false,
   });
+  const knownBookingCategories = [
+    { id: "meeting-room", label: "Meeting Room" },
+    { id: "co-living", label: "Co-living" },
+    { id: "hostel", label: "Hostel" },
+  ];
+  const websiteBookings = bookingData?.bookings || [];
+  const bookingCategories = [
+    ...knownBookingCategories,
+    ...[...new Set(websiteBookings.map((booking) => String(booking.serviceType || "").trim()).filter(Boolean))]
+      .filter((serviceType) => !knownBookingCategories.some((category) => category.id === serviceType))
+      .map((id) => ({ id, label: getBookingCategoryLabel(id) })),
+  ];
+  const visibleWebsiteBookings = bookingCategory
+    ? websiteBookings.filter((booking) => booking.serviceType === bookingCategory)
+    : websiteBookings;
 
   useEffect(() => {
     if (!auth?.user) navigate("/login", { replace: true });
@@ -803,6 +828,33 @@ const AiProfile = () => {
         <Container padding={false}>
         <div className="min-h-screen rounded-xl bg-white p-6">
           <h1 className="mb-6 text-xl font-semibold text-secondary-dark">My Bookings</h1>
+                {bookingCategory ? (
+                  <div className="mb-6 flex items-center justify-between gap-3">
+                    <h2 className="text-lg font-semibold text-secondary-dark">
+                      {bookingCategories.find((category) => category.id === bookingCategory)?.label} Bookings
+                    </h2>
+                    <button type="button" onClick={() => setBookingCategory("")} className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-gray-400">
+                      All categories
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {bookingCategories.map((category) => {
+                      const count = websiteBookings.filter((booking) => booking.serviceType === category.id).length;
+                      return (
+                        <button
+                          key={category.id}
+                          type="button"
+                          onClick={() => setBookingCategory(category.id)}
+                          className="rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
+                        >
+                          <span className="block text-base font-semibold text-secondary-dark">{category.label}</span>
+                          <span className="mt-2 block text-sm text-gray-500">{count} {count === 1 ? "booking" : "bookings"}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
           {bookingsLoading && (
             <div className="flex justify-center"><CircularProgress size={28} /></div>
           )}
@@ -811,16 +863,24 @@ const AiProfile = () => {
               {bookingsError.response?.data?.message || "Unable to load bookings."}
             </p>
           )}
-          {!bookingsLoading && !bookingsError && !(bookingData?.bookings || []).length && (
+          {!bookingsLoading && !bookingsError && !bookingCategory && !websiteBookings.length && (
             <p className="text-center text-gray-600">
-              No meeting-room bookings were found for {user?.email || "this account"}.
+              No website bookings were found for {user?.email || "this account"}.
             </p>
           )}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-            {(bookingData?.bookings || []).map((booking) => {
+          {bookingCategory && (
+            <>
+              {!bookingsLoading && !bookingsError && !visibleWebsiteBookings.length && (
+                <p className="text-center text-gray-600">
+                  No {bookingCategories.find((category) => category.id === bookingCategory)?.label || ""} bookings found.
+                </p>
+              )}
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                {visibleWebsiteBookings.map((booking) => {
               const start = new Date(booking.start);
               const end = new Date(booking.end);
               const normalizedStatus = String(booking.status || "confirmed").toLowerCase();
+              const isStayBooking = booking.serviceType === "hostel" || booking.serviceType === "co-living";
               return (
                 <article
                   key={booking.id}
@@ -829,7 +889,7 @@ const AiProfile = () => {
                   <button
                     type="button"
                     className="group relative aspect-square w-full overflow-hidden rounded-3xl bg-white"
-                    disabled={['cancelled', 'completed'].includes(normalizedStatus)}
+                    disabled={isStayBooking || ['cancelled', 'completed'].includes(normalizedStatus)}
                     onClick={() => {
                       const current = new Date(booking.start);
                       setRescheduleBooking(booking);
@@ -853,11 +913,13 @@ const AiProfile = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/5" />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="rounded-full bg-black/60 px-4 py-1.5 text-sm font-semibold text-white">
-                        {['cancelled', 'completed'].includes(normalizedStatus) ? "View Booking" : "Reschedule"}
+                        {isStayBooking ? "Confirmed" : ['cancelled', 'completed'].includes(normalizedStatus) ? "View Booking" : "Reschedule"}
                       </span>
                     </div>
                     <div className="absolute inset-x-2 bottom-2 flex justify-end">
-                      <span className="rounded-lg bg-white px-2.5 py-1 text-xs font-normal text-black">Meeting Room</span>
+                      <span className="rounded-lg bg-white px-2.5 py-1 text-xs font-normal text-black">
+                      {getBookingCategoryLabel(booking.serviceType)}
+                      </span>
                     </div>
                   </button>
                   <div className="flex flex-col gap-1 px-4 pr-1">
@@ -871,13 +933,17 @@ const AiProfile = () => {
                       <span className="shrink-0 text-xs font-medium capitalize text-gray-600 md:text-sm">{normalizedStatus}</span>
                     </div>
                     <p className="truncate text-xs text-gray-500">
-                      {start.toLocaleDateString()} · {start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}–{end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      {isStayBooking
+                        ? `${start.toLocaleDateString()} – ${end.toLocaleDateString()}`
+                        : `${start.toLocaleDateString()} · ${start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}–${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}
                     </p>
                   </div>
                 </article>
               );
-            })}
-          </div>
+                })}
+              </div>
+            </>
+          )}
           <Dialog
             open={Boolean(rescheduleBooking)}
             onClose={() => !reschedulePending && setRescheduleBooking(null)}

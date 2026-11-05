@@ -111,7 +111,7 @@ export const getLeadFormDefinition = (kind, ctx = {}) => {
                 { key: "endDate", label: "Check-out", type: "date", required: true, target: "form", half: true, min: ctx.date || ctx.today },
                 {
                     key: "people",
-                    label: kind === "hostel" ? "Beds / guests" : "Guests",
+                    label: kind === "hostel" ? "Number of beds required" : "Guests",
                     type: "number",
                     required: true,
                     target: "form",
@@ -146,12 +146,13 @@ export const getLeadFormDefinition = (kind, ctx = {}) => {
                 ],
             };
         }
+        const monthly = ctx.stayType === "monthly";
         return {
             ...base,
             fields: [
                 ...contactFields(),
                 { key: "startDate", label: "Move-in date", type: "date", required: true, target: "form", half: true, min: ctx.today },
-                { key: "endDate", label: "Staying until (optional)", type: "date", target: "form", half: true, min: ctx.date || ctx.today },
+                { key: "endDate", label: monthly ? "Staying until (optional)" : "Check-out", type: "date", required: !monthly, target: "form", half: true, min: ctx.date || ctx.today },
                 { key: "people", label: "Occupants", type: "number", required: true, target: "form", min: 1 },
                 { key: "notes", label: "Anything we should know?", type: "textarea", target: "extra" },
             ],

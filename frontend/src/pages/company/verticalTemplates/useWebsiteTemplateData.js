@@ -314,10 +314,17 @@ export const useWebsiteTemplateData = () => {
         const configuredRooms = [
             ...(Array.isArray(draft?.meetingRooms) ? draft.meetingRooms : []),
             ...(Array.isArray(draft?.rooms) ? draft.rooms : []),
+            ...(Array.isArray(draft?.coLivingRooms) ? draft.coLivingRooms : []),
+            ...(Array.isArray(draft?.dorms) ? draft.dorms : []),
         ];
         const selectedRoom = configuredRooms.find((room) =>
             String(room?.title || room?.name || room?.heading || "").trim().toLowerCase() === String(roomName).trim().toLowerCase());
-        if (!selectedRoom || !leadForm.startDate || !leadExtras.time || !leadExtras.endTime) {
+        const isMonthlyCoLiving = (draft?.coLivingRooms || []).includes(selectedRoom) && selectedRoom?.stayType === "monthly";
+        const isStay = !isMonthlyCoLiving && ((draft?.coLivingRooms || []).includes(selectedRoom) || (draft?.dorms || []).includes(selectedRoom));
+        const hasSchedule = isStay
+            ? Boolean(leadForm.startDate && leadForm.endDate)
+            : Boolean(leadForm.startDate && leadExtras.time && leadExtras.endTime);
+        if (!selectedRoom || !hasSchedule) {
             setLeadAvailability({ status: "idle", message: "" });
             return undefined;
         }
@@ -330,8 +337,9 @@ export const useWebsiteTemplateData = () => {
                     workspaceId: draft?.workspaceId || "",
                     roomName,
                     startDate: leadForm.startDate,
-                    startTime: leadExtras.time,
-                    endTime: leadExtras.endTime,
+                    ...(isStay
+                        ? { endDate: leadForm.endDate, attendees: leadForm.people || 1 }
+                        : { startTime: leadExtras.time, endTime: leadExtras.endTime }),
                 });
                 if (cancelled) return;
                 setLeadAvailability(response?.data?.available
@@ -347,7 +355,7 @@ export const useWebsiteTemplateData = () => {
             cancelled = true;
             window.clearTimeout(timer);
         };
-    }, [draft?.meetingRooms, draft?.rooms, draft?.workspaceId, leadExtras.endTime, leadExtras.time, leadForm.startDate, selectedLeadProduct]);
+    }, [draft?.coLivingRooms, draft?.dorms, draft?.meetingRooms, draft?.rooms, draft?.workspaceId, leadExtras.endTime, leadExtras.time, leadForm.endDate, leadForm.people, leadForm.startDate, selectedLeadProduct]);
     const [reviewModalOpen, setReviewModalOpen] = useState(false);
     const [reviewSubmitted, setReviewSubmitted] = useState(false);
     const [reviewSubmitPending, setReviewSubmitPending] = useState(false);
@@ -891,6 +899,7 @@ export const useWebsiteTemplateData = () => {
                   return [h ? `${h} hr${h > 1 ? "s" : ""}` : "", m ? `${m} min` : ""].filter(Boolean).join(" ");
                 })(),
                 inquiryType: extras.inquiryType || (slug.includes("cafe") ? "Cafe" : ""),
+                stayType: extras.stayType || "",
                 websiteUrl: window.location.href,
             });
             setLeadSubmitted(true);

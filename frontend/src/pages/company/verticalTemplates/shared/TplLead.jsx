@@ -51,8 +51,9 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
         date: t.leadForm?.startDate,
         mode: canVisit ? mode : "enquiry",
         spaces,
+        stayType: item?.raw?.stayType || "short_stay",
         today: todayISO(),
-    }), [service.kind, draft?.reservation, draft?.openingHours, t.leadForm?.startDate, mode, canVisit, spaces]);
+    }), [service.kind, draft?.reservation, draft?.openingHours, t.leadForm?.startDate, mode, canVisit, spaces, item?.raw?.stayType]);
     const setField = (field, value) => {
         if (field.target === "form") {
             t.setLeadForm((prev) => ({ ...prev, [field.key]: value }));
@@ -84,6 +85,7 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
         inquiryType: def.inquiryType,
         productType: service.name,
         ...(item ? { roomType: item.title, packageName: item.title, dormType: item.title } : {}),
+        ...(service.kind === "coLiving" ? { stayType: item?.raw?.stayType || "short_stay" } : {}),
     };
     return (<form onSubmit={(event) => t.submitLeadForm(event, overrides)} className="grid grid-cols-2 gap-x-4 gap-y-4" aria-label={def.title}>
       {canVisit ? (<div className="col-span-2 flex gap-2" role="group" aria-label="Request type">
@@ -108,7 +110,9 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
         </div>) : null}
 
       {service.kind === "hostel" || service.kind === "workation" || service.kind === "coLiving" ? (<p className="tp-muted col-span-2 text-[12px] leading-relaxed">
-          This sends a booking request. Our team confirms availability and gets back to you.
+          {service.kind === "hostel"
+            ? "Enter the total number of guests. One bed is requested for each guest. This is one group booking under the primary contact above."
+            : "This sends a booking request. Our team confirms availability and gets back to you."}
         </p>) : null}
 
       {draft?.stayPolicy?.cancellationNote && (service.kind === "hostel" || service.kind === "coLiving") ? (<p className="tp-muted col-span-2 text-[12px]">{draft.stayPolicy.cancellationNote}</p>) : null}
