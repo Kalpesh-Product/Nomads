@@ -57,6 +57,14 @@ const getBookingCategoryLabel = (serviceType) => {
   };
   return knownLabels[value] || value.replace(/[-_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 };
+const DEFAULT_BOOKING_CATEGORY_IMAGES = {
+  "meeting-room": "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80",
+  "co-living": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
+  hostel: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80",
+  default: "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=800&q=80",
+};
+const getDefaultBookingImage = (serviceType) =>
+  DEFAULT_BOOKING_CATEGORY_IMAGES[String(serviceType || "").trim()] || DEFAULT_BOOKING_CATEGORY_IMAGES.default;
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
 const tickMenuItemSx = {
@@ -131,6 +139,13 @@ const AiProfile = () => {
   const userId = auth?.user?._id || auth?.user?.id;
 
   const [searchParams] = useSearchParams();
+  const setBookingCategoryParam = (categoryId) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", "bookings");
+    if (categoryId) params.set("category", categoryId);
+    else params.delete("category");
+    navigate(`/profile?${params.toString()}`);
+  };
   const countries = useMemo(() => Country.getAllCountries(), []);
 
   const initialTab = searchParams.get("tab") || "profile";
@@ -186,7 +201,7 @@ const AiProfile = () => {
     confirmPassword: "",
   });
   const [rescheduleBooking, setRescheduleBooking] = useState(null);
-  const [bookingCategory, setBookingCategory] = useState("");
+  const [bookingCategory, setBookingCategory] = useState(searchParams.get("category") || "");
   const [rescheduleDate, setRescheduleDate] = useState("");
   const [rescheduleTime, setRescheduleTime] = useState("");
   const [rescheduleEndTime, setRescheduleEndTime] = useState("");
@@ -295,6 +310,7 @@ const AiProfile = () => {
   useEffect(() => {
     const tab = searchParams.get("tab") || "profile";
     setActiveTab(tab);
+    setBookingCategory(searchParams.get("category") || "");
   }, [searchParams]);
 
   useEffect(() => {
@@ -828,33 +844,44 @@ const AiProfile = () => {
         <Container padding={false}>
         <div className="min-h-screen rounded-xl bg-white p-6">
           <h1 className="mb-6 text-xl font-semibold text-secondary-dark">My Bookings</h1>
-                {bookingCategory ? (
-                  <div className="mb-6 flex items-center justify-between gap-3">
-                    <h2 className="text-lg font-semibold text-secondary-dark">
-                      {bookingCategories.find((category) => category.id === bookingCategory)?.label} Bookings
-                    </h2>
-                    <button type="button" onClick={() => setBookingCategory("")} className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-gray-400">
-                      All categories
-                    </button>
-                  </div>
-                ) : (
-                  <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {bookingCategories.map((category) => {
-                      const count = websiteBookings.filter((booking) => booking.serviceType === category.id).length;
-                      return (
-                        <button
-                          key={category.id}
-                          type="button"
-                          onClick={() => setBookingCategory(category.id)}
-                          className="rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-400 hover:shadow-md"
-                        >
-                          <span className="block text-base font-semibold text-secondary-dark">{category.label}</span>
-                          <span className="mt-2 block text-sm text-gray-500">{count} {count === 1 ? "booking" : "bookings"}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                  <button
+                    type="button"
+                    onClick={() => setBookingCategoryParam("")}
+                    className={`rounded-2xl border bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${!bookingCategory ? "border-secondary-dark ring-1 ring-secondary-dark" : "border-gray-200 hover:border-gray-400"}`}
+                  >
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-500">All</p>
+                    <p className="mt-2 text-2xl font-bold text-secondary-dark">{websiteBookings.length}</p>
+                    <p className="text-xs text-gray-500">{websiteBookings.length === 1 ? "booking" : "bookings"}</p>
+                    <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
+                      <span className="text-[10px] uppercase text-gray-400">Every category</span>
+                      <span className="text-xs font-semibold text-blue-600">View bookings →</span>
+                    </div>
+                  </button>
+                  {bookingCategories.map((category) => {
+                    const count = websiteBookings.filter((booking) => booking.serviceType === category.id).length;
+                    const isActive = bookingCategory === category.id;
+                    return (
+                      <button
+                        key={category.id}
+                        type="button"
+                        onClick={() => setBookingCategoryParam(category.id)}
+                        className={`rounded-2xl border bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${isActive ? "border-secondary-dark ring-1 ring-secondary-dark" : "border-gray-200 hover:border-gray-400"}`}
+                      >
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-500">{category.label}</p>
+                        <p className="mt-2 text-2xl font-bold text-secondary-dark">{count}</p>
+                        <p className="text-xs text-gray-500">{count === 1 ? "booking" : "bookings"}</p>
+                        <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
+                          <span className="text-[10px] uppercase text-gray-400">{category.label}</span>
+                          <span className="text-xs font-semibold text-blue-600">View bookings →</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+          <h2 className="mb-4 text-lg font-semibold text-secondary-dark">
+            {bookingCategory ? bookingCategories.find((category) => category.id === bookingCategory)?.label : "All"} Bookings
+          </h2>
           {bookingsLoading && (
             <div className="flex justify-center"><CircularProgress size={28} /></div>
           )}
@@ -863,18 +890,14 @@ const AiProfile = () => {
               {bookingsError.response?.data?.message || "Unable to load bookings."}
             </p>
           )}
-          {!bookingsLoading && !bookingsError && !bookingCategory && !websiteBookings.length && (
+          {!bookingsLoading && !bookingsError && !visibleWebsiteBookings.length && (
             <p className="text-center text-gray-600">
-              No website bookings were found for {user?.email || "this account"}.
+              {bookingCategory
+                ? `No ${bookingCategories.find((category) => category.id === bookingCategory)?.label || ""} bookings found.`
+                : `No website bookings were found for ${user?.email || "this account"}.`}
             </p>
           )}
-          {bookingCategory && (
-            <>
-              {!bookingsLoading && !bookingsError && !visibleWebsiteBookings.length && (
-                <p className="text-center text-gray-600">
-                  No {bookingCategories.find((category) => category.id === bookingCategory)?.label || ""} bookings found.
-                </p>
-              )}
+          {!bookingsLoading && !bookingsError && visibleWebsiteBookings.length > 0 && (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                 {visibleWebsiteBookings.map((booking) => {
               const start = new Date(booking.start);
@@ -898,18 +921,12 @@ const AiProfile = () => {
                       setRescheduleEndTime(new Date(booking.end).toTimeString().slice(0, 5));
                     }}
                   >
-                    {booking.imageUrl ? (
-                      <img
-                        src={booking.imageUrl}
-                        alt={booking.hostCompanyName || booking.roomName}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,#050505_0%,#050505_48%,#f4f4f4_48%,#f4f4f4_52%,#171717_52%,#171717_100%)] px-6 text-center">
-                        <span className="text-2xl font-semibold tracking-tight text-white mix-blend-difference">{booking.hostCompanyName || booking.roomName}</span>
-                      </div>
-                    )}
+                    <img
+                      src={booking.imageUrl || getDefaultBookingImage(booking.serviceType)}
+                      alt={booking.hostCompanyName || booking.roomName}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/5" />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="rounded-full bg-black/60 px-4 py-1.5 text-sm font-semibold text-white">
@@ -942,7 +959,6 @@ const AiProfile = () => {
               );
                 })}
               </div>
-            </>
           )}
           <Dialog
             open={Boolean(rescheduleBooking)}
