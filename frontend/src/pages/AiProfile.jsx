@@ -21,9 +21,11 @@ import { CircularProgress } from "@mui/material";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { Country } from "country-state-city";
 import { HiCheck } from "react-icons/hi";
+import { FiCalendar, FiHome, FiMapPin, FiUsers } from "react-icons/fi";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import Seo from "../components/Seo";
 import Container from "../components/Container";
+import MuiModal from "../components/Modal";
 
 const floatingLabelSx = {
   color: "black",
@@ -146,6 +148,13 @@ const AiProfile = () => {
     else params.delete("category");
     navigate(`/profile?${params.toString()}`);
   };
+  const setBookingViewParam = (view) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", "bookings");
+    if (view === "history") params.set("view", "history");
+    else params.delete("view");
+    navigate(`/profile?${params.toString()}`);
+  };
   const countries = useMemo(() => Country.getAllCountries(), []);
 
   const initialTab = searchParams.get("tab") || "profile";
@@ -201,7 +210,9 @@ const AiProfile = () => {
     confirmPassword: "",
   });
   const [rescheduleBooking, setRescheduleBooking] = useState(null);
+  const [selectedBookingDetail, setSelectedBookingDetail] = useState(null);
   const [bookingCategory, setBookingCategory] = useState(searchParams.get("category") || "");
+  const [bookingHistoryView, setBookingHistoryView] = useState(searchParams.get("view") === "history");
   const [rescheduleDate, setRescheduleDate] = useState("");
   const [rescheduleTime, setRescheduleTime] = useState("");
   const [rescheduleEndTime, setRescheduleEndTime] = useState("");
@@ -299,9 +310,18 @@ const AiProfile = () => {
       .filter((serviceType) => !knownBookingCategories.some((category) => category.id === serviceType))
       .map((id) => ({ id, label: getBookingCategoryLabel(id) })),
   ];
+  const isPastBooking = (booking) => {
+    const status = String(booking.status || "confirmed").toLowerCase();
+    if (["cancelled", "completed"].includes(status)) return true;
+    const end = new Date(booking.end);
+    return !Number.isNaN(end.getTime()) && end < new Date();
+  };
+  const scopedWebsiteBookings = websiteBookings.filter((booking) =>
+    bookingHistoryView ? isPastBooking(booking) : !isPastBooking(booking),
+  );
   const visibleWebsiteBookings = bookingCategory
-    ? websiteBookings.filter((booking) => booking.serviceType === bookingCategory)
-    : websiteBookings;
+    ? scopedWebsiteBookings.filter((booking) => booking.serviceType === bookingCategory)
+    : scopedWebsiteBookings;
 
   useEffect(() => {
     if (!auth?.user) navigate("/login", { replace: true });
@@ -311,6 +331,7 @@ const AiProfile = () => {
     const tab = searchParams.get("tab") || "profile";
     setActiveTab(tab);
     setBookingCategory(searchParams.get("category") || "");
+    setBookingHistoryView(searchParams.get("view") === "history");
   }, [searchParams]);
 
   useEffect(() => {
@@ -851,15 +872,15 @@ const AiProfile = () => {
                     className={`rounded-2xl border bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${!bookingCategory ? "border-secondary-dark ring-1 ring-secondary-dark" : "border-gray-200 hover:border-gray-400"}`}
                   >
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-500">All</p>
-                    <p className="mt-2 text-2xl font-bold text-secondary-dark">{websiteBookings.length}</p>
-                    <p className="text-xs text-gray-500">{websiteBookings.length === 1 ? "booking" : "bookings"}</p>
+                    <p className="mt-2 text-2xl font-bold text-secondary-dark">{scopedWebsiteBookings.length}</p>
+                    <p className="text-xs text-gray-500">{scopedWebsiteBookings.length === 1 ? "booking" : "bookings"}</p>
                     <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
                       <span className="text-[10px] uppercase text-gray-400">Every category</span>
-                      <span className="text-xs font-semibold text-blue-600">View bookings →</span>
+                      <span className="text-xs font-semibold text-primary-blue">View bookings →</span>
                     </div>
                   </button>
                   {bookingCategories.map((category) => {
-                    const count = websiteBookings.filter((booking) => booking.serviceType === category.id).length;
+                    const count = scopedWebsiteBookings.filter((booking) => booking.serviceType === category.id).length;
                     const isActive = bookingCategory === category.id;
                     return (
                       <button
@@ -873,15 +894,24 @@ const AiProfile = () => {
                         <p className="text-xs text-gray-500">{count === 1 ? "booking" : "bookings"}</p>
                         <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
                           <span className="text-[10px] uppercase text-gray-400">{category.label}</span>
-                          <span className="text-xs font-semibold text-blue-600">View bookings →</span>
+                          <span className="text-xs font-semibold text-primary-blue">View bookings →</span>
                         </div>
                       </button>
                     );
                   })}
                 </div>
-          <h2 className="mb-4 text-lg font-semibold text-secondary-dark">
-            {bookingCategory ? bookingCategories.find((category) => category.id === bookingCategory)?.label : "All"} Bookings
-          </h2>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-secondary-dark">
+              All {bookingHistoryView ? "Past" : "Upcoming"}{bookingCategory ? ` ${bookingCategories.find((category) => category.id === bookingCategory)?.label}` : ""} Bookings
+            </h2>
+            <button
+              type="button"
+              onClick={() => setBookingViewParam(bookingHistoryView ? "" : "history")}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${bookingHistoryView ? "border-secondary-dark bg-secondary-dark text-white" : "border-gray-200 bg-white text-gray-700 hover:border-gray-400"}`}
+            >
+              {bookingHistoryView ? "Back to Upcoming" : "History"}
+            </button>
+          </div>
           {bookingsLoading && (
             <div className="flex justify-center"><CircularProgress size={28} /></div>
           )}
@@ -893,8 +923,10 @@ const AiProfile = () => {
           {!bookingsLoading && !bookingsError && !visibleWebsiteBookings.length && (
             <p className="text-center text-gray-600">
               {bookingCategory
-                ? `No ${bookingCategories.find((category) => category.id === bookingCategory)?.label || ""} bookings found.`
-                : `No website bookings were found for ${user?.email || "this account"}.`}
+                ? `No ${bookingHistoryView ? "past" : "upcoming"} ${bookingCategories.find((category) => category.id === bookingCategory)?.label || ""} bookings found.`
+                : bookingHistoryView
+                  ? "No past bookings yet."
+                  : `No upcoming bookings were found for ${user?.email || "this account"}.`}
             </p>
           )}
           {!bookingsLoading && !bookingsError && visibleWebsiteBookings.length > 0 && (
@@ -912,14 +944,7 @@ const AiProfile = () => {
                   <button
                     type="button"
                     className="group relative aspect-square w-full overflow-hidden rounded-3xl bg-white"
-                    disabled={isStayBooking || ['cancelled', 'completed'].includes(normalizedStatus)}
-                    onClick={() => {
-                      const current = new Date(booking.start);
-                      setRescheduleBooking(booking);
-                      setRescheduleDate(current.toISOString().slice(0, 10));
-                      setRescheduleTime(current.toTimeString().slice(0, 5));
-                      setRescheduleEndTime(new Date(booking.end).toTimeString().slice(0, 5));
-                    }}
+                    onClick={() => setSelectedBookingDetail(booking)}
                   >
                     <img
                       src={booking.imageUrl || getDefaultBookingImage(booking.serviceType)}
@@ -930,7 +955,7 @@ const AiProfile = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/5" />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="rounded-full bg-black/60 px-4 py-1.5 text-sm font-semibold text-white">
-                        {isStayBooking ? "Confirmed" : ['cancelled', 'completed'].includes(normalizedStatus) ? "View Booking" : "Reschedule"}
+                        View Details
                       </span>
                     </div>
                     <div className="absolute inset-x-2 bottom-2 flex justify-end">
@@ -967,18 +992,20 @@ const AiProfile = () => {
             maxWidth="sm"
             PaperProps={{ sx: { borderRadius: 4, overflow: "hidden" } }}
           >
-            <div className="bg-black px-6 py-5 text-white">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#00AEEF]">Meeting room booking</p>
-              <DialogTitle sx={{ p: 0, mt: 0.75, color: "white", fontWeight: 700 }}>
+            <DialogTitle sx={{ px: 3, pt: 3, pb: 0.5 }}>
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                Meeting room booking
+              </p>
+              <p className="mt-1 text-xl font-semibold text-gray-900 sm:text-2xl">
                 Reschedule {rescheduleBooking?.roomName}
-              </DialogTitle>
-            </div>
+              </p>
+            </DialogTitle>
             <DialogContent sx={{ p: 3 }}>
               {rescheduleBooking && (
                 <div className="mb-5 rounded-2xl border border-gray-200 bg-gray-50 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Current booking</p>
-                  <p className="mt-1 font-semibold text-black">{rescheduleBooking.bookingCode}</p>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Current booking</p>
+                  <p className="mt-1 text-sm font-semibold text-gray-900">{rescheduleBooking.bookingCode}</p>
+                  <p className="mt-0.5 text-sm text-gray-600">
                     {new Date(rescheduleBooking.start).toLocaleDateString()} · {new Date(rescheduleBooking.start).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} – {new Date(rescheduleBooking.end).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </p>
                 </div>
@@ -1011,10 +1038,10 @@ const AiProfile = () => {
                 fullWidth
               />
               </div>
-              <div className="mt-5 rounded-2xl border p-4">
+              <div className="mt-5 rounded-2xl border border-gray-200 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm font-semibold text-gray-700">Selected duration</span>
-                  <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-black">
+                  <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-900">
                     {selectedDurationMinutes ? `${selectedDurationMinutes} min` : "—"}
                   </span>
                 </div>
@@ -1035,9 +1062,10 @@ const AiProfile = () => {
             </DialogContent>
             <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
               <Button
+                variant="outlined"
                 onClick={() => setRescheduleBooking(null)}
                 disabled={reschedulePending}
-                sx={{ borderRadius: 999, px: 3, color: "black" }}
+                sx={{ borderRadius: 999, px: 3, borderColor: "#d1d5db", color: "#374151", "&:hover": { bgcolor: "#f9fafb", borderColor: "#d1d5db" } }}
               >Cancel</Button>
               <Button
                 variant="contained"
@@ -1049,6 +1077,183 @@ const AiProfile = () => {
               </Button>
             </DialogActions>
           </Dialog>
+
+          <MuiModal
+            open={Boolean(selectedBookingDetail)}
+            onClose={() => setSelectedBookingDetail(null)}
+            title={selectedBookingDetail?.bookingCode || "Booking Details"}
+          >
+            {selectedBookingDetail && (() => {
+              const detail = selectedBookingDetail;
+              const detailStart = new Date(detail.start);
+              const detailEnd = new Date(detail.end);
+              const detailIsStay = detail.serviceType === "hostel" || detail.serviceType === "co-living";
+              const detailIsPast = isPastBooking(detail);
+              const detailStatus = String(detail.status || "confirmed").toLowerCase();
+              const detailNights = Math.max(
+                1,
+                Math.round((detailEnd - detailStart) / (1000 * 60 * 60 * 24)),
+              );
+              const detailBedLabel = Array.isArray(detail.bedNumbers)
+                ? detail.bedNumbers.join(", ")
+                : detail.bedNumbers;
+              const DetailIcon = detail.serviceType === "meeting-room" ? FiUsers : FiHome;
+              const amountFormatter = new Intl.NumberFormat("en-US", { style: "currency", currency: detail.currency || "USD" });
+              return (
+                <div className="flex flex-col gap-6 pb-2">
+                  {/* Hero image */}
+                  <img
+                    src={detail.imageUrl || getDefaultBookingImage(detail.serviceType)}
+                    alt={detail.hostCompanyName || detail.roomName}
+                    className="h-48 w-full rounded-2xl object-cover sm:h-56"
+                  />
+
+                  {/* Header: icon avatar + name + status pills */}
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 items-center gap-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#fff0f0] text-[#ff5757] sm:h-14 sm:w-14">
+                        <DetailIcon size={22} aria-hidden />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-xl font-semibold text-gray-900 sm:text-2xl">
+                          {detail.hostCompanyName || detail.roomName}
+                        </p>
+                        <p className="mt-0.5 truncate text-sm text-gray-500" title={detail.roomName}>
+                          {detail.roomName && detail.hostCompanyName
+                            ? detail.roomName
+                            : getBookingCategoryLabel(detail.serviceType)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+                      <span className="rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700">
+                        {getBookingCategoryLabel(detail.serviceType)}
+                      </span>
+                      <span
+                        className={`rounded-full border px-3 py-1.5 text-xs font-medium capitalize ${
+                          detailStatus === "cancelled"
+                            ? "border-red-200 bg-red-50 text-red-700"
+                            : "border-gray-200 bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {detailStatus}
+                      </span>
+                      {detail.paymentStatus ? (
+                        <span
+                          className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                            detail.paymentStatus === "Paid"
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                              : "border-amber-200 bg-amber-50 text-amber-700"
+                          }`}
+                        >
+                          {detail.paymentStatus}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* Details */}
+                  <div className="flex flex-col gap-4 border-t border-borderGray pt-5">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600">
+                        <FiCalendar size={15} aria-hidden />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                          {detailIsStay ? "Stay" : "Schedule"}
+                        </p>
+                        <p className="mt-0.5 text-sm font-medium text-gray-800">
+                          {detailIsStay
+                            ? `${detailStart.toLocaleDateString()} – ${detailEnd.toLocaleDateString()}`
+                            : `${detailStart.toLocaleDateString()} · ${detailStart.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}–${detailEnd.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}
+                        </p>
+                        {detailIsStay && (
+                          <p className="mt-0.5 text-sm text-gray-500">
+                            {detailNights} night{detailNights === 1 ? "" : "s"}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {detail.location && (
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600">
+                          <FiMapPin size={15} aria-hidden />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Location</p>
+                          <p className="mt-0.5 text-sm font-medium text-gray-800">{detail.location}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {detail.attendees ? (
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600">
+                          <FiUsers size={15} aria-hidden />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Attendees</p>
+                          <p className="mt-0.5 text-sm font-medium text-gray-800">
+                            {detail.attendees} attendee{detail.attendees === 1 ? "" : "s"}
+                          </p>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {detailIsStay && detailBedLabel ? (
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600">
+                          <FiHome size={15} aria-hidden />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Beds</p>
+                          <p className="mt-0.5 text-sm font-medium text-gray-800">{detailBedLabel}</p>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {/* Amount */}
+                  {typeof detail.totalAmount === "number" && (
+                    <div className="flex items-center justify-between border-t border-borderGray pt-5">
+                      <span className="text-sm font-medium text-gray-500">Amount</span>
+                      <span className="text-xl font-semibold text-gray-900">
+                        {amountFormatter.format(detail.totalAmount)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Footer actions */}
+                  <div className="flex flex-col-reverse gap-3 border-t border-borderGray pt-5 sm:flex-row sm:justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedBookingDetail(null)}
+                      className="rounded-full border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                    >
+                      Close
+                    </button>
+                    {!detailIsStay && !detailIsPast && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const current = new Date(detail.start);
+                          setRescheduleBooking(detail);
+                          setRescheduleDate(current.toISOString().slice(0, 10));
+                          setRescheduleTime(current.toTimeString().slice(0, 5));
+                          setRescheduleEndTime(new Date(detail.end).toTimeString().slice(0, 5));
+                          setSelectedBookingDetail(null);
+                        }}
+                        className="rounded-full bg-black px-6 py-2 text-sm font-semibold text-white transition hover:bg-[#333]"
+                      >
+                        Reschedule
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+          </MuiModal>
         </div>
         </Container>
       )}
