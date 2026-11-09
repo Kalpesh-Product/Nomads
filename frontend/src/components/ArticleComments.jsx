@@ -32,7 +32,7 @@ function CommentEntry({ entry, children }) {
   );
 }
 
-export default function ArticleComments({ articleId, kind, title, readOnly = false, hideWhenEmpty = false }) {
+export default function ArticleComments({ articleId, kind, title, repliesOnly = false, hideWhenEmpty = false }) {
   const { auth } = useAuth();
   const client = useAxiosPrivate();
   const queryClient = useQueryClient();
@@ -115,7 +115,7 @@ export default function ArticleComments({ articleId, kind, title, readOnly = fal
         <div className="space-y-7">
           {data?.data?.map((comment) => (
             <CommentEntry key={comment._id} entry={comment}>
-              {!readOnly && <button type="button" disabled={mutation.isPending} onClick={() => { if (!signedIn) return logIn(); setReplyTo(comment._id); setReplyText(""); mutation.reset(); setNotice(""); }} className="text-xs font-medium text-primary-blue hover:underline">Reply</button>}
+              <button type="button" disabled={mutation.isPending} onClick={() => { if (!signedIn) return logIn(); setReplyTo(comment._id); setReplyText(""); mutation.reset(); setNotice(""); }} className="text-xs font-medium text-primary-blue hover:underline">Reply</button>
               {comment.replies?.length > 0 && <div className="space-y-5 border-l border-gray-200 pl-3 pt-3 sm:pl-5">{comment.replies.map((reply) => <CommentEntry key={reply._id} entry={reply} />)}</div>}
               {replyTo === comment._id && <div className="pt-3">{renderReplyForm()}</div>}
             </CommentEntry>
@@ -127,7 +127,7 @@ export default function ArticleComments({ articleId, kind, title, readOnly = fal
         <span className="text-gray-500">Page {page} of {data.totalPages}</span>
         <button type="button" disabled={page >= data.totalPages || mutation.isPending} onClick={() => { setPage(page + 1); setReplyTo(null); }} className="text-primary-blue disabled:text-gray-400">Older comments</button>
       </div>}
-      {!readOnly && <div className="flex justify-center">
+      {!repliesOnly && <div className="flex justify-center">
         <button type="button" onClick={() => {
           if (!signedIn) return logIn();
           mutation.reset(); setNotice(""); setReplyTo(null); setCommentOpen(true);
@@ -135,7 +135,7 @@ export default function ArticleComments({ articleId, kind, title, readOnly = fal
           WRITE A COMMENT
         </button>
       </div>}
-      {!readOnly && <MuiModal open={commentOpen} onClose={() => { if (!mutation.isPending) setCommentOpen(false); }} title={title || "Write a comment"}>
+      {!repliesOnly && <MuiModal open={commentOpen} onClose={() => { if (!mutation.isPending) setCommentOpen(false); }} title={title || "Write a comment"}>
         <form onSubmit={(event) => submit(event)} className="grid grid-cols-1 gap-6">
           <div className="flex items-center gap-4">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary-blue text-2xl font-semibold uppercase text-white">{initials(authorName)}</div>

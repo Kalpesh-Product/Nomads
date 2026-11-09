@@ -33,6 +33,7 @@ const contributionPreviewConfig = {
     errorMessage: "Could not update this blog. Please check the details and try again.",
     submitButtonLabel: "Publish Blog",
     previewType: "article",
+    commentKind: "blog",
   },
   news: {
     label: "News",
@@ -45,6 +46,7 @@ const contributionPreviewConfig = {
     errorMessage: "Could not update this news item. Please check the details and try again.",
     submitButtonLabel: "Publish News",
     previewType: "article",
+    commentKind: "news",
   },
   event: {
     label: "Event",
@@ -307,6 +309,9 @@ const PreviewHeader = ({ config, item, onEdit, onDelete, isDeleting }) => {
 const ArticlePreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   let sectionImageIndex = 0;
   const title = item.mainTitle || `Untitled ${config.label}`;
+  const articleId = item._id || item.id;
+  const showComments = config.commentKind && articleId && !item.isDraft &&
+    !item.deletedAt && String(item.status).toLowerCase() === "approved";
   const sections = (item.sections || []).map((section) => {
     if (!section.image) return { ...section, imageSide: null };
     const imageSide = sectionImageIndex % 2 === 0 ? "left" : "right";
@@ -367,13 +372,12 @@ const ArticlePreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
             {getSourceName(item.source) || "Source"}
           </p>
         </footer>
-        {config.label === "Blog" && !item.isDraft && !item.deletedAt && String(item.status).toLowerCase() === "approved" ? (
+        {showComments ? (
           <ArticleComments
-            key={`blog-${item._id || item.id}`}
-            articleId={item._id || item.id}
-            kind="blog"
-            title={title}
-            readOnly
+            key={`${config.commentKind}-${articleId}`}
+            articleId={articleId}
+            kind={config.commentKind}
+            repliesOnly
             hideWhenEmpty
           />
         ) : null}
