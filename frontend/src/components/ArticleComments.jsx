@@ -32,7 +32,7 @@ function CommentEntry({ entry, children }) {
   );
 }
 
-export default function ArticleComments({ articleId, kind, title }) {
+export default function ArticleComments({ articleId, kind, title, repliesOnly = false, hideWhenEmpty = false }) {
   const { auth } = useAuth();
   const client = useAxiosPrivate();
   const queryClient = useQueryClient();
@@ -94,6 +94,8 @@ export default function ArticleComments({ articleId, kind, title }) {
     </form>
   );
 
+  if (hideWhenEmpty && !isPending && !isError && !data?.total) return null;
+
   return (
     <section aria-labelledby={`${formId}-heading`} className="border-b border-gray-200 py-8 space-y-6">
       <div className="flex flex-wrap items-center gap-3">
@@ -125,15 +127,15 @@ export default function ArticleComments({ articleId, kind, title }) {
         <span className="text-gray-500">Page {page} of {data.totalPages}</span>
         <button type="button" disabled={page >= data.totalPages || mutation.isPending} onClick={() => { setPage(page + 1); setReplyTo(null); }} className="text-primary-blue disabled:text-gray-400">Older comments</button>
       </div>}
-      <div className="flex justify-center">
+      {!repliesOnly && <div className="flex justify-center">
         <button type="button" onClick={() => {
           if (!signedIn) return logIn();
           mutation.reset(); setNotice(""); setReplyTo(null); setCommentOpen(true);
         }} className="flex rounded-full items-center cursor-pointer justify-center gap-2 bg-primary-blue hover:bg-secondary-light text-primary text-content leading-5 px-6 py-3">
           WRITE A COMMENT
         </button>
-      </div>
-      <MuiModal open={commentOpen} onClose={() => { if (!mutation.isPending) setCommentOpen(false); }} title={title || "Write a comment"}>
+      </div>}
+      {!repliesOnly && <MuiModal open={commentOpen} onClose={() => { if (!mutation.isPending) setCommentOpen(false); }} title={title || "Write a comment"}>
         <form onSubmit={(event) => submit(event)} className="grid grid-cols-1 gap-6">
           <div className="flex items-center gap-4">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary-blue text-2xl font-semibold uppercase text-white">{initials(authorName)}</div>
@@ -157,7 +159,7 @@ export default function ArticleComments({ articleId, kind, title }) {
             <SecondaryButton title="Submit Comment" type="submit" externalStyles="mt-4" disabled={mutation.isPending || !text.trim()} isLoading={mutation.isPending} />
           </div>
         </form>
-      </MuiModal>
+      </MuiModal>}
     </section>
   );
 }
