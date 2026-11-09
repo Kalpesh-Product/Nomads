@@ -1,3 +1,4 @@
+import ArticleComments from "../components/ArticleComments";
 import CharacterLimitedField from "../components/CharacterLimitedField";
 import PlaceLocation, { PlaceAddress } from "../components/PlaceLocation";
 import CategorySelect from "../components/CategorySelect";
@@ -366,6 +367,16 @@ const ArticlePreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
             {getSourceName(item.source) || "Source"}
           </p>
         </footer>
+        {config.label === "Blog" && !item.isDraft && !item.deletedAt && String(item.status).toLowerCase() === "approved" ? (
+          <ArticleComments
+            key={`blog-${item._id || item.id}`}
+            articleId={item._id || item.id}
+            kind="blog"
+            title={title}
+            readOnly
+            hideWhenEmpty
+          />
+        ) : null}
       </div>
     </div>
   );
@@ -433,7 +444,7 @@ const DestinationPreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   );
 };
 
-const EditActions = ({ config, isSaving, onCancel, onSubmit }) => (
+const EditActions = ({ config, isSaving, onCancel, onSubmit, deleteAction }) => (
   <div className="contribution-edit-actions sticky top-0 z-30 -mx-4 mb-6 flex flex-col gap-3 border-b border-black/10 bg-[#fffef2]/95 px-4 pb-5 pt-2 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:-mx-8 md:px-8 lg:-mx-8">
     <div>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-blue">
@@ -444,6 +455,7 @@ const EditActions = ({ config, isSaving, onCancel, onSubmit }) => (
       </h1>
     </div>
     <div className="flex flex-wrap items-center gap-3">
+      {deleteAction}
       <button
         type="button"
         onClick={onCancel}
@@ -593,7 +605,7 @@ const PlaceFields = ({ formValues, updateFormField }) => (
   </>
 );
 
-const ContributionEditForm = ({ item, config, onCancel }) => {
+const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = false }) => {
   const isRepublish =
     !item.isDraft &&
     ["approved", "rejected"].includes(String(item.status || "").toLowerCase());
@@ -892,12 +904,23 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
     updateContributionMutation.mutate({ payload });
   };
 
-  const isSaving = updateContributionMutation.isPending;
+  const isSaving = updateContributionMutation.isPending || isDeleting;
 
   if (showSections) {
     return (
       <ArticleInlineEdit
         config={editConfig}
+        deleteAction={onDelete ? (
+          <button
+            type="button"
+            onClick={onDelete}
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-5 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <HiOutlineTrash size={16} />
+            {isDeleting ? "Deleting..." : "Delete"}
+          </button>
+        ) : null}
         formValues={formValues}
         updateFormField={updateFormField}
         updateSection={updateSection}
@@ -932,6 +955,7 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
 
 const ArticleInlineEdit = ({
   config,
+  deleteAction,
   formValues,
   updateFormField,
   updateSection,
@@ -957,6 +981,7 @@ const ArticleInlineEdit = ({
   return (
     <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
       <EditActions
+        deleteAction={deleteAction}
         config={config}
         isSaving={isSaving}
         onCancel={onCancel}
@@ -1435,6 +1460,8 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
         item={item}
         config={config}
         onCancel={() => setIsEditing(false)}
+        onDelete={type === "blog" && item.isDraft ? handleDelete : undefined}
+        isDeleting={isDeleting}
       />
     );
   }
