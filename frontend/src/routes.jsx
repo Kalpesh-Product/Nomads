@@ -230,7 +230,8 @@ function getTenantFromHost() {
     hostname === `www.${rootDomain}` ||
     hostname === "localhost" ||
     hostname.startsWith("localhost:") ||
-    hostname.endsWith(".vercel.app")
+    hostname.endsWith(".vercel.app") ||
+    hostname.endsWith(".trycloudflare.com")
   ) {
     return "main";
   }
