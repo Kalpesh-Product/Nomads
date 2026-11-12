@@ -154,6 +154,7 @@ export const getBlogs = async (req, res, next) => {
     try {
         const { keyword, destination } = req.query;
         let query = {
+            deletedAt: null,
             isDraft: { $ne: true },
             isActive: { $ne: false },
             $or: [{ status: "approved" }, { status: { $exists: false } }],
@@ -183,6 +184,7 @@ export const getBlogDestinationCounts = async (req, res, next) => {
         const counts = await Blog.aggregate([
             {
                 $match: {
+                    deletedAt: null,
                     isActive: { $ne: false },
                     isDraft: { $ne: true },
                     $or: [{ status: "approved" }, { status: { $exists: false } }],
@@ -378,7 +380,7 @@ export const createBlog = async (req, res, next) => {
 export const getMyBlogs = async (req, res, next) => {
     try {
         const user = req.userData._id;
-        const blogs = await Blog.find({ contributor: user }).sort({
+        const blogs = await Blog.find({ contributor: user, deletedAt: null }).sort({
             updatedAt: -1,
             date: -1,
         });
@@ -401,7 +403,12 @@ export const getBlogContributions = async (req, res, next) => {
         };
 
         if (status && status !== "all") {
-            query.status = status;
+            if (status === "deleted") {
+                query.deletedAt = { $ne: null };
+            } else {
+                query.status = status;
+                query.deletedAt = null;
+            }
         }
 
         if (search) {
@@ -421,7 +428,12 @@ export const getBlogContributions = async (req, res, next) => {
 
         return res.status(200).json({
             count: blogs.length,
-            data: blogs,
+            // Keep the stored review status for the timeline; deletion takes precedence in moderation.
+            data: blogs.map((blog) => blog.deletedAt ? {
+                ...blog.toObject(),
+                statusBeforeDeletion: blog.status,
+                status: "deleted",
+            } : blog),
         });
     } catch (error) {
         next(error);
@@ -432,6 +444,10 @@ export const createMyBlog = async (req, res, next) => {
     try {
         const user = req.userData._id;
         const payload = await buildBlogPayloadWithUploads(req);
+        // Review metadata is owned by moderation, not contributor form fields.
+        for (const field of ["reviewedBy", "reviewedById", "reviewedAt", "moderationHistory"]) {
+            delete payload[field];
+        }
         const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
         const blog = await Blog.create({
@@ -459,16 +475,29 @@ export const updateMyBlog = async (req, res, next) => {
         const user = req.userData._id;
         const { id } = req.params;
         const payload = await buildBlogPayloadWithUploads(req);
+        // Review metadata is owned by moderation, not contributor form fields.
+        for (const field of ["reviewedBy", "reviewedById", "reviewedAt", "moderationHistory"]) {
+            delete payload[field];
+        }
         const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
+        const editedAt = new Date();
         const blog = await Blog.findOneAndUpdate(
             {
                 _id: id,
                 contributor: user,
+                deletedAt: null,
             },
             {
                 ...payload,
                 contributor: user,
+                lastEditedAt: editedAt,
+                reviewedAt: null,
+                reviewedBy: "",
+                reviewedById: "",
+                ...(!isDraft ? { $push: { moderationHistory: {
+                    status: "pending", date: editedAt, actor: "Contributor",
+                } } } : {}),
                 status: "pending",
                 rejectionReason: "",
                 isDraft,
@@ -507,16 +536,34 @@ export const updateBlogContributionStatus = async (req, res, next) => {
             return res.status(400).json({ message: "Rejection reason is required" });
         }
 
+        // This endpoint is protected by the admin API key; the Master Panel
+        // supplies the identity from its verified staff session.
+        const reviewedBy = typeof req.body.reviewedBy === "string" ? req.body.reviewedBy.trim() : "";
+        const reviewedById = typeof req.body.reviewedById === "string" ? req.body.reviewedById.trim() : "";
+        const reviewedAt = new Date();
         const blog = await Blog.findOneAndUpdate(
             {
                 _id: id,
                 contributor: { $exists: true, $ne: null },
+                deletedAt: null,
                 isDraft: { $ne: true },
             },
             {
                 status: normalizedStatus,
                 rejectionReason: normalizedStatus === "rejected" ? normalizedReason : "",
                 isActive: normalizedStatus === "approved",
+                reviewedAt,
+                reviewedBy,
+                reviewedById,
+                $push: {
+                    moderationHistory: {
+                        status: normalizedStatus,
+                        date: reviewedAt,
+                        reason: normalizedStatus === "rejected" ? normalizedReason : "",
+                        actor: reviewedBy || "Master Panel",
+                        actorId: reviewedById,
+                    },
+                },
             },
             { new: true },
         ).populate("contributor", "firstName lastName fullName name email");
@@ -534,11 +581,41 @@ export const updateBlogContributionStatus = async (req, res, next) => {
     }
 };
 
+// Retain the contributor's reason while removing the blog from active lists.
+export const deleteMyBlog = async (req, res, next) => {
+    try {
+        const user = req.userData?._id;
+        if (!user) return res.status(401).json({ message: "Authentication required" });
+
+        const { deletionReason, agreedToDelete } = req.body || {};
+        if (agreedToDelete !== true) {
+            return res.status(400).json({ message: "Please agree before deleting this blog." });
+        }
+        if (typeof deletionReason !== "string" || !deletionReason.trim()) {
+            return res.status(400).json({ message: "Reason for deleting is required." });
+        }
+        const reason = deletionReason.trim();
+        if (reason.length > 500) {
+            return res.status(400).json({ message: "Deletion reason must be 500 characters or fewer." });
+        }
+
+        const blog = await Blog.findOneAndUpdate(
+            { _id: req.params.id, contributor: user, deletedAt: null },
+            { $set: { deletedAt: new Date(), deletionReason: reason, isActive: false } },
+            { new: true, runValidators: true },
+        );
+        if (!blog) return res.status(404).json({ message: "Blog contribution not found" });
+        return res.status(200).json({ message: "Blog deleted successfully" });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // PUT: Update a single blog item
 export const updateBlog = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const blog = await Blog.findByIdAndUpdate(id, req.body, { new: true });
+        const blog = await Blog.findOneAndUpdate({ _id: id, deletedAt: null }, req.body, { new: true });
         if (!blog) return res.status(404).json({ message: "Blog not found" });
         res.status(200).json({ message: "Blog updated", blog });
     } catch (error) {

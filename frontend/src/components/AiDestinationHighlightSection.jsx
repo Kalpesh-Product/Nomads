@@ -1,4 +1,5 @@
 import { AiFillStar } from "react-icons/ai";
+import ContentFavoriteButton from "./ContentFavoriteButton";
 
 const DEFAULT_HIGHLIGHT_IMAGE = "/images/goa-image.jpg";
 
@@ -48,16 +49,23 @@ const getHighlightImage = (image) => {
   return normalizeImageUrl(image) || DEFAULT_HIGHLIGHT_IMAGE;
 };
 
-const HighlightCard = ({ item, kind, onClick }) => {
+export const HighlightCard = ({ item, kind, onClick, showRemoveFavoriteIcon = false }) => {
   const imageSrc = getHighlightImage(item.image);
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          onClick(item);
+        }
+      }}
       onClick={() => onClick(item)}
-      className="flex w-full flex-col gap-2 rounded-lg bg-white text-left transition-transform hover:scale-[1.01]"
+      className="flex w-full cursor-pointer flex-col gap-2 rounded-lg bg-white text-left transition-transform hover:scale-[1.01]"
     >
-      <div className="aspect-square w-full overflow-hidden rounded-3xl bg-gray-100">
+      <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-gray-100">
         <img
           src={imageSrc}
           alt={item.title}
@@ -68,6 +76,9 @@ const HighlightCard = ({ item, kind, onClick }) => {
             event.currentTarget.src = DEFAULT_HIGHLIGHT_IMAGE;
           }}
         />
+        {["blog", "news", "place", "event"].includes(kind) && item._id && (
+          <ContentFavoriteButton item={item} kind={kind} showRemoveFavoriteIcon={showRemoveFavoriteIcon} />
+        )}
       </div>
       <div className="flex min-w-0 flex-col gap-1 px-4">
         <p
@@ -90,7 +101,7 @@ const HighlightCard = ({ item, kind, onClick }) => {
           </div>
         )}
       </div>
-    </button>
+    </div>
   );
 };
 

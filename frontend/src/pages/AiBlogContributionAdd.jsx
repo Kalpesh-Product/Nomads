@@ -1,4 +1,5 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
+import BlogSectionPreview from "../components/BlogSectionPreview";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import CategorySelect from "../components/CategorySelect";
@@ -1448,8 +1449,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       ) : (
         <section className="mt-0 bg-transparent px-0 py-2">
           <div className="w-full py-6">
-            <h1 className="mb-8 text-2xl font-semibold uppercase text-slate-700">
+            <h1 className="mb-8 flex flex-wrap items-center gap-3 text-2xl font-semibold uppercase text-slate-700">
               Add {config.contentLabel}
+              <BlogSectionPreview contentLabel={config.contentLabel} layout={isArticleContribution ? "article" : "destination"} />
             </h1>
 
             <div
@@ -1923,7 +1925,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             {config.formType === "event" ||
             config.formType === "place" ? null : (
               <>
-                <h2 className="mt-5 text-lg font-semibold text-slate-700">
+                <h2 className="mt-5 flex flex-wrap items-center gap-3 text-lg font-semibold text-slate-700">
                   Sections
                 </h2>
 
@@ -1931,8 +1933,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   {formValues.sections.map((section, index) => (
                     <div key={index} className="border-t border-slate-200 pt-5">
                       <div className="mb-4 flex items-center justify-between gap-3">
-                        <h3 className="text-sm font-medium text-slate-600">
+                        <h3 className="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
                           Section {index + 1}
+                          <BlogSectionPreview contentLabel={config.contentLabel} section="section" index={index} />
                         </h3>
                         {formValues.sections.length > 1 ? (
                           <button

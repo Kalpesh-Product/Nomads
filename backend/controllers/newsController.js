@@ -1,3 +1,11 @@
+import {
+  applyContributionStatusFilter,
+  serializeContribution,
+  stripLifecycleFields,
+  resubmissionFields,
+  createDeleteContribution,
+  createModerateContribution,
+} from "../utils/contributionLifecycle.js";
 // // controllers/newsController.js
 // import axios from "axios";
 // import NewsCache from "../models/NewsCache.js";
@@ -109,6 +117,7 @@ export const getNews = async (req, res, next) => {
 
     let query = {
       isDraft: { $ne: true },
+      deletedAt: null,
       isActive: { $ne: false },
       $or: [{ status: "approved" }, { status: { $exists: false } }],
     };
@@ -137,6 +146,7 @@ export const getNewsDestinationCounts = async (req, res, next) => {
     const counts = await News.aggregate([
       {
         $match: {
+          deletedAt: null,
           isActive: { $ne: false },
           isDraft: { $ne: true },
           $or: [{ status: "approved" }, { status: { $exists: false } }],
@@ -249,7 +259,7 @@ export const createNews = async (req, res, next) => {
 export const getMyNews = async (req, res, next) => {
   try {
     const user = req.userData._id;
-    const news = await News.find({ contributor: user }).sort({
+    const news = await News.find({ contributor: user, deletedAt: null }).sort({
       updatedAt: -1,
       date: -1,
     });
@@ -271,9 +281,7 @@ export const getNewsContributions = async (req, res, next) => {
       isDraft: { $ne: true },
     };
 
-    if (status && status !== "all") {
-      query.status = status;
-    }
+    applyContributionStatusFilter(query, status);
 
     if (search) {
       const pattern = { $regex: search, $options: "i" };
@@ -292,7 +300,7 @@ export const getNewsContributions = async (req, res, next) => {
 
     return res.status(200).json({
       count: news.length,
-      data: news,
+      data: news.map(serializeContribution),
     });
   } catch (error) {
     next(error);
@@ -308,6 +316,7 @@ export const createMyNews = async (req, res, next) => {
       folderType: "news",
       title: req.body?.mainTitle,
     });
+    stripLifecycleFields(payload);
     const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
     const news = await News.create({
@@ -339,15 +348,18 @@ export const updateMyNews = async (req, res, next) => {
       folderType: "news",
       title: req.body?.mainTitle,
     });
+    stripLifecycleFields(payload);
     const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
 
     const news = await News.findOneAndUpdate(
       {
         _id: id,
         contributor: user,
+        deletedAt: null,
       },
       {
         ...payload,
+        ...resubmissionFields(isDraft),
         contributor: user,
         status: "pending",
         isDraft,
@@ -371,47 +383,15 @@ export const updateMyNews = async (req, res, next) => {
   }
 };
 
-export const updateNewsContributionStatus = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-    const normalizedStatus = String(status || "").toLowerCase();
+export const updateNewsContributionStatus = createModerateContribution(News, "News", "news");
 
-    if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
-      return res.status(400).json({ message: "Invalid news status" });
-    }
-
-    const news = await News.findOneAndUpdate(
-      {
-        _id: id,
-        contributor: { $exists: true, $ne: null },
-        isDraft: { $ne: true },
-      },
-      {
-        status: normalizedStatus,
-        isActive: normalizedStatus === "approved",
-      },
-      { new: true },
-    ).populate("contributor", "firstName lastName fullName name email");
-
-    if (!news) {
-      return res.status(404).json({ message: "News contribution not found" });
-    }
-
-    return res.status(200).json({
-      message: `News ${normalizedStatus} successfully`,
-      news,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+export const deleteMyNews = createDeleteContribution(News, "News");
 
 // PUT: Update a single news item
 export const updateNews = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const news = await News.findByIdAndUpdate(id, req.body, { new: true });
+    const news = await News.findOneAndUpdate({ _id: id, deletedAt: null }, req.body, { new: true });
     if (!news) return res.status(404).json({ message: "News not found" });
     res.status(200).json({ message: "News updated", news });
   } catch (error) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import {
   HiArrowRight,
   HiHeart,
@@ -14,13 +14,13 @@ import {
   MdMilitaryTech,
   MdOutlineNewspaper,
   MdOutlinePlace,
-  MdRateReview,
 } from "react-icons/md";
 import { TbNotebook } from "react-icons/tb";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Seo from "../components/Seo";
 import humanDate from "../utils/humanDate";
+import { rankContributionsByFavorites } from "../utils/contributionFavorites";
 
 const contributionTypes = [
   {
@@ -112,19 +112,6 @@ const getDestination = (item) =>
 
 const getItemDate = (item) => item?.date || item?.updatedAt || item?.createdAt;
 
-const getLikeCount = (item, fallback) => {
-  const value =
-    item?.likesCount ?? item?.likeCount ?? item?.totalLikes ?? item?.likes;
-
-  if (Array.isArray(value)) return value.length;
-  if (typeof value === "number") return value;
-  if (typeof value === "string" && value.trim() && !Number.isNaN(Number(value))) {
-    return Number(value);
-  }
-
-  return fallback;
-};
-
 const sortRecent = (items) =>
   [...items].sort(
     (a, b) =>
@@ -189,11 +176,10 @@ const TopContributionRow = ({ entry, index }) => {
       </div>
       <span className="hidden items-center justify-center gap-1.5 text-sm font-semibold text-black/75 md:inline-flex">
         <HiHeart className="text-rose-500" size={18} />
-        {getLikeCount(item, `${Math.max(1, index + 2)}.${index + 1}K`)}
+        {entry.favoritesCount.toLocaleString()}
       </span>
-      <span className="hidden items-center justify-center gap-1.5 text-sm font-semibold text-black/75 md:inline-flex">
-        <MdRateReview className="text-primary-blue" size={18} />
-        {Math.max(1, index + 1)}.{index + 4}K
+      <span className="hidden w-fit justify-self-center rounded-full bg-white px-3 py-1 text-xs text-black/65 md:inline-flex">
+        {config.label}
       </span>
     </button>
   );
@@ -221,6 +207,17 @@ const AiContributionsHubTwo = () => {
       enabled: Boolean(userId) && Boolean(auth?.user?.[config.flag]),
       staleTime: 1000 * 60,
     })),
+  });
+
+  const favoriteCountsQuery = useQuery({
+    queryKey: ["contributionFavoriteCounts", userId],
+    queryFn: async () => {
+      const { data } = await axiosPrivate.get("/user/content-favorites/counts");
+      return data;
+    },
+    enabled: Boolean(userId) && accessibleTypes.length > 0,
+    refetchOnMount: "always",
+    refetchInterval: 30000,
   });
 
   useEffect(() => {
@@ -269,9 +266,10 @@ const AiContributionsHubTwo = () => {
   const draftItems = allItems.filter(({ item }) => item.isDraft);
   const rankScore =
     approvedItems.length * 4 + pendingItems.length * 2 + draftItems.length;
-  const communityRank = Math.max(7, 72 - rankScore * 5);
+  const communityRank = auth.user.rank ?? Math.max(7, 72 - rankScore * 5);
+  const hasRank = auth.user.rank != null && auth.user.rank !== "";
   const recentItems = sortRecent(allItems);
-  const topItems = recentItems.slice(0, 5);
+  const topItems = rankContributionsByFavorites(recentItems, favoriteCountsQuery.data || []).slice(0, 5);
   const recentListItems = recentItems.slice(0, 5);
   const isLoading = sections.some((section) => section.query?.isLoading);
 
@@ -284,7 +282,9 @@ const AiContributionsHubTwo = () => {
             <div className="relative overflow-hidden rounded-[1.5rem] border border-sky-100 bg-gradient-to-br from-white via-[#f8fdff] to-[#eef9ff] p-6">
               <div className="absolute -right-12 -top-14 h-48 w-48 rounded-full bg-sky-100/70" />
               <div className="absolute right-40 bottom-0 h-24 w-24 rounded-t-full bg-cyan-100/55" />
-              <div className="relative z-10 grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_9rem]">
+              <div
+                className={`relative z-10 grid items-center gap-6 ${hasRank ? "lg:grid-cols-[minmax(0,1fr)_9rem]" : ""}`}
+              >
                 <div>
                   <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold text-primary-blue ring-1 ring-sky-100">
                     <HiOutlineSparkles size={15} />
@@ -294,25 +294,33 @@ const AiContributionsHubTwo = () => {
                     {getGreeting()}, {firstName}
                   </h1>
                   <p className="mt-3 max-w-2xl text-sm leading-6 text-black/65">
-                    You are currently ranked{" "}
-                    <span className="font-bold text-black">#{communityRank}</span>{" "}
-                    in the contributor community. Keep publishing approved
-                    stories and moving drafts into review to climb the
-                    leaderboard.
+                    {hasRank ? (
+                      <>
+                        You are currently ranked{" "}
+                        <span className="font-bold text-black">#{communityRank}</span>{" "}
+                        in the contributor community. Keep publishing approved
+                        stories and moving drafts into review to climb the
+                        leaderboard.
+                      </>
+                    ) : (
+                      "You can add your blogs, news, events, and places here. Share your stories and local discoveries to help the community explore more and stay informed."
+                    )}
                   </p>
                 </div>
 
-                <div className="flex h-36 w-full flex-col items-center justify-center rounded-[1.5rem] border border-white/80 bg-white/90 text-center backdrop-blur sm:w-36">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_12px_26px_rgba(73,159,222,0.24)]">
-                    <MdMilitaryTech size={20} />
-                  </span>
-                  <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-black/40">
-                    Community Rank
-                  </p>
-                  <p className="mt-1 text-2xl font-bold leading-none text-black">
-                    #{communityRank}
-                  </p>
-                </div>
+                {hasRank && (
+                  <div className="flex h-36 w-full flex-col items-center justify-center rounded-[1.5rem] border border-white/80 bg-white/90 text-center backdrop-blur sm:w-36">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-blue text-white shadow-[0_12px_26px_rgba(73,159,222,0.24)]">
+                      <MdMilitaryTech size={20} />
+                    </span>
+                    <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-black/40">
+                      Community Rank
+                    </p>
+                    <p className="mt-1 text-2xl font-bold leading-none text-black">
+                      #{communityRank}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -436,12 +444,17 @@ const AiContributionsHubTwo = () => {
                     Top contributions
                   </h2>
                   <p className="mt-1 text-xs text-black/55">
-                    The most engaged items across blogs, news, events, and places.
+                    Your most favorited items across blogs, news, events, and places.
                   </p>
 
-                  {isLoading ? (
+                  {isLoading || favoriteCountsQuery.isLoading ? (
                     <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
                       Loading contributions...
+                    </div>
+                  ) : favoriteCountsQuery.isError ? (
+                    <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
+                      Could not load favorite counts.
+                      <button type="button" className="ml-2 underline" onClick={() => favoriteCountsQuery.refetch()}>Retry</button>
                     </div>
                   ) : topItems.length > 0 ? (
                     <div className="mt-5">
@@ -450,7 +463,7 @@ const AiContributionsHubTwo = () => {
                         <span>Image</span>
                         <span>Title</span>
                         <span className="justify-self-center">Likes</span>
-                        <span className="justify-self-center">Reviews</span>
+                        <span className="justify-self-center">Category</span>
                       </div>
                       <div className="hidden border-t border-black/10 md:block" />
                       <div className="mt-2 space-y-1">

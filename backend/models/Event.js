@@ -1,3 +1,4 @@
+import { contributionLifecycleFields } from "../utils/contributionLifecycle.js";
 import mongoose from "mongoose";
 
 const eventSchema = new mongoose.Schema(
@@ -81,6 +82,8 @@ const eventSchema = new mongoose.Schema(
 );
 
 eventSchema.index({ destination: 1 });
+
+eventSchema.add(contributionLifecycleFields);
 
 const Event = mongoose.model("Event", eventSchema, "events");
 

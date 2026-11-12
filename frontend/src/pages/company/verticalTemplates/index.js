@@ -14,6 +14,7 @@ import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
 import WorkscapeTemplate from "./workscape/WorkscapeTemplate";
 import BrixspaceTemplate from "./brixspace/BrixspaceTemplate";
 import WorpaceTemplate from "./worpace/WorpaceTemplate";
+import CoboxTemplate from "./cobox/CoboxTemplate";
 import QerjaTemplate from "./qerja/QerjaTemplate";
 import TulumTemplate from "./tulum/TulumTemplate";
 import GrindelwaldTemplate from "./grindelwald/GrindelwaldTemplate";
@@ -38,6 +39,7 @@ export const VERTICAL_TEMPLATES = {
   workscape: WorkscapeTemplate,
   brixspace: BrixspaceTemplate,
   worpace: WorpaceTemplate,
+  cobox: CoboxTemplate,
   qerja: QerjaTemplate,
   tulum: TulumTemplate,
   grindelwald: GrindelwaldTemplate,
