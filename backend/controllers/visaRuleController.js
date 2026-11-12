@@ -4,12 +4,15 @@ import VisaRule from "../models/VisaRule.js";
 
 export const VISA_REQUIREMENT_LABELS = {
   "traditional visa": "visa required",
+  "physical visa": "visa required",
   "e visa": "e-visa",
   evisa: "e-visa",
   "e-visa": "e-visa",
   "visa on arrival": "visa on arrival",
   "visa free": "visa free",
   "nomad visa": "nomad visa",
+  eta: "eta",
+  "no admission": "no admission",
 };
 
 export const normalizeCountryKey = (value = "") => {
