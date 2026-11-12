@@ -1508,6 +1508,9 @@ const AiProduct = () => {
                         }}
                         helperText={errors?.mobileNumber?.message}
                         error={!!errors.mobileNumber}
+                        FormHelperTextProps={{
+                          sx: { fontSize: "0.65rem", whiteSpace: "nowrap" },
+                        }}
                         disabled={!!auth?.user}
                       />
                     )}
@@ -1899,6 +1902,9 @@ const AiProduct = () => {
                               }}
                               helperText={salesErrors?.mobileNumber?.message}
                               error={!!salesErrors?.mobileNumber}
+                              FormHelperTextProps={{
+                                sx: { fontSize: "0.65rem", whiteSpace: "nowrap" },
+                              }}
                             />
                           )}
                         />
@@ -2855,6 +2861,9 @@ const AiProduct = () => {
                               }}
                               helperText={salesErrors?.mobileNumber?.message}
                               error={!!salesErrors?.mobileNumber}
+                              FormHelperTextProps={{
+                                sx: { fontSize: "0.65rem", whiteSpace: "nowrap" },
+                              }}
                             />
                           )}
                         />
