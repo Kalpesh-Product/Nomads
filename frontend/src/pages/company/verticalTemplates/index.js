@@ -10,6 +10,7 @@ import CaliHostelTemplate from "./caliHostel/CaliHostelTemplate";
 import TastycTemplate from "./tastyc/TastycTemplate";
 import GrandBarTemplate from "./grandbar/GrandBarTemplate";
 import AromaticaTemplate from "./aromatica/AromaticaTemplate";
+import RestobarTemplate from "./restobar/RestobarTemplate";
 import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
 import WorkscapeTemplate from "./workscape/WorkscapeTemplate";
 import BrixspaceTemplate from "./brixspace/BrixspaceTemplate";
@@ -35,6 +36,7 @@ export const VERTICAL_TEMPLATES = {
   tastyc: TastycTemplate,
   grandbar: GrandBarTemplate,
   aromatica: AromaticaTemplate,
+  restobar: RestobarTemplate,
   flowspace: FlowspaceTemplate,
   workscape: WorkscapeTemplate,
   brixspace: BrixspaceTemplate,
