@@ -44,17 +44,21 @@ const continentOptions = [
 
 const visaRequirementOptions = [
   "Show All",
+  "Visa Free",
   "Physical Visa",
   "e-Visa",
   "Visa on Arrival",
-  "Visa Free",
+  "eTA",
+  "No Admission",
 ];
 
 const visaRequirementApiValueMap = {
+  "Visa Free": "visa free",
   "Physical Visa": "visa required",
   "e-Visa": "e-visa",
   "Visa on Arrival": "visa on arrival",
-  "Visa Free": "visa free",
+  eTA: "eta",
+  "No Admission": "no admission",
 };
 
 const getVisaRequirementApiValue = (value) =>
@@ -68,6 +72,8 @@ const destinationCards = aiDestinationCards;
 const getDestinationFavoriteKey = (destination) =>
   destination?._id || `${destination.city}-${destination.country}`;
 
+// Algo 2.0: one formula per attribute, shared across every Wono Filter tab
+// it appears under (no more WFA-suffixed variants).
 const goalOptionToApiAttributeMap = {
   "Best for Nomads": "bestForNomads",
   "Most Affordable": "mostAffordable",
@@ -77,11 +83,10 @@ const goalOptionToApiAttributeMap = {
   "Healthcare Friendly": "healthcareFriendly",
   "Startup / Business Opportunities": "startupBusinessOpportunities",
   "Clean Air / Environment": "cleanAirEnvironment",
+  "Best Work Infrastructure": "bestWorkInfrastructure",
   "Best for Remote Work Setup": "bestForRemoteWorkSetup",
-  "Cheapest Places": "cheapestPlaces",
   "Best Connected Cities (Flights)": "bestConnectedCitiesFlights",
   "Fast Internet Cities": "fastInternetCities",
-  "Best Work Infrastructure": "bestWorkInfrastructure",
   "Maximum Savings": "maximumSavings",
   "Low Taxation": "lowTaxation",
   "Purchasing Power": "purchasingPower",
@@ -90,39 +95,20 @@ const goalOptionToApiAttributeMap = {
   "Balanced Financial Lifestyle": "balancedFinancialLifestyle",
   "Startup Ecosystems": "startupEcosystems",
   "Remote Job Opportunities": "remoteJobOpportunities",
-  "Founder Nomads": "founderNomads",
   "Tech Talent Density": "techTalentDensity",
-  "Startup Funding & Support": "startupIncubatorsAccelerators",
-  "Balanced Career Growth": "balancedCareerGrowth",
+  "Startup Funding & Support": "startupFundingSupport",
   "Venture Capital Presence": "ventureCapitalPresence",
+  "Founder Nomads": "founderNomads",
+  "Balanced Career Growth": "balancedCareerGrowth",
   "Conferences & Events": "conferencesEvents",
   "Social & Party Lifestyle": "socialPartyLifestyle",
   "Chill & Wellness Lifestyle": "chillWellnessLifestyle",
   "Adventure & Exploration": "adventureExploration",
-  "Nomad Community & Networking": "nomadCommunityNetworking",
+  "Solo Nomads": "soloNomads",
   "Couple - Friendly Lifestyle": "coupleFriendlyLifestyle",
   "Family - Friendly Lifestyle": "familyFriendlyLifestyle",
   "Female - Friendly Lifestyle": "femaleFriendlyLifestyle",
-  "Solo Nomads": "soloNomads",
 };
-
-const leftBadgeFieldByGoalOption = {
-  "Fast Internet Cities": "internetSpeed",
-  "Clean Air / Environment": "aqiValue",
-  "Low Taxation": "nomadTax",
-  "Cheapest Places": "costOfLivingPerMonth",
-};
-
-const leftBadgeLabelFieldByGoalOption = {
-  "Easy Visa / Long Stay": "labelEasyVisa",
-  "Best for Remote Work Setup": "labelBestWorkInfrastructureWfa",
-  "Financial Stability (Low Risk)": "labelFinancialStability",
-};
-
-const toLabelFieldKey = (apiAttribute = "") =>
-  apiAttribute
-    ? `label${apiAttribute.charAt(0).toUpperCase()}${apiAttribute.slice(1)}`
-    : "";
 
 const formatLeftBadgeValue = (value) => {
   if (value === null || value === undefined || value === "") {
@@ -174,324 +160,14 @@ const getScoreFillPercentage = (score) => {
   return ((clampedScore - min) / denominator) * 100;
 };
 
-const quickStatsConfigByGoalOption = {
-  "Best for Nomads": [
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-    { label: "Internet", weightKey: "internet" },
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Community", weightKey: "nomadCommunity" },
-  ],
-  "Most Affordable": [
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
-    { label: "Visa Cost", weightKey: "visaCost" },
-  ],
-  "Safest Cities": [
-    { label: "Safety", weightKey: "safety" },
-    { label: "Livability", weightKey: "qualityOfLife" },
-    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
-    { label: "Air Quality", weightKey: "airQualityIndex" },
-  ],
-  "Easy Visa / Long Stay": [
-    { label: "Visa-Friendly", weightKey: "visaFlexibility" },
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Safety", weightKey: "safety" },
-    { label: "Livability", weightKey: "qualityOfLife" },
-  ],
-  "Strong Nomad Community": [
-    { label: "Community", weightKey: "nomadCommunity" },
-    { label: "Meetups & Events", weightKey: "meetupsEvents" },
-    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
-    { label: "Safety", weightKey: "safety" },
-  ],
-  "Healthcare Friendly": [
-    { label: "Livability", weightKey: "qualityOfLife" },
-    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
-    { label: "Safety", weightKey: "safety" },
-    { label: "Air Quality", weightKey: "airQualityIndex" },
-  ],
-  "Startup / Business Opportunities": [
-    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
-    { label: "Tech Talent", weightKey: "techTalentDensity" },
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-    { label: "Startup Support", weightKey: "incubators" },
-  ],
-  "Clean Air / Environment": [
-    { label: "Safety", weightKey: "safety" },
-    { label: "Livability", weightKey: "qualityOfLife" },
-    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
-    { label: "Air Quality", weightKey: "airQualityIndex" },
-  ],
-  "Best Work Infrastructure": [
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-    { label: "Internet", weightKey: "internet" },
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Community", weightKey: "nomadCommunity" },
-  ],
-  "Best for Remote Work Setup": [
-    { label: "Internet", weightKey: "internet" },
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-    { label: "Community", weightKey: "nomadCommunity" },
-    { label: "Affordability", weightKey: "costOfLiving" },
-  ],
-  "Cheapest Places": [
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Internet", weightKey: "internet" },
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-    { label: "Community", weightKey: "nomadCommunity" },
-  ],
-  "Best Connected Cities (Flights)": [
-    { label: "Direct Flights", weightKey: "directInternationalFlights" },
-    { label: "Connectivity", weightKey: "airportConnectivity" },
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-    { label: "Community", weightKey: "nomadCommunity" },
-  ],
-  "Fast Internet Cities": [
-    { label: "Internet", weightKey: "internet" },
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-    { label: "Community", weightKey: "nomadCommunity" },
-    { label: "Affordability", weightKey: "costOfLiving" },
-  ],
-  "Maximum Savings": [
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Tax Friendly", weightKey: "taxFriendly" },
-    { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Visa Cost", weightKey: "visaCost" },
-  ],
-  "Low Taxation": [
-    { label: "Tax Friendly", weightKey: "taxFriendly" },
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Visa Cost", weightKey: "visaCost" },
-  ],
-  "Purchasing Power": [
-    { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Tax Friendly", weightKey: "taxFriendly" },
-    { label: "Visa Cost", weightKey: "visaCost" },
-  ],
-  "Financial Stability(Low Risk)": [
-    { label: "Visa Cost", weightKey: "visaCost" },
-    { label: "Healthcare Cost", weightKey: "healthcareCostIndex" },
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Tax Friendly", weightKey: "taxFriendly" },
-  ],
-  "Startup Setup Cost": [
-    { label: "Startup Costs", weightKey: "startupSetupCost" },
-    { label: "Tax Friendly", weightKey: "taxFriendly" },
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-  ],
-  "Balanced Financial Lifestyle": [
-    { label: "Affordability", weightKey: "costOfLiving" },
-    { label: "Purchasing Power", weightKey: "purchasingPower" },
-    { label: "Tax Friendly", weightKey: "taxFriendly" },
-    { label: "Startup Costs", weightKey: "startupSetupCost" },
-  ],
-  "Social & Party Lifestyle": [
-    { label: "Social Scene", weightKey: "partyLifestyle" },
-    { label: "Nightlife", weightKey: "nightlife" },
-    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
-    { label: "Community", weightKey: "nomadCommunity" },
-  ],
-  "Chill & Wellness Lifestyle": [
-    { label: "Environment", weightKey: "climateEnvironment" },
-    { label: "Nature", weightKey: "nature" },
-    { label: "Wellness", weightKey: "yoga" },
-    { label: "Community", weightKey: "nomadCommunity" },
-  ],
-  "Adventure & Exploration": [
-    { label: "Adventure", weightKey: "adventure" },
-    { label: "Nature", weightKey: "nature" },
-    { label: "Environment", weightKey: "climateEnvironment" },
-    { label: "Community", weightKey: "nomadCommunity" },
-  ],
-  "Nomad Community & Networking": [
-    { label: "Community", weightKey: "nomadCommunity" },
-    { label: "Meetups & Events", weightKey: "meetupsEvents" },
-    { label: "Founder Nomads", weightKey: "founderNomads" },
-    { label: "Conferences", weightKey: "conferences" },
-  ],
-  "Couple - Friendly Lifestyle": [
-    { label: "Couple-Friendly", weightKey: "coupleNomads" },
-    { label: "Community", weightKey: "nomadCommunity" },
-    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
-    { label: "Safety", weightKey: "safety" },
-  ],
-  "Family - Friendly Lifestyle": [
-    { label: "Family-Friendly", weightKey: "familyNomads" },
-    { label: "Safety", weightKey: "safety" },
-    { label: "Community", weightKey: "nomadCommunity" },
-    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
-  ],
-  "Female - Friendly Lifestyle": [
-    { label: "Female-Friendly", weightKey: "femaleNomads" },
-    { label: "Safety", weightKey: "safety" },
-    { label: "Community", weightKey: "nomadCommunity" },
-    { label: "Travel Ease", weightKey: "accessibility" },
-  ],
-  "Founder Nomads": [
-    { label: "Founder Nomads", weightKey: "founderNomads" },
-    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
-    { label: "Venture Capital", weightKey: "ventureCapital" },
-    { label: "Community", weightKey: "nomadCommunity" },
-  ],
-  "Solo Nomads": [
-    { label: "Social Scene", weightKey: "partyLifestyle" },
-    { label: "Community", weightKey: "nomadCommunity" },
-    { label: "Lifestyle & Entertainment", weightKey: "lifestyleEntertainment" },
-    { label: "Safety", weightKey: "safety" },
-  ],
-  "Startup Ecosystems": [
-    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
-    { label: "Venture Capital", weightKey: "ventureCapital" },
-    { label: "Startup Support", weightKey: "incubators" },
-    { label: "Tech Talent", weightKey: "techTalentDensity" },
-  ],
-  "Remote Job Opportunities": [
-    { label: "Remote Jobs", weightKey: "remoteJobs" },
-    { label: "Community", weightKey: "nomadCommunity" },
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
-  ],
-  "Tech Talent Density": [
-    { label: "Tech Talent", weightKey: "techTalentDensity" },
-    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
-    { label: "Founder Nomads", weightKey: "founderNomads" },
-    { label: "Venture Capital", weightKey: "ventureCapital" },
-  ],
-  "Startup Funding & Support": [
-    { label: "Startup Support", weightKey: "incubators" },
-    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
-    { label: "Founder Nomads", weightKey: "founderNomads" },
-    { label: "Venture Capital", weightKey: "ventureCapital" },
-  ],
-  "Balanced Career Growth": [
-    { label: "Remote Jobs", weightKey: "remoteJobs" },
-    { label: "Work Infra", weightKey: "workInfrastructure" },
-    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
-    { label: "Tech Talent", weightKey: "techTalentDensity" },
-  ],
-  "Venture Capital Presence": [
-    { label: "Venture Capital", weightKey: "ventureCapital" },
-    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
-    { label: "Startup Support", weightKey: "incubators" },
-    { label: "Tech Talent", weightKey: "techTalentDensity" },
-  ],
-  "Conferences & Events": [
-    { label: "Conferences", weightKey: "conferences" },
-    { label: "Founder Nomads", weightKey: "founderNomads" },
-    { label: "Startup Ecosystem", weightKey: "startupEcosystemScore" },
-    { label: "Community", weightKey: "nomadCommunity" },
-  ],
-};
-
-const fallbackQuickStatsConfig = [
-  { label: "Internet", labelKey: "labelInternetSpeed", field: "internetSpeed" },
-  {
-    label: "Cost",
-    labelKey: "labelCostOfLivingPerMonth",
-    field: "costOfLivingPerMonth",
-  },
-  { label: "AQI", labelKey: "labelAqiValue", field: "aqiValue" },
-  { label: "Score", field: "suggestions" },
-];
-
-const labelToAllScoresKeyMap = {
-  labelCostOfLivingPerMonth: "cheapestPlaces",
-  labelBestWorkInfrastructureWfa: "bestWorkInfrastructureWFA",
-  labelStrongNomadCommunityWfa: "strongNomadCommunityWFA",
-  labelFinancialStability: "financialStabilityLowRisk",
-};
-
-const labelToWeightKeyMap = {
-  labelCostOfLivingPerMonth: "costOfLiving",
-  labelBestWorkInfrastructure: "workInfrastructure",
-  labelBestWorkInfrastructureWfa: "workInfrastructure",
-  labelFastInternetCities: "internet",
-  labelStrongNomadCommunity: "nomadCommunity",
-  labelStrongNomadCommunityWfa: "nomadCommunity",
-  labelMostAffordable: "qualityOfLife",
-  labelSafestCities: "safety",
-  labelEasyVisa: "visaFlexibility",
-  labelHealthcareFriendly: "healthcareCostIndex",
-  labelStartupBusinessOpportunities: "startupEcosystemScore",
-  labelCleanAirEnvironment: "airQualityIndex",
-  labelBestConnectedCitiesFlights: "airportConnectivity",
-  labelLowTaxation: "taxFriendly",
-  labelPurchasingPower: "purchasingPower",
-  labelFinancialStability: "inflationStability",
-  labelStartupSetupCost: "startupSetupCost",
-  labelBalancedFinancialLifestyle: "inflationStability",
-  labelStartupEcosystems: "startupEcosystemScore",
-  labelRemoteJobOpportunities: "remoteJobs",
-  labelFounderNomads: "founderNomads",
-  labelFounderNomadsAyc: "founderNomads",
-  labelTechTalentDensity: "techTalentDensity",
-  labelStartupIncubatorsAccelerators: "incubators",
-  labelBalancedCareerGrowth: "remoteJobs",
-  labelVentureCapitalPresence: "ventureCapital",
-  labelConferencesEvents: "conferences",
-  labelSocialPartyLifestyle: "partyLifestyle",
-  labelChillWellnessLifestyle: "yoga",
-  labelAdventureExploration: "adventure",
-  labelNomadCommunityNetworking: "meetupsEvents",
-  labelCoupleFriendlyLifestyle: "coupleNomads",
-  labelFamilyFriendlyLifestyle: "familyNomads",
-  labelFemaleFriendlyLifestyle: "femaleNomads",
-};
-
-const getQuickStatsForDestination = (
-  destination,
-  selectedGoal,
-  selectedGoalOption,
-) => {
-  const statConfig =
-    quickStatsConfigByGoalOption[selectedGoalOption] ||
-    fallbackQuickStatsConfig;
-  const selectedGoalScoreKey = getApiAttributeForSelection(
-    selectedGoal,
-    selectedGoalOption,
-  );
-
-  const configuredStats = statConfig.slice(0, 4).map((config) => {
-    const scoreKeyFromLabel = config.labelKey
-      ? labelToAllScoresKeyMap[config.labelKey] ||
-        `${config.labelKey.charAt(5).toLowerCase()}${config.labelKey.slice(6)}`
-      : null;
-    const scoreKey = config.scoreKey || scoreKeyFromLabel || config.field;
-    const weightKey =
-      config.weightKey ||
-      (config.labelKey ? labelToWeightKeyMap[config.labelKey] : null) ||
-      scoreKey;
-    const weights = destination?.weight || {};
-    const directWeight = weightKey ? weights[weightKey] : undefined;
-    const caseInsensitiveScore =
-      directWeight === undefined && weightKey
-        ? Object.entries(weights).find(
-            ([key]) => key.toLowerCase() === weightKey.toLowerCase(),
-          )?.[1]
-        : undefined;
-
-    const score = Number(
-      directWeight !== undefined
-        ? directWeight
-        : caseInsensitiveScore !== undefined
-          ? caseInsensitiveScore
-          : selectedGoalScoreKey
-            ? weights[selectedGoalScoreKey]
-            : undefined,
-    );
-
-    return {
-      label: config.label,
-      score: Number.isFinite(score) ? score : null,
-    };
-  });
-
-  return configuredStats;
-};
+// Algo 2.0: quickStats (4 hover factors + their own labels) are computed
+// server-side per request attribute (see ATTRIBUTE_QUICK_STATS_CONFIG in the
+// backend calc engine) — the frontend just renders what the API returns.
+const getQuickStatsForDestination = (destination) =>
+  (destination?.quickStats || []).slice(0, 4).map((stat) => ({
+    label: stat.label,
+    score: Number.isFinite(Number(stat.value)) ? Number(stat.value) : null,
+  }));
 
 const getScoreBarColorValue = (score) => {
   if (!Number.isFinite(score)) {
@@ -593,7 +269,8 @@ const normalizedCountryAliasMap = {
 };
 
 const normalizeCountryKey = (value = "") => {
-  const normalized = normalizeDestinationKey(value).replace(/&/g, "and");
+  const withAnd = String(value || "").replace(/&/g, "and");
+  const normalized = normalizeDestinationKey(withAnd);
   return normalizedCountryAliasMap[normalized] || normalized;
 };
 
@@ -625,28 +302,10 @@ const toApiAttribute = (goalOption = "") => {
     .join("");
 };
 
-const getApiAttributeForSelection = (selectedGoal, selectedGoalOption) => {
-  if (
-    selectedGoal === "Work From Anywhere" &&
-    selectedGoalOption === "Best Work Infrastructure"
-  ) {
-    return "bestWorkInfrastructureWFA";
-  }
-
-  return toApiAttribute(selectedGoalOption);
-};
-
-const getLabelFieldKeyForSelection = (selectedGoal, selectedGoalOption) => {
-  if (selectedGoalOption === "Best Work Infrastructure") {
-    return selectedGoal === "Work From Anywhere"
-      ? "labelBestWorkInfrastructureWfa"
-      : "labelBestWorkInfrastructure";
-  }
-
-  return toLabelFieldKey(
-    getApiAttributeForSelection(selectedGoal, selectedGoalOption),
-  );
-};
+// Algo 2.0: one formula per attribute regardless of which Wono Filter tab
+// it's selected under, so no more goal-specific (WFA) variants.
+const getApiAttributeForSelection = (_selectedGoal, selectedGoalOption) =>
+  toApiAttribute(selectedGoalOption);
 
 const INITIAL_VISIBLE_DESTINATIONS = 12;
 const DESTINATION_LAZY_BATCH_SIZE = 8;
@@ -766,91 +425,91 @@ const normalizeSelectedContinent = (continent) =>
 const goalNarrativeByGoalAndAttribute = {
   [normalizeNarrativeKey("World Ranking")]: {
     [normalizeNarrativeKey("Best for Nomads")]:
-      "Curated below are the top cities in X based on overall livability for modern remote professionals.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💰 Cost of living\n• 🏢 Work infrastructure\n• ⚡ High-speed & stable internet\n• 🤝 Nomad community\n• 🚀 Startup ecosystem\n• 🛡️ Safety\n• 🛂 Visa flexibility for longer stays\n\n→ Find the best overall place to live and work.",
+      "Top cities for a balanced digital nomad lifestyle.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🏢 Work Infrastructure\n• 🌐 Internet\n• 💰 Cost of Living\n• 🛡️ Safety\n• 🤝 Nomad Community\n• 🌬️ Air Quality Index\n• 🛂 Easy Visa / Long Stay\n• 🏥 Healthcare Friendly\n\n→ Find the best overall place to live and work.",
     [normalizeNarrativeKey("Most Affordable")]:
-      "Curated below are the most affordable cities in X designed to help you maximize your budget.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n• 🎫 Visa cost\n\n→ Find cities where affordability meets comfort.",
+      "Spend less without losing financial flexibility.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 💰 Cost of Living\n• 💊 Healthcare Cost Index\n• 🛒 Purchasing Power\n• 📉 Inflation Stability\n\n→ Find destinations where your money goes further.",
     [normalizeNarrativeKey("Safest Cities")]:
-      "Curated below are the safest cities in X based on your preference for security and peace of mind.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🛡️ Safety levels\n• 🏥 Healthcare accessibility\n• 🌿 Clean environments\n\n→ Live confidently, whether short-term or long-term.",
+      "Discover destinations that put personal safety first.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🛡️ Safety\n• 🌬️ Air Quality Index\n• 🌿 Climate & Environment\n• 💊 Healthcare Cost Index\n\n→ Find cities where safety is the priority.",
     [normalizeNarrativeKey("Easy Visa / Long Stay")]:
-      "Curated below are the most visa-friendly cities in X for extended stays.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🛂 Visa flexibility\n• 💰 Visa cost\n• 🔄 Visa renewal ease\n\n→ Stay longer, with fewer restrictions.",
+      "Explore destinations with simpler entry and stay options.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🛂 Visa Openness\n• ✈️ Flight Connectivity\n• 🧾 Lower Taxes\n• 🚀 Startup Ecosystem\n\n→ Find places with more accessible visa options.",
     [normalizeNarrativeKey("Strong Nomad Community")]:
-      "Curated below are the best cities in X with strong and active nomad communities.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🤝 Active nomad communities\n• 🌐 Social & collaborative environments\n\n→ Find your people, anywhere you go.",
+      "Discover cities with an established digital nomad network.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🤝 Nomad Community\n• 🎉 Meetups & Events\n• 🏢 Work Infrastructure\n• 🌐 Internet\n\n→ Find your community wherever you go.",
     [normalizeNarrativeKey("Healthcare Friendly")]:
-      "Curated below are the most healthcare-friendly cities in X for reliable and accessible medical support.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🏥 Healthcare quality & accessibility\n• 🩺 Reliable medical infrastructure\n• 📄 Easy Medical Insurance \n\n→ Access dependable healthcare wherever you live.",
+      "Find destinations that balance healthcare quality with affordability.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🏥 Healthcare Quality\n• 💊 Healthcare Cost Index\n• 🛒 Purchasing Power\n• 📉 Inflation Stability\n\n→ Compare places that support healthier living.",
     [normalizeNarrativeKey("Startup / Business Opportunities")]:
-      "Curated below are the best cities in X for startups, entrepreneurship, and career growth.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🤝 Startup ecosystems/communities \n• 🧠 Talent density\n• 🏢 Work infrastructure\n• 🚀 Incubators & accelerator programs\n\n→ Build, scale, and grow faster.",
+      "Explore destinations with stronger business and startup ecosystems.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🚀 Startup Ecosystem\n• 🏢 Startup Incubators & Accelerators\n• 💼 Venture Capital Presence\n• 👩‍💻 Tech Talent Density\n\n→ Find a promising place to build and grow.",
     [normalizeNarrativeKey("Clean Air / Environment")]:
-      "Curated below are the cleanest and most environmentally friendly cities in X.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🌿 Air quality\n• 🛡️ Safe, livable environments\n• 🏥 Health-conscious conditions\n\n→ Breathe better, live better.",
+      "Discover cities with cleaner air and healthier surroundings.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🌬️ Air Quality Index\n• 🌿 Climate & Environment\n• 🏞️ Nature Nomad Travelling\n• 🛡️ Safety\n\n→ Find a place with a cleaner living environment.",
     [normalizeNarrativeKey("Best Work Infrastructure")]:
-      "Curated below are the best cities in X optimized for productivity and remote work performance.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🏢 Work infrastructure\n• ⚡ High-speed & stable internet\n• 🚌 Internal Commuting\n\n→ Work efficiently from anywhere, without compromise.",
+      "Discover places with the infrastructure to stay productive.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🏢 Work Infrastructure\n• 🌐 Internet\n• 🤝 Nomad Community\n• 🚀 Startup Ecosystem\n\n→ Find a workspace-friendly destination.",
   },
   [normalizeNarrativeKey("Work From Anywhere")]: {
     [normalizeNarrativeKey("Best for Remote Work Setup")]:
-      "Curated below are the best cities in X optimized for a seamless remote work setup.\nPowered by wono’s intelligence model, prioritizing:\n\n• ⚡ Fast, reliable internet\n• 🏢 Strong work infrastructure\n\n→ Work efficiently, from anywhere in the world.",
-    [normalizeNarrativeKey("Cheapest Places")]:
-      "Curated below are the cheapest cities in X designed to help you minimize your living expenses.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💰 Low cost of living\n• 📊 Strong purchasing power\n\n→ Spend less, live comfortably.",
+      "Find destinations with a dependable remote-work foundation.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🌐 Internet\n• 🏢 Work Infrastructure\n• 🤝 Nomad Community\n• 🧾 Lower Taxes\n\n→ Work confidently from wherever you choose.",
+    [normalizeNarrativeKey("Most Affordable")]:
+      "Spend less without losing financial flexibility.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 💰 Cost of Living\n• 💊 Healthcare Cost Index\n• 🛒 Purchasing Power\n• 📉 Inflation Stability\n\n→ Find destinations where your money goes further.",
     [normalizeNarrativeKey("Best Connected Cities (Flights)")]:
-      "Curated below are the best-connected cities in X for global travel and accessibility.\nPowered by wono’s intelligence model, prioritizing:\n\n• ✈️ Direct international flights\n• 🌐 Airport connectivity\n\n→ Travel easily, stay connected.",
+      "Discover cities with better flight connectivity.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• ✈️ Flight Connectivity\n• 🌐 Internet\n• 🏢 Work Infrastructure\n• 💼 Venture Capital Presence\n\n→ Stay connected to more destinations.",
     [normalizeNarrativeKey("Strong Nomad Community")]:
-      "Curated below are the best cities in X with strong and active nomad communities.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🤝 Strong nomad communities\n• 🚀 Startup ecosystems\n\n→ Meet people, plug in, and belong.",
+      "Discover cities with an established digital nomad network.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🤝 Nomad Community\n• 🎉 Meetups & Events\n• 🏢 Work Infrastructure\n• 🌐 Internet\n\n→ Find your community wherever you go.",
     [normalizeNarrativeKey("Fast Internet Cities")]:
-      "Curated below are the cities in X with the fastest and most reliable internet connectivity.\nPowered by wono’s intelligence model, prioritizing:\n\n• ⚡ High-speed internet\n• 📡 Network reliability\n• 🏢 Work-ready infrastructure\n\n→ Stay fast, stay online.",
+      "Find destinations that prioritise stronger internet access.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🌐 Internet\n• 🏢 Work Infrastructure\n• 🎉 Meetups & Events\n• 🧾 Lower Taxes\n\n→ Stay connected and work more smoothly.",
     [normalizeNarrativeKey("Best Work Infrastructure")]:
-      "Curated below are the best cities in X with strong work infrastructure and professional environments.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🏢 Strong work infrastructure\n• ⚡ Reliable internet\n• 🚀 Strong startup activity\n\n→ Work smarter, not harder.",
+      "Discover places with the infrastructure to stay productive.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🏢 Work Infrastructure\n• 🌐 Internet\n• 🤝 Nomad Community\n• 🚀 Startup Ecosystem\n\n→ Find a workspace-friendly destination.",
   },
   [normalizeNarrativeKey("Increase Your Savings")]: {
     [normalizeNarrativeKey("Maximum Savings")]:
-      "Curated below are the best cities in X to maximize your savings after expenses.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💰 Low cost of living\n• 🏦 Tax-friendly environments\n• 🏥 Affordable healthcare\n\n→ Keep more of what you earn.",
+      "Explore cities where your income can go further.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 💰 Cost of Living\n• 🧾 Lower Taxes\n• 🛒 Purchasing Power\n• 💊 Healthcare Cost Index\n\n→ Make more of what you earn.",
     [normalizeNarrativeKey("Low Taxation")]:
-      "Curated below are the best cities in X for a low-tax and financially efficient lifestyle.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🏦 Tax-friendly environments\n• 📉 Economic stability\n\n→ Keep more, spend smarter.",
+      "Explore destinations with more favourable personal-tax environments.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🧾 Lower Taxes\n• 💰 Cost of Living\n• 🛒 Purchasing Power\n• 📉 Inflation Stability\n\n→ Compare places with lower personal income tax rates.",
     [normalizeNarrativeKey("Purchasing Power")]:
-      "Curated below are the best cities in X with the strongest purchasing power.\nPowered by wono’s intelligence model, prioritizing:\n\n• 📊 Strong purchasing power\n• 💰 Low cost of living\n• 🏦 Tax efficiency\n\n→ Maximize the value of your income.",
+      "Find destinations where earnings have greater spending power.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🛒 Purchasing Power\n• 🧾 Lower Taxes\n• 💊 Healthcare Cost Index\n• 📉 Inflation Stability\n\n→ See where your income can buy more.",
     [normalizeNarrativeKey("Financial Stability (Low Risk)")]:
-      "Curated below are the best cities in X for a financially stable and low-risk lifestyle.\nPowered by wono’s intelligence model, prioritizing:\n\n• 📉 Stable inflation\n• 🏦 Tax efficiency\n• 💰 Cost control\n\n→ Protect what you’ve built.",
+      "Discover places with more stable consumer prices.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 📉 Inflation Stability\n• 🧾 Lower Taxes\n• 💊 Healthcare Cost Index\n• 🛡️ Safety\n\n→ Plan your spending with greater confidence.",
     [normalizeNarrativeKey("Startup Setup Cost")]:
-      "Curated below are the best cities in X to start and run a business cost-effectively.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🚀 Low startup setup costs\n• 🏦 Tax-friendly environments\n• 💰 Affordable living\n\n→ Build lean, scale smart.",
+      "Find destinations that may help founders keep everyday business and living costs manageable.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 💰 Cost of Living\n• 🧾 Lower Taxes\n• 🏢 Work Infrastructure\n• 🚀 Startup Incubators & Accelerators\n• 🛒 Purchasing Power\n\n→ Compare the practical conditions for starting lean; actual registration fees and legal costs are not measured.",
     [normalizeNarrativeKey("Balanced Financial Lifestyle")]:
-      "Curated below are the best cities in X for a well-balanced financial lifestyle.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💰 Cost efficiency\n• 🏦 Tax balance\n• 📊 Purchasing power\n\n→ Live well, spend wisely, stay secure.",
-  },
-  [normalizeNarrativeKey("Find Your Community")]: {
-    [normalizeNarrativeKey("Social & Party Lifestyle")]:
-      "Curated below are the best cities in X for a vibrant social and party lifestyle.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🎉 Party & events culture\n• 🍸 Nightlife & pubs\n• 🤝 Active nomad community\n\n→ Go out, meet people, enjoy the vibe.",
-    [normalizeNarrativeKey("Chill & Wellness Lifestyle")]:
-      "Curated below are the best cities in X for a calm and wellness-focused lifestyle.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🌿 Peaceful environments\n• 🧘 Wellness & yoga culture\n• 🌱 Nature & slow living\n\n→ Slow down, recharge, feel better.",
-    [normalizeNarrativeKey("Adventure & Exploration")]:
-      "Curated below are the best cities in X for adventure and exploration.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🧗 Adventure activities\n• 🌿 Nature access\n\n→ Go beyond the ordinary.",
-    [normalizeNarrativeKey("Nomad Community & Networking")]:
-      "Curated below are the best cities in X for building connections and expanding your network.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🤝 Active nomad communities\n• 📅 Meetups & events\n• 🧑‍💼 Founder & professional circles\n\n→ Connect, collaborate, grow.",
-    [normalizeNarrativeKey("Couple-Friendly Lifestyle")]:
-      "Curated below are the best cities in X for couples seeking a balanced and enjoyable lifestyle.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💑 Couple-friendly destinations\n• 🌿 Lifestyle & shared experiences\n• 🛡️ Safety and comfort for couples\n\n→ Build a life together, not just travel.",
-    [normalizeNarrativeKey("Family-Friendly Lifestyle")]:
-      "Curated below are the best cities in X for families seeking a safe and comfortable lifestyle.\nPowered by wono’s intelligence model, prioritizing:\n\n• 👨‍👩‍👧 Family-friendly destinations\n• 🛡️ Safety & stability\n• 🌿 Calm & livable surroundings\n\n→ Build a secure and balanced life for your family.",
-    [normalizeNarrativeKey("Female - Friendly Lifestyle")]:
-      "Curated below are the best cities in X for solo female travelers seeking safety and comfort.\nPowered by wono’s intelligence model, prioritizing:\n\n• 👩 Female-friendly destinations\n• 🛡️ Safety & security\n• 🤝 Supportive communities\n• 🌍 Ease of navigation\n\n→ Travel independently with confidence.",
-    [normalizeNarrativeKey("Founder Nomads")]:
-      "Curated below are the best cities in X for founder nomads and startup builders.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💎 Strong founder destinations\n• 🚀 Startup ecosystems\n• 🤝 Startup investors presence for networking\n• 📅 Startup events & activities\n\n→ Build, connect, scale.",
-    [normalizeNarrativeKey("Solo Nomads")]:
-      "Curated below are the best cities in X for solo nomad travelers.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🧍 Solo-friendly destinations\n• 🤝 Easy social integration\n• 🌍 Freedom & flexibility\n\n→ Explore freely, connect easily.",
+      "Find destinations that support a balanced personal budget.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 💰 Cost of Living\n• 🛒 Purchasing Power\n• 📉 Inflation Stability\n• 🧾 Lower Taxes\n• 💊 Healthcare Cost Index\n\n→ Find a better balance between costs and income.",
   },
   [normalizeNarrativeKey("Advance Your Career")]: {
     [normalizeNarrativeKey("Startup Ecosystems")]:
-      "Curated below are the best cities in X with strong startup ecosystems and innovation-driven environments.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🚀 Strong startup activity\n• 💰 Access to venture capital\n• 🏢 Incubators & accelerators\n• 📅 Startup events & activities\n\n→ Build, scale, and thrive.",
+      "Explore destinations with stronger startup scenes.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🚀 Startup Ecosystem\n• 🏢 Startup Incubators & Accelerators\n• 💼 Venture Capital Presence\n• 💸 Venture Capital Investments\n\n→ Find a city with entrepreneurial momentum.",
     [normalizeNarrativeKey("Remote Job Opportunities")]:
-      "Curated below are the best cities in X for accessing remote job opportunities and global work.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💼 Availability of remote jobs\n• 🧑‍💻 Digital work ecosystem\n• 🚀 Startup ecosystems\n\n→ Work globally, earn flexibly.",
-    [normalizeNarrativeKey("Founder Nomads")]:
-      "Curated below are the best cities in X for building strong networks and valuable connections.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💎 Strong founder destinations\n• 📅 Startup conferences & networking events\n• 📈 Emerging startup ecosystems\n\n→ Meet the right people, unlock opportunities.",
+      "Discover destinations with more remote-job opportunities.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 💻 Remote Job Opportunities\n• 🌐 Internet\n• 🏢 Work Infrastructure\n• 🛒 Purchasing Power\n\n→ Explore where remote-work opportunities are stronger.",
     [normalizeNarrativeKey("Tech Talent Density")]:
-      "Curated below are the best cities in X with high tech talent density and innovation-driven ecosystems.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🧠 Skilled tech workforce\n• 💻 Tech startups ecosystem\n• 🚀 Innovation-driven environments\n\n→ Build faster with the right people around you.",
+      "Discover places where technology talent is concentrated.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 👩‍💻 Tech Talent Density\n• 🌐 Internet\n• 🏢 Work Infrastructure\n• 🎉 Meetups & Events\n\n→ Find a thriving network of technical professionals.",
     [normalizeNarrativeKey("Startup Funding & Support")]:
-      "Curated below are the best cities in X for startup support through incubators and accelerators.\nPowered by wono’s intelligence model, prioritizing:\n\n• 🚀 Incubators & accelerator presence\n• 🧠 Mentorship & founder community\n• 🏛️ Local government support\n\n→ Build faster with guidance and support.",
-    [normalizeNarrativeKey("Balanced Career Growth")]:
-      "Curated below are the best cities in X for balanced career growth and long-term opportunities.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💼 Growing job opportunities\n• 🚀 Emerging startup ecosystems\n• 🤝 Startup networking communities\n• 🏛️ Government support towards startups\n\n→ Grow consistently while staying balanced.",
+      "Explore destinations with accelerator networks and funding activity.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🏢 Startup Incubators & Accelerators\n• 💼 Venture Capital Presence\n• 💸 Venture Capital Investments\n• 🧾 Lower Taxes\n\n→ Find ecosystems that help businesses grow.",
     [normalizeNarrativeKey("Venture Capital Presence")]:
-      "Curated below are the best cities in X for accessing venture capital and startup funding.\nPowered by wono’s intelligence model, prioritizing:\n\n• 💰 Active venture capital communities\n• 💸 Venture capital investments\n\n→ Raise faster, scale bigger.",
+      "Discover destinations with a stronger venture capital environment.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 💼 Venture Capital Presence\n• 💸 Venture Capital Investments\n• 🏢 Startup Incubators & Accelerators\n• 🌐 Internet\n\n→ Explore where venture activity is stronger.",
+    [normalizeNarrativeKey("Founder Nomads")]:
+      "Explore destinations where independent founders can find startup support and professional connections.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🚀 Startup Ecosystem\n• 🏢 Startup Incubators & Accelerators\n• 🤝 Nomad Community\n• 📅 Meetups & Events\n• 💼 Venture Capital Presence\n\n→ Find environments that support building a business while living as a nomad.",
+    [normalizeNarrativeKey("Balanced Career Growth")]:
+      "Find places with a balanced mix of remote work, professional networks, and career opportunities.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 💻 Remote Job Opportunities\n• 🏢 Work Infrastructure\n• 🚀 Startup Ecosystem\n• 👩‍💻 Tech Talent Density\n• 🎤 Conferences & Events\n\n→ Explore destinations that combine career options with a practical working environment.",
     [normalizeNarrativeKey("Conferences & Events")]:
-      "Curated below are the best cities in X for conferences, events, and professional networking.\nPowered by wono’s intelligence model, prioritizing:\n\n• 📅 Startup programs\n• 🏛️ Government startup events\n• 🎤 Conferences & industry events\n\n→ Learn, connect, and unlock opportunities.",
+      "Find places with more professional events and conferences.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🎤 Conferences & Events\n• 🚀 Startup Ecosystem\n• 🏢 Startup Incubators & Accelerators\n• 💼 Venture Capital Presence\n\n→ Discover more opportunities to learn and connect.",
   },
-};
+  [normalizeNarrativeKey("Find Your Community")]: {
+    [normalizeNarrativeKey("Social & Party Lifestyle")]:
+      "Explore cities with a more active social calendar.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🎉 Meetups & Events\n• 🎤 Conferences & Events\n• 🤝 Nomad Community\n• 🏢 Work Infrastructure\n\n→ Meet people and make new connections.",
+    [normalizeNarrativeKey("Chill & Wellness Lifestyle")]:
+      "Discover calmer destinations with a wellness-focused atmosphere.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🧘 Yoga\n• 🌿 Climate & Environment\n• 🌬️ Air Quality Index\n• 🏥 Healthcare Friendly\n\n→ Find a place that supports your wellbeing.",
+    [normalizeNarrativeKey("Adventure & Exploration")]:
+      "Discover destinations with more opportunities to explore.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🏞️ Nature Nomad Travelling\n• 🌿 Climate & Environment\n• ✈️ Flight Connectivity\n• 🛡️ Safety\n\n→ Make more room for adventure.",
+    [normalizeNarrativeKey("Strong Nomad Community")]:
+      "Discover cities with an established digital nomad network.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🤝 Nomad Community\n• 🎉 Meetups & Events\n• 🏢 Work Infrastructure\n• 🌐 Internet\n\n→ Find your community wherever you go.",
+    [normalizeNarrativeKey("Solo Nomads")]:
+      "Explore destinations suited to independent travel.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🛡️ Safety\n• 🎉 Meetups & Events\n• 🤝 Nomad Community\n• 🛂 Easy Visa / Long Stay\n\n→ Travel independently with more confidence.",
+    [normalizeNarrativeKey("Couple-Friendly Lifestyle")]:
+      "Explore destinations with supportive communities, shared travel opportunities, and everyday practicality for two.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🛡️ Safety\n• 🤝 Nomad Community\n• 🏞️ Nature Nomad Travelling\n• 💰 Cost of Living\n• 🏢 Work Infrastructure\n\n→ Find places for travelling together using available destination-level indicators.",
+    [normalizeNarrativeKey("Female-Friendly Lifestyle")]:
+      "Compare general safety, healthcare, and social-support conditions for women travelling or working remotely.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🛡️ Safety\n• 🏥 Healthcare Quality\n• 🤝 Nomad Community\n• 🎉 Meetups & Events\n\n→ Use these as broad lifestyle indicators, not a guarantee of safety for women.",
+    [normalizeNarrativeKey("Family-Friendly Lifestyle")]:
+      "Explore destinations with a practical balance of safety, healthcare, affordability, and environment.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🛡️ Safety\n• 🏥 Healthcare Quality\n• 💰 Cost of Living\n• 💊 Healthcare Cost Index\n• 🌿 Climate & Environment\n\n→ Compare the broader living conditions; schools, childcare, and family visas need separate research.",
+    [normalizeNarrativeKey("Founder Nomads")]:
+      "Explore destinations where independent founders can find startup support and professional connections.\n\nPowered by WoNo's Intelligence Model, prioritising:\n\n• 🚀 Startup Ecosystem\n• 🏢 Startup Incubators & Accelerators\n• 🤝 Nomad Community\n• 📅 Meetups & Events\n• 💼 Venture Capital Presence\n\n→ Find environments that support building a business while living as a nomad.",
+  },
+};;
 
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
@@ -1226,10 +885,10 @@ const AiSearchResults = () => {
   }, []);
 
   const rankedDestinations = useMemo(() => {
-    const leftBadgeField = leftBadgeFieldByGoalOption[selectedGoalOption];
-    const leftBadgeLabelField =
-      leftBadgeLabelFieldByGoalOption[selectedGoalOption] ||
-      getLabelFieldKeyForSelection(selectedGoal, selectedGoalOption);
+    const selectedAttributeKey = getApiAttributeForSelection(
+      selectedGoal,
+      selectedGoalOption,
+    );
 
     const filteredDestinations = apiDestinations.filter((destination) => {
       if (destination?.isActive !== true) {
@@ -1269,21 +928,13 @@ const AiSearchResults = () => {
             .map(({ destination }) => destination)
         : filteredDestinations;
 
-    return sortedDestinations.map((destination, index) => {
-      const leftBadgeValueFromLabel =
-        leftBadgeLabelField && destination?.labels
-          ? formatLeftBadgeValue(destination.labels[leftBadgeLabelField])
-          : null;
-      const leftBadgeValueFromField = leftBadgeField
-        ? formatLeftBadgeValue(destination[leftBadgeField])
-        : null;
-
-      return {
-        ...destination,
-        rankLabel: `Rank ${index + 1}`,
-        leftBadgeLabel: leftBadgeValueFromLabel || leftBadgeValueFromField,
-      };
-    });
+    return sortedDestinations.map((destination, index) => ({
+      ...destination,
+      rankLabel: `Rank ${index + 1}`,
+      leftBadgeLabel: formatLeftBadgeValue(
+        destination?.allLabels?.[selectedAttributeKey] ?? destination?.label,
+      ),
+    }));
   }, [
     apiDestinations,
     selectedGoal,
@@ -1311,7 +962,7 @@ const AiSearchResults = () => {
 
     const fetchVisaRules = async () => {
       try {
-        const response = await axios.get("/visa-rules", {
+        const response = await axios.get("/visa-rules-v2", {
           params: {
             passportCountry,
             requirement: getVisaRequirementApiValue(selectedVisaRequirement),
@@ -1414,7 +1065,7 @@ const AiSearchResults = () => {
       }
       try {
         const response = await axios.post(
-          "/state-wise-weight",
+          "/state-wise-weight-v2",
           {
             selectionType: selectedGoal,
             continent: selectedContinentDisplay,
@@ -1473,8 +1124,10 @@ const AiSearchResults = () => {
             nomadTax: item?.nomadTax,
             costOfLivingPerMonth: item?.costOfLivingPerMonth,
             allScores: item?.allScores || {},
+            allLabels: item?.allLabels || {},
+            label: item?.label || "",
+            quickStats: item?.quickStats || [],
             weight: item?.weight || {},
-            labels: item?.labels || {},
             isActive: item?.isActive ?? existingDestination?.isActive ?? false,
             image: (() => {
               const urls = Array.isArray(item?.imageUrl)
@@ -2656,7 +2309,9 @@ const AiSearchResults = () => {
                         const visaDurationLabel =
                           visaDurationDays !== null &&
                           visaDurationDays !== undefined
-                            ? `Visa Duration: ${visaDurationDays} days`
+                            ? `Visa Duration: ${
+                                visaDurationDays === 0 ? "N/A" : `${visaDurationDays} days`
+                              }`
                             : null;
 
                         const isDestinationLiked = likedDestinations.includes(
@@ -2779,8 +2434,6 @@ const AiSearchResults = () => {
                                   <div className="grid grid-cols-1 gap-1 md:gap-2 text-[0.6rem] sm:text-xs md:text-sm text-white/90">
                                     {getQuickStatsForDestination(
                                       destination,
-                                      selectedGoal,
-                                      selectedGoalOption,
                                     ).map((stat, statIndex) => (
                                       <div
                                         key={`${destination.city}-${stat.label}-${statIndex}`}
