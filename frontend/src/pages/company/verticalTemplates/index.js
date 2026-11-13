@@ -10,6 +10,7 @@ import CaliHostelTemplate from "./caliHostel/CaliHostelTemplate";
 import TastycTemplate from "./tastyc/TastycTemplate";
 import GrandBarTemplate from "./grandbar/GrandBarTemplate";
 import AromaticaTemplate from "./aromatica/AromaticaTemplate";
+import ItalianoTemplate from "./italiano/ItalianoTemplate";
 import RestobarTemplate from "./restobar/RestobarTemplate";
 import TinyHomeTemplate from "./tinyhome/TinyHomeTemplate";
 import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
@@ -38,6 +39,7 @@ export const VERTICAL_TEMPLATES = {
   tastyc: TastycTemplate,
   grandbar: GrandBarTemplate,
   aromatica: AromaticaTemplate,
+  italiano: ItalianoTemplate,
   restobar: RestobarTemplate,
   tinyhome: TinyHomeTemplate,
   flowspace: FlowspaceTemplate,
