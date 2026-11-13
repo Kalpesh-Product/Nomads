@@ -19,6 +19,7 @@ import {
   updateLeads,
   escalateLeadToHostPanel,
   bulkUpdateCompanyInclusions,
+  bulkUpdateCompanyStats,
   deactivateProduct,
   setListingPublicStatus,
   softDeleteProduct,
@@ -54,6 +55,9 @@ router.patch(
   upload.single("inclusions"),
   bulkUpdateCompanyInclusions
 );
+
+// JSON body (master panel parses the data team's xlsx and forwards rows).
+router.patch("/bulk-update-company-stats", bulkUpdateCompanyStats);
 
 // Public: records a "Verify Business" click on a listing page.
 router.post("/verify-business-click", trackVerifyBusinessClick);
