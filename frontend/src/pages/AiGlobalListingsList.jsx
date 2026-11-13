@@ -260,8 +260,8 @@ const HorizontalScrollWrapper = ({ children, title }) => {
 
   return (
     <div className="relative group/scroll mb-6 max-sm:mb-4">
-      <div className="flex items-center justify-between mb-4 gap-2 max-sm:mb-2">
-        <h2 className="text-lg sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
+      <div className="flex items-center justify-between mb-4 gap-2 max-sm:mb-2 max-sm:group-first/scroll:mb-6">
+        <h2 className="text-sm sm:text-base md:text-subtitle text-secondary-dark font-semibold truncate leading-tight">
           {title}
         </h2>
       </div>
@@ -2095,7 +2095,7 @@ const AiGlobalListingsList = () => {
       </div>
 
       {/* ==================== MOBILE/TABLET VIEW (below lg) ==================== */}
-      <div className="lg:hidden flex flex-col gap-2 max-sm:gap-1">
+      <div className="lg:hidden flex flex-col gap-2 max-sm:gap-0">
         <div className="flex flex-col gap-4 justify-center items-center w-full lg:mt-0 max-sm:gap-2">
           <div className="w-full lg:min-w-[82%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto px-2 sm:px-6 lg:px-0">
             <p className="mb-4 mt-2 flex items-center gap-2 text-sm font-medium leading-snug text-black/85 lg:hidden font-play">
@@ -2107,7 +2107,7 @@ const AiGlobalListingsList = () => {
               )}
               {typedHeading}
             </p>
-            <div className="lg:hidden w-full flex flex-col gap-4 mb-4 max-sm:gap-2 max-sm:mb-2">
+            <div className="lg:hidden w-full flex flex-col gap-4 mb-4">
               <div
                 data-tour="verticals-breadcrumb"
                 className="mx-auto flex min-h-[46px] w-[92%] items-center rounded-full border bg-white px-3 py-2 shadow-[0_5px_14px_rgba(0,0,0,0.12)] max-sm:w-full max-sm:px-2"
@@ -2141,11 +2141,11 @@ const AiGlobalListingsList = () => {
 
             <div
               data-tour="verticals-category-strip"
-              className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4 max-sm:pb-2"
+              className="lg:hidden flex justify-start overflow-x-auto snap-x snap-mandatory custom-scrollbar-hide gap-1 pb-4"
             >
               {isLisitingLoading ? (
                 <CategoryShortcutSkeletons
-                  itemClassName="flex-shrink-0 snap-start px-2 py-2 flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem] max-sm:py-1"
+                  itemClassName="flex-shrink-0 snap-start px-2 py-2 flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
                   iconBoxClassName="h-10 w-full"
                   labelClassName="w-12"
                 />
@@ -2159,8 +2159,9 @@ const AiGlobalListingsList = () => {
                       label={cat.label}
                       iconSrc={iconSrc}
                       onClick={() => handleCategoryClick(cat.value)}
-                      buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem] max-sm:py-1"
-                      iconBoxClassName="h-10 w-full"
+                      buttonClassName="flex-shrink-0 snap-start text-black px-2 py-2 hover:text-black transition flex items-center justify-center w-[28%] sm:w-[20%] md:w-[15%] min-w-[5rem] md:min-w-[5.75rem]"
+                      contentClassName="flex min-h-[3.5rem] w-full flex-col items-center justify-start gap-1 max-sm:h-10 max-sm:min-h-0"
+                      iconBoxClassName="h-10 w-full max-sm:shrink-0"
                       imageClassName="h-full w-[90%] object-contain mx-auto"
                       labelClassName={`text-[10px] font-medium whitespace-nowrap border-b-2 ${
                         isActive
@@ -2266,6 +2267,7 @@ const AiGlobalListingsList = () => {
         </div>
 
         <Container padding={false} className="max-sm:px-2">
+          <div className="mt-6 mb-6 border-t border-gray-300 sm:hidden" />
           <div className="">
             <div className="font-semibold text-md">
               <div className="custom-scrollbar-hide">

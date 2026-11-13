@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import { CircleAlert, X } from "lucide-react";
+import { AiBetaBanner } from "./AiFooter";
 import PlaceLocation, { PlaceAddress } from "./PlaceLocation";
 
 const sampleContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
@@ -51,10 +52,80 @@ const SampleDestination = ({ contentLabel }) => (
   </article>
 );
 
+const SamplePhoneArticle = ({ contentLabel, section }) => {
+  const isOverview = section === "overview";
+  const metadata = {
+    Event: ["Sample category", "Sample month", "Sample venue"],
+    Place: ["Sample category", "Sample rating", "Sample venue"],
+    News: ["Author name", "Publication date", "Source (optional)"],
+  }[contentLabel];
+
+  return (
+    <>
+      <article className="p-4">
+        <div className="flex flex-col gap-8">
+          <section className="flow-root">
+            <h3 className="mb-8 text-title font-bold leading-normal">
+              {isOverview ? `Sample ${contentLabel.toLowerCase()} title` : "Sample section title"}
+            </h3>
+            <img
+              src="/images/goa-image.jpg"
+              alt="Sample destination in Goa"
+              className="mb-5 block h-auto w-full rounded-xl"
+            />
+            <p className="whitespace-pre-line leading-relaxed">
+              {sampleContent}{"\n\n"}{sampleContent}
+            </p>
+          </section>
+          {isOverview && contentLabel === "News" && (
+            <>
+              <hr />
+              <section className="flex flex-col gap-8">
+                <h3 className="text-card-title font-bold leading-tight">Sample section title</h3>
+                <p className="whitespace-pre-line leading-relaxed">{sampleContent}</p>
+              </section>
+            </>
+          )}
+          {isOverview && (
+            <>
+              <hr />
+              <footer className="flex w-full flex-col items-center gap-2 text-center text-sm">
+                {metadata.map((value) => <p key={value}>{value}</p>)}
+              </footer>
+            </>
+          )}
+        </div>
+        <hr className="mt-5" />
+        {isOverview && <section className="space-y-6 border-b border-gray-200 py-8">
+          <h3 className="text-subtitle font-semibold text-gray-900">Comments (0)</h3>
+          <p className="text-sm text-gray-500">
+            No comments yet. Be the first to share your thoughts.
+          </p>
+          <div className="flex justify-center">
+            <button
+              type="button"
+              disabled
+              className="flex items-center justify-center rounded-full bg-primary-blue px-6 py-3 text-content leading-5 text-primary"
+            >
+              WRITE A COMMENT
+            </button>
+          </div>
+        </section>}
+        <p className="mt-5 text-[0.5rem] leading-relaxed text-gray-500">
+          <b>Preview:</b> This sample uses placeholder text and images.
+          {` Your ${contentLabel.toLowerCase()} uses the content you enter in the form.`}
+        </p>
+      </article>
+      <AiBetaBanner />
+    </>
+  );
+};
+
 export default function BlogSectionPreview({ section = "overview", index = 0, contentLabel = "Blog", layout = "article" }) {
   const [open, setOpen] = useState(false);
   const titleId = useId();
   const descriptionId = useId();
+  const usesPhoneArticle = ["News", "Place", "Event"].includes(contentLabel);
   const title = section === "overview" ? `${contentLabel} Preview`
     : section === "main" ? "Main Content"
       : section === "sections" ? `${contentLabel} Sections` : `Section ${index + 1}`;
@@ -75,18 +146,32 @@ export default function BlogSectionPreview({ section = "overview", index = 0, co
         open={open}
         onClose={() => setOpen(false)}
         aria-labelledby={titleId}
-        aria-describedby={descriptionId}
+        aria-describedby={usesPhoneArticle ? `${descriptionId}-sample` : descriptionId}
         maxWidth="md"
         fullWidth
         slotProps={{
           backdrop: { sx: { backgroundColor: "rgba(15, 23, 42, 0.4)", backdropFilter: "blur(4px)" } },
-          paper: { sx: { borderRadius: "22px", maxHeight: "85vh", margin: 2, width: "calc(100% - 32px)" } },
+          paper: { sx: {
+            borderRadius: "22px",
+            maxHeight: "85vh",
+            margin: 2,
+            width: "calc(100% - 32px)",
+            ...(usesPhoneArticle && {
+              "@media (width < 640px)": {
+                borderRadius: 0,
+                margin: 0,
+                width: "100%",
+                height: "100dvh",
+                maxHeight: "100dvh",
+              },
+            }),
+          } },
         }}
       >
         <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-100 p-5 sm:p-6">
           <div>
             <h2 id={titleId} className="text-lg font-semibold text-blue-950">{title}</h2>
-            <p className="mt-1 text-[10px] font-medium uppercase tracking-widest text-slate-500">Sample layout with placeholder text</p>
+            <p id={`${descriptionId}-sample`} className="mt-1 text-[10px] font-medium uppercase tracking-widest text-slate-500">Sample layout with placeholder text</p>
           </div>
           <button
             type="button"
@@ -97,7 +182,12 @@ export default function BlogSectionPreview({ section = "overview", index = 0, co
             <X aria-hidden="true" size={16} />
           </button>
         </div>
-        <div className="overflow-y-auto bg-slate-50/50 p-4 sm:p-6">
+        {usesPhoneArticle && (
+          <div className="flex-1 overflow-y-auto sm:hidden">
+            <SamplePhoneArticle contentLabel={contentLabel} section={section} />
+          </div>
+        )}
+        <div className={`overflow-y-auto bg-slate-50/50 p-4 sm:p-6 ${usesPhoneArticle ? "max-sm:hidden" : ""}`}>
           <div className="space-y-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
             {layout === "destination" ? <SampleDestination contentLabel={contentLabel} /> : <>
             {(section === "overview" || section === "main") && <SampleArticleSection main />}
