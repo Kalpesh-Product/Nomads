@@ -52,60 +52,80 @@ const SampleDestination = ({ contentLabel }) => (
   </article>
 );
 
-const SampleEventArticle = () => (
-  <>
-    <article className="p-4">
-      <div className="flex flex-col gap-8">
-        <section className="flow-root">
-          <h3 className="mb-8 text-title font-bold leading-normal">
-            Sample event title
-          </h3>
-          <img
-            src="/images/goa-image.jpg"
-            alt="Sample event destination in Goa"
-            className="mb-5 block h-auto w-full rounded-xl"
-          />
-          <p className="whitespace-pre-line leading-relaxed">
-            {sampleContent}{"\n\n"}{sampleContent}
-          </p>
-        </section>
-        <hr />
-        <footer className="flex w-full flex-col items-center gap-2 text-center text-sm">
-          <p>Sample category</p>
-          <p>Sample month</p>
-          <p>Sample venue</p>
-        </footer>
-      </div>
-      <hr className="mt-5" />
-      <section className="space-y-6 border-b border-gray-200 py-8">
-        <h3 className="text-subtitle font-semibold text-gray-900">Comments (0)</h3>
-        <p className="text-sm text-gray-500">
-          No comments yet. Be the first to share your thoughts.
-        </p>
-        <div className="flex justify-center">
-          <button
-            type="button"
-            disabled
-            className="flex items-center justify-center rounded-full bg-primary-blue px-6 py-3 text-content leading-5 text-primary"
-          >
-            WRITE A COMMENT
-          </button>
+const SamplePhoneArticle = ({ contentLabel, section }) => {
+  const isOverview = section === "overview";
+  const metadata = {
+    Event: ["Sample category", "Sample month", "Sample venue"],
+    Place: ["Sample category", "Sample rating", "Sample venue"],
+    News: ["Author name", "Publication date", "Source (optional)"],
+  }[contentLabel];
+
+  return (
+    <>
+      <article className="p-4">
+        <div className="flex flex-col gap-8">
+          <section className="flow-root">
+            <h3 className="mb-8 text-title font-bold leading-normal">
+              {isOverview ? `Sample ${contentLabel.toLowerCase()} title` : "Sample section title"}
+            </h3>
+            <img
+              src="/images/goa-image.jpg"
+              alt="Sample destination in Goa"
+              className="mb-5 block h-auto w-full rounded-xl"
+            />
+            <p className="whitespace-pre-line leading-relaxed">
+              {sampleContent}{"\n\n"}{sampleContent}
+            </p>
+          </section>
+          {isOverview && contentLabel === "News" && (
+            <>
+              <hr />
+              <section className="flex flex-col gap-8">
+                <h3 className="text-card-title font-bold leading-tight">Sample section title</h3>
+                <p className="whitespace-pre-line leading-relaxed">{sampleContent}</p>
+              </section>
+            </>
+          )}
+          {isOverview && (
+            <>
+              <hr />
+              <footer className="flex w-full flex-col items-center gap-2 text-center text-sm">
+                {metadata.map((value) => <p key={value}>{value}</p>)}
+              </footer>
+            </>
+          )}
         </div>
-      </section>
-      <p className="mt-5 text-[0.5rem] leading-relaxed text-gray-500">
-        <b>Preview:</b> This sample uses placeholder text and images. Your event
-        uses the content you enter in the form.
-      </p>
-    </article>
-    <AiBetaBanner />
-  </>
-);
+        <hr className="mt-5" />
+        {isOverview && <section className="space-y-6 border-b border-gray-200 py-8">
+          <h3 className="text-subtitle font-semibold text-gray-900">Comments (0)</h3>
+          <p className="text-sm text-gray-500">
+            No comments yet. Be the first to share your thoughts.
+          </p>
+          <div className="flex justify-center">
+            <button
+              type="button"
+              disabled
+              className="flex items-center justify-center rounded-full bg-primary-blue px-6 py-3 text-content leading-5 text-primary"
+            >
+              WRITE A COMMENT
+            </button>
+          </div>
+        </section>}
+        <p className="mt-5 text-[0.5rem] leading-relaxed text-gray-500">
+          <b>Preview:</b> This sample uses placeholder text and images.
+          {` Your ${contentLabel.toLowerCase()} uses the content you enter in the form.`}
+        </p>
+      </article>
+      <AiBetaBanner />
+    </>
+  );
+};
 
 export default function BlogSectionPreview({ section = "overview", index = 0, contentLabel = "Blog", layout = "article" }) {
   const [open, setOpen] = useState(false);
   const titleId = useId();
   const descriptionId = useId();
-  const isEventOverview = contentLabel === "Event" && layout === "destination" && section === "overview";
+  const usesPhoneArticle = ["News", "Place", "Event"].includes(contentLabel);
   const title = section === "overview" ? `${contentLabel} Preview`
     : section === "main" ? "Main Content"
       : section === "sections" ? `${contentLabel} Sections` : `Section ${index + 1}`;
@@ -126,7 +146,7 @@ export default function BlogSectionPreview({ section = "overview", index = 0, co
         open={open}
         onClose={() => setOpen(false)}
         aria-labelledby={titleId}
-        aria-describedby={isEventOverview ? `${descriptionId}-sample` : descriptionId}
+        aria-describedby={usesPhoneArticle ? `${descriptionId}-sample` : descriptionId}
         maxWidth="md"
         fullWidth
         slotProps={{
@@ -136,7 +156,7 @@ export default function BlogSectionPreview({ section = "overview", index = 0, co
             maxHeight: "85vh",
             margin: 2,
             width: "calc(100% - 32px)",
-            ...(isEventOverview && {
+            ...(usesPhoneArticle && {
               "@media (width < 640px)": {
                 borderRadius: 0,
                 margin: 0,
@@ -162,12 +182,12 @@ export default function BlogSectionPreview({ section = "overview", index = 0, co
             <X aria-hidden="true" size={16} />
           </button>
         </div>
-        {isEventOverview && (
+        {usesPhoneArticle && (
           <div className="flex-1 overflow-y-auto sm:hidden">
-            <SampleEventArticle />
+            <SamplePhoneArticle contentLabel={contentLabel} section={section} />
           </div>
         )}
-        <div className={`overflow-y-auto bg-slate-50/50 p-4 sm:p-6 ${isEventOverview ? "max-sm:hidden" : ""}`}>
+        <div className={`overflow-y-auto bg-slate-50/50 p-4 sm:p-6 ${usesPhoneArticle ? "max-sm:hidden" : ""}`}>
           <div className="space-y-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
             {layout === "destination" ? <SampleDestination contentLabel={contentLabel} /> : <>
             {(section === "overview" || section === "main") && <SampleArticleSection main />}
