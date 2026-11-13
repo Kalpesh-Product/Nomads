@@ -82,6 +82,11 @@ const AiFooter = () => {
         { name: "About", link: "/about" },
         { name: "Career", link: "career" },
         { name: "FAQs", link: "faq" },
+        {
+          name: "User Guide",
+          link: import.meta.env.DEV ? "http://localhost:3000/docs/" : "/docs/",
+          reloadDocument: true,
+        },
         // {
         //   name: "Content and Copyright Policy",
         //   link: goToHostsContentCopyright,
@@ -148,6 +153,7 @@ const AiFooter = () => {
                       <Link
                         key={i}
                         to={linkObj.link}
+                        reloadDocument={linkObj.reloadDocument}
                         className="text-sm opacity-80 hover:text-gray-500 uppercase p-2"
                       >
                         {linkObj.name}
