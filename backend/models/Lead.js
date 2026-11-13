@@ -83,7 +83,7 @@ const leadSchema = new mongoose.Schema(
     hostPanelStatus: {
       type: String,
       default: "Pending",
-      enum: ["Pending", "Closed"],
+      enum: ["Pending", "Accepted", "Rejected", "Closed"],
     },
     masterStatusUpdatedAt: {
       type: Date,

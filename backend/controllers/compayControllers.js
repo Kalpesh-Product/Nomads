@@ -2792,7 +2792,7 @@ export const updateLeads = async (req, res, next) => {
 
     if (
       normalizedHostStatus &&
-      !["Pending", "Closed"].includes(normalizedHostStatus)
+      !["Pending", "Accepted", "Rejected", "Closed"].includes(normalizedHostStatus)
     ) {
       return res.status(400).json({ message: "Invalid HostPanel lead status" });
     }
