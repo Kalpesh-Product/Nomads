@@ -271,9 +271,6 @@ const ContributionTextField = ({ as, maxLength, allowContextMenu, ...props }) =>
 const FieldError = ({ message }) =>
   message ? <p className={errorTextClassName}>{message}</p> : null;
 
-// The default Multer limit rejects files that reach 5 MB.
-const defaultImageLimitMB = 5;
-
 const BlogImageFileInput = ({
   id,
   label,
@@ -288,9 +285,8 @@ const BlogImageFileInput = ({
   const errorMessage = selectionError || error;
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
-  const limitMB = maxSizeMB ?? defaultImageLimitMB;
-  const limitBytes = limitMB * 1024 * 1024;
-  const sizeHint = maxSizeMB ? `Up to ${limitMB} MB` : `Under ${limitMB} MB`;
+  const limitBytes = maxSizeMB * 1024 * 1024;
+  const sizeHint = `Up to ${maxSizeMB} MB`;
 
   const handleFileChange = (event) => {
     const input = event.currentTarget;
@@ -298,7 +294,7 @@ const BlogImageFileInput = ({
     input.value = "";
     if (!selectedFile) return;
 
-    if (selectedFile.size > limitBytes || (!maxSizeMB && selectedFile.size === limitBytes)) {
+    if (selectedFile.size > limitBytes) {
       setSelectionError(`Image was not added. ${sizeHint} per image.`);
       return;
     }
@@ -1665,7 +1661,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   <BlogImageFileInput
                     id="blog-main-image"
                     label="Main Image"
-                    maxSizeMB={type === "blog" ? 3 : undefined}
+                    maxSizeMB={3}
                     file={formValues.mainImageFile}
                     error={getErrorMessage("mainImage")}
                     required
@@ -2022,7 +2018,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             <BlogImageFileInput
                               id={`blog-section-image-${index}`}
                               label={`Section ${index + 1} Image (optional)`}
-                              maxSizeMB={type === "blog" ? 1 : undefined}
+                              maxSizeMB={1}
                               file={section.imageFile}
                               error={getErrorMessage(`sections.${index}.image`)}
                               onChange={(file) =>

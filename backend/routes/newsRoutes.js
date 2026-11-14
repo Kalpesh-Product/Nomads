@@ -15,6 +15,7 @@ import {
   deleteNews,
 } from "../controllers/newsController.js";
 import upload from "../config/multerConfig.js";
+import { validateContributionImageSizes } from "../middlewares/validateContributionImageSizes.js";
 import { verifyJwt } from "../middlewares/verifyJwt.js";
 import { verifyAdminApiKey } from "../middlewares/verifyAdminApiKey.js";
 
@@ -25,8 +26,8 @@ router.get("/news", getNews);
 router.get("/get-news", getNews);
 router.get("/destination-counts", getNewsDestinationCounts);
 router.get("/my", verifyJwt, requireContributorRole("isNewsWriter"), getMyNews);
-router.post("/my", verifyJwt, requireContributorRole("isNewsWriter"), upload.any(), createMyNews);
-router.patch("/my/:id", verifyJwt, requireContributorRole("isNewsWriter"), upload.any(), updateMyNews);
+router.post("/my", verifyJwt, requireContributorRole("isNewsWriter"), upload.any(), validateContributionImageSizes, createMyNews);
+router.patch("/my/:id", verifyJwt, requireContributorRole("isNewsWriter"), upload.any(), validateContributionImageSizes, updateMyNews);
 router.delete("/my/:id", verifyJwt, requireContributorRole("isNewsWriter"), deleteMyNews);
 router.get("/contributions", verifyAdminApiKey, getNewsContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updateNewsContributionStatus);

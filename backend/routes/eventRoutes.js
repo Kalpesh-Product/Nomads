@@ -1,5 +1,6 @@
 import { Router } from "express";
 import upload from "../config/multerConfig.js";
+import { validateContributionImageSizes } from "../middlewares/validateContributionImageSizes.js";
 import {
   addEvent,
   bulkInsertEvents,
@@ -25,8 +26,8 @@ const router = Router();
 router.get("/", getEvents);
 router.get("/destination/:destination", getEventsByDestination);
 router.get("/my", verifyJwt, requireContributorRole("isEventWriter"), getMyEvents);
-router.post("/my", verifyJwt, requireContributorRole("isEventWriter"), upload.any(), createMyEvent);
-router.patch("/my/:id", verifyJwt, requireContributorRole("isEventWriter"), upload.any(), updateMyEvent);
+router.post("/my", verifyJwt, requireContributorRole("isEventWriter"), upload.any(), validateContributionImageSizes, createMyEvent);
+router.patch("/my/:id", verifyJwt, requireContributorRole("isEventWriter"), upload.any(), validateContributionImageSizes, updateMyEvent);
 router.delete("/my/:id", verifyJwt, requireContributorRole("isEventWriter"), deleteMyEvent);
 router.get("/contributions", verifyAdminApiKey, getEventContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updateEventContributionStatus);
