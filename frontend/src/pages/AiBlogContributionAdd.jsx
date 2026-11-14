@@ -77,7 +77,10 @@ const buildExactKeyword = (label) => {
   return `^${escaped}$`;
 };
 
+let nextSectionId = 0;
+
 const emptySection = () => ({
+  id: nextSectionId++,
   title: "",
   image: "",
   imageFile: null,
@@ -265,67 +268,100 @@ const ContributionTextField = ({ as, maxLength, allowContextMenu, ...props }) =>
   />
 );
 
-const RequiredLabel = ({ children }) => (
-  <label className={labelClassName}>
-    {children}
-    <span className="ml-0.5 text-red-500">*</span>
-  </label>
-);
-
 const FieldError = ({ message }) =>
   message ? <p className={errorTextClassName}>{message}</p> : null;
+
+// The default Multer limit rejects files that reach 5 MB.
+const defaultImageLimitMB = 5;
 
 const BlogImageFileInput = ({
   id,
   label,
   file,
   error,
+  maxSizeMB,
   required = false,
   onChange,
   onClear,
-}) => (
-  <div>
-    {required ? (
-      <RequiredLabel>{label}</RequiredLabel>
-    ) : (
-      <label className={labelClassName}>{label}</label>
-    )}
-    <div
-      className={`contribution-upload flex min-h-[32px] items-center gap-3 border-b bg-white text-sm transition ${
-        error
-          ? "border-red-500"
-          : "border-black/40 hover:border-black focus-within:border-primary-blue"
-      }`}
-    >
-      <input
-        id={id}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        className="sr-only"
-        onChange={(event) => onChange(event.target.files?.[0] || null)}
-      />
-      <label
-        htmlFor={id}
-        className="shrink-0 cursor-pointer rounded-md bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
-      >
-        Choose image
+}) => {
+  const [selectionError, setSelectionError] = useState("");
+  const errorMessage = selectionError || error;
+  const hintId = `${id}-hint`;
+  const errorId = `${id}-error`;
+  const limitMB = maxSizeMB ?? defaultImageLimitMB;
+  const limitBytes = limitMB * 1024 * 1024;
+  const sizeHint = maxSizeMB ? `Up to ${limitMB} MB` : `Under ${limitMB} MB`;
+
+  const handleFileChange = (event) => {
+    const input = event.currentTarget;
+    const selectedFile = input.files?.[0];
+    input.value = "";
+    if (!selectedFile) return;
+
+    if (selectedFile.size > limitBytes || (!maxSizeMB && selectedFile.size === limitBytes)) {
+      setSelectionError(`Image was not added. ${sizeHint} per image.`);
+      return;
+    }
+
+    setSelectionError("");
+    onChange(selectedFile);
+  };
+
+  return (
+    <div>
+      <label htmlFor={id} className={labelClassName}>
+        {label}
+        {required && <span className="ml-0.5 text-red-500">*</span>}
       </label>
-      <span className="min-w-0 flex-1 truncate text-slate-600">
-        {file?.name || "No file selected"}
-      </span>
-      {file ? (
-        <button
-          type="button"
-          onClick={onClear}
-          className="shrink-0 text-xs font-semibold text-red-500 hover:text-red-600"
+      <div
+        className={`contribution-upload flex min-h-[32px] items-center gap-3 border-b bg-white text-sm transition ${
+          errorMessage
+            ? "border-red-500"
+            : "border-black/40 hover:border-black focus-within:border-primary-blue"
+        }`}
+      >
+        <input
+          id={id}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="sr-only"
+          aria-label={label}
+          aria-required={required || undefined}
+          aria-describedby={errorMessage ? `${hintId} ${errorId}` : hintId}
+          aria-invalid={Boolean(errorMessage)}
+          onChange={handleFileChange}
+        />
+        <label
+          htmlFor={id}
+          className="shrink-0 cursor-pointer rounded-md bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
         >
-          Remove
-        </button>
-      ) : null}
+          Choose image
+        </label>
+        <span className="min-w-0 flex-1 truncate text-slate-600">
+          {file?.name || "No file selected"}
+        </span>
+        {file ? (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectionError("");
+              onClear();
+            }}
+            className="shrink-0 text-xs font-semibold text-red-500 hover:text-red-600"
+          >
+            Remove
+          </button>
+        ) : null}
+      </div>
+      <p id={hintId} className="mt-1 text-xs text-slate-600">
+        JPG, PNG, or WebP. {sizeHint} per image.
+      </p>
+      <div id={errorId} role="status">
+        <FieldError message={errorMessage} />
+      </div>
     </div>
-    <FieldError message={error} />
-  </div>
-);
+  );
+};
 
 const DropdownBadge = ({
   label,
@@ -1629,6 +1665,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   <BlogImageFileInput
                     id="blog-main-image"
                     label="Main Image"
+                    maxSizeMB={type === "blog" ? 3 : undefined}
                     file={formValues.mainImageFile}
                     error={getErrorMessage("mainImage")}
                     required
@@ -1940,7 +1977,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
 
                 <div className="mt-3 space-y-4">
                   {formValues.sections.map((section, index) => (
-                    <div key={index} className="border-t border-slate-200 pt-5">
+                    <div key={section.id} className="border-t border-slate-200 pt-5">
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <h3 className="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
                           Section {index + 1}
@@ -1985,6 +2022,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             <BlogImageFileInput
                               id={`blog-section-image-${index}`}
                               label={`Section ${index + 1} Image (optional)`}
+                              maxSizeMB={type === "blog" ? 1 : undefined}
                               file={section.imageFile}
                               error={getErrorMessage(`sections.${index}.image`)}
                               onChange={(file) =>
