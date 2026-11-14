@@ -621,8 +621,8 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const hasAccess = Boolean(user?.[config.accessFlag]);
   const contributorName = user?.fullName?.trim() || user?.name || "";
   const isAddRoute = routeLocation.pathname.endsWith("/add");
-  const allowBlogContentContextMenu = Boolean(
-    matchPath("/contributions/blog/add", routeLocation.pathname),
+  const allowContentContextMenu = Boolean(
+    matchPath(config.addPath, routeLocation.pathname),
   );
 
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -1884,7 +1884,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     : "Main Content"
                 }
                 as="textarea"
-                allowContextMenu={allowBlogContentContextMenu}
+                allowContextMenu={allowContentContextMenu}
                 className={`${getFieldClassName(
                   isEventForm || isPlaceForm
                     ? "shortDescription"
@@ -2027,7 +2027,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           <ContributionTextField
                             label="Section Content"
                             as="textarea"
-                            allowContextMenu={allowBlogContentContextMenu}
+                            allowContextMenu={allowContentContextMenu}
                             className={`${getFieldClassName(
                               `sections.${index}.content`,
                             )} min-h-[150px] resize-y leading-relaxed`}
