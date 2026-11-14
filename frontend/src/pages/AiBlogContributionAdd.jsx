@@ -17,7 +17,7 @@ import {
 } from "react-icons/hi";
 import { FaCheck } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { useLocation, useNavigate } from "react-router-dom";
+import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails";
@@ -242,7 +242,7 @@ const MonthSelect = ({ value, onChange, error, required = true }) => (
   </TextField>
 );
 
-const ContributionTextField = ({ as, maxLength, ...props }) => (
+const ContributionTextField = ({ as, maxLength, allowContextMenu, ...props }) => (
   <CharacterLimitedField
     as={TextField}
     {...props}
@@ -256,7 +256,12 @@ const ContributionTextField = ({ as, maxLength, ...props }) => (
     minRows={as === "textarea" ? 6 : undefined}
     error={Boolean(props["aria-invalid"])}
     maxLength={maxLength}
-    slotProps={{ htmlInput: { maxLength } }}
+    slotProps={{
+      htmlInput: {
+        maxLength,
+        "data-allow-context-menu": allowContextMenu ? "" : undefined,
+      },
+    }}
   />
 );
 
@@ -616,6 +621,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const hasAccess = Boolean(user?.[config.accessFlag]);
   const contributorName = user?.fullName?.trim() || user?.name || "";
   const isAddRoute = routeLocation.pathname.endsWith("/add");
+  const allowBlogContentContextMenu = Boolean(
+    matchPath("/contributions/blog/add", routeLocation.pathname),
+  );
 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState("");
@@ -1876,6 +1884,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     : "Main Content"
                 }
                 as="textarea"
+                allowContextMenu={allowBlogContentContextMenu}
                 className={`${getFieldClassName(
                   isEventForm || isPlaceForm
                     ? "shortDescription"
@@ -2018,6 +2027,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           <ContributionTextField
                             label="Section Content"
                             as="textarea"
+                            allowContextMenu={allowBlogContentContextMenu}
                             className={`${getFieldClassName(
                               `sections.${index}.content`,
                             )} min-h-[150px] resize-y leading-relaxed`}
