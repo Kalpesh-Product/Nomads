@@ -1,5 +1,5 @@
 import React from "react";
-import Container from "../../components/Container";
+import AiAlignBox from "../../components/AiAlignBox";
 import LeadsImage from "/hosts/leads-page/leads-section-image-webp.webp";
 import GoogleSheetsImage from "/hosts/leads-page/google-sheets-image-webp.webp";
 
@@ -76,25 +76,35 @@ const Leads = () => {
   const navigate = useNavigate();
   const onBack = () => navigate("/");
   return (
-    <div>
-      <div className="sticky top-0 z-[100] -mx-1 flex min-w-[11rem] items-center gap-3 bg-white px-1 py-3 shadow-none md:-mx-6 md:px-6 lg:-mx-10 lg:px-10 xl:-mx-24 xl:px-24">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500"
-          aria-label="Go back to search results"
-        >
-          <HiOutlineArrowLeft size={18} />
-        </button>
-        <span className="text-lg font-medium text-primary-blue">Leads</span>
-        {/* {stateLabel && (
-                      <span className="text-lg font-medium text-primary-blue">
-                        {stateLabel}
-                      </span>
-                    )} */}
+    // Full-bleed: cancels AiHostLayout's px-1/md:px-6/lg:px-10/xl:px-24 so
+    // this page spans the same width as the header row above it, letting
+    // AiAlignBox reproduce the header's exact left/right alignment.
+    <div className="mt-px -mx-1 md:-mx-6 lg:-mx-10 xl:-mx-24 w-[calc(100%+0.5rem)] md:w-[calc(100%+3rem)] lg:w-[calc(100%+5rem)] xl:w-[calc(100%+12rem)]">
+      {/* Breadcrumb bar — sits below the mobile sidebar overlay (z-70) and
+          below the header (z-50), and aligns with the header's edges via
+          AiAlignBox at every breakpoint. */}
+      <div className="sticky top-0 isolate z-30 bg-white">
+        <AiAlignBox>
+          <div className="flex min-h-11 w-full min-w-0 items-center gap-3 bg-white py-1.5 pb-3 md:h-11 md:pb-4">
+            <button
+              type="button"
+              onClick={onBack}
+              className="ml-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-500 bg-white text-sky-500 md:ml-0"
+              aria-label="Go back to search results"
+            >
+              <HiOutlineArrowLeft size={18} />
+            </button>
+            <span className="text-lg font-medium text-primary-blue">Leads</span>
+            {/* {stateLabel && (
+                          <span className="text-lg font-medium text-primary-blue">
+                            {stateLabel}
+                          </span>
+                        )} */}
+          </div>
+        </AiAlignBox>
       </div>
       {/* Top Text section */}
-      <Container padding={false}>
+      <AiAlignBox>
         {/* <div className="lg:pt-16 pt-10"> */}
         <div>
           <h2 className="lg:text-[1.67rem] md:text-[1.75rem] sm:text-[1.75rem] xs:text-[1.75rem] leading-[1.4] font-semibold text-host">
@@ -109,15 +119,21 @@ const Leads = () => {
           />
         </div>
         {/* </div> */}
-      </Container>
+      </AiAlignBox>
 
       {/* Social media icons banner */}
-      <div>
-        <img src={LeadsImage} alt="Leads Image" className="w-full" />
-      </div>
+      <AiAlignBox>
+        <div className="overflow-hidden">
+          <img
+            src={LeadsImage}
+            alt="Leads Image"
+            className="w-full h-auto object-cover"
+          />
+        </div>
+      </AiAlignBox>
 
       {/* Our Core focus section */}
-      <Container padding={false}>
+      <AiAlignBox>
         <div className="pt-6 sm:pt-16 pb-12">
           <div className="pb-6 sm:pb-16">
             <h2 className="lg:text-[2.75rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] xs:leading-9 font-semibold text-host">
@@ -170,13 +186,13 @@ const Leads = () => {
             </div>
           </div>
         </div>
-      </Container>
+      </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30" />
+      </AiAlignBox>
       {/* Automated Google Leads Section */}
-      <Container padding={false}>
+      <AiAlignBox>
         <div className="pt-10 pb-12">
           <div className="pb-6">
             <h2 className="lg:text-[2.5rem] md:text-[2.75rem] sm:text-[1.75rem] xs:text-[1.75rem] lg:leading-[3.5rem] md:leading-9 sm:leading-9 xs:leading-9 font-semibold text-host">
@@ -194,14 +210,14 @@ const Leads = () => {
             />
           </div>
         </div>
-      </Container>
+      </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30" />
+      </AiAlignBox>
 
       {/* Run & Scale Grid Section */}
-      <Container padding={false}>
+      <AiAlignBox>
         <div className="pt-8 pb-8">
           <ReactFitty className="text-host">
             RUN & SCALE YOUR BUSINESS
@@ -228,14 +244,14 @@ const Leads = () => {
             />
           </div>
         </div>
-      </Container>
+      </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30  " />
+      </AiAlignBox>
 
       {/* Get better ROI Section */}
-      <Container padding={false}>
+      <AiAlignBox>
         <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 py-8">
           <div>
             <img src={RoiImage} alt="ROI Image" />
@@ -253,14 +269,14 @@ const Leads = () => {
             </p>
           </div>
         </div>
-      </Container>
+      </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30  " />
+      </AiAlignBox>
 
       {/* Get a Complete View Section */}
-      <Container padding={false}>
+      <AiAlignBox>
         <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 py-8">
           <div className="flex flex-col justify-center lg:order-1 md:order-1 sm:order-2 xs:order-2">
             <h2 className="lg:text-[4rem] sm:text-[2.5rem] xs:text-[2.5rem] leading-[1.2]  text-host">
@@ -277,14 +293,14 @@ const Leads = () => {
             <img src={CompleteViewImage} alt="Complete View Image" />
           </div>
         </div>
-      </Container>
+      </AiAlignBox>
 
-      <div className="flex items-center justify-center h-0">
-        <hr className="w-full h-0 m-0 border-t-4" />
-      </div>
+      <AiAlignBox>
+        <hr className="w-full h-0 m-0 border-t border-black/30  " />
+      </AiAlignBox>
 
       {/* The finer points Section */}
-      <Container padding={false}>
+      <AiAlignBox>
         <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 py-8">
           <div>
             <img src={FinerPointsImage} alt="Finer Points" />
@@ -301,7 +317,7 @@ const Leads = () => {
             </p>
           </div>
         </div>
-      </Container>
+      </AiAlignBox>
     </div>
   );
 };

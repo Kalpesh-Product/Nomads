@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import Container from "../components/Container";
 import ListingCard from "../components/ListingCard";
+import ContentFavorites from "../components/ContentFavorites";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert } from "../utils/alerts";
@@ -353,6 +354,7 @@ const Favorites = ({
             </div>
           )}
         </div>
+        <ContentFavorites showRemoveFavoriteIcons={showRemoveFavoriteIcons} />
       </div>
     </Container>
   );

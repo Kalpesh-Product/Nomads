@@ -9,10 +9,16 @@ import LodgeTemplate from "./lodge/LodgeTemplate";
 import CaliHostelTemplate from "./caliHostel/CaliHostelTemplate";
 import TastycTemplate from "./tastyc/TastycTemplate";
 import GrandBarTemplate from "./grandbar/GrandBarTemplate";
+import AromaticaTemplate from "./aromatica/AromaticaTemplate";
+import ItalianoTemplate from "./italiano/ItalianoTemplate";
+import RestobarTemplate from "./restobar/RestobarTemplate";
+import TinyHomeTemplate from "./tinyhome/TinyHomeTemplate";
 import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
 import WorkscapeTemplate from "./workscape/WorkscapeTemplate";
 import BrixspaceTemplate from "./brixspace/BrixspaceTemplate";
 import WorpaceTemplate from "./worpace/WorpaceTemplate";
+import CoPlaceTemplate from "./coplace/CoPlaceTemplate";
+import CoboxTemplate from "./cobox/CoboxTemplate";
 import QerjaTemplate from "./qerja/QerjaTemplate";
 import TulumTemplate from "./tulum/TulumTemplate";
 import GrindelwaldTemplate from "./grindelwald/GrindelwaldTemplate";
@@ -32,10 +38,16 @@ export const VERTICAL_TEMPLATES = {
   "cali-hostel": CaliHostelTemplate,
   tastyc: TastycTemplate,
   grandbar: GrandBarTemplate,
+  aromatica: AromaticaTemplate,
+  italiano: ItalianoTemplate,
+  restobar: RestobarTemplate,
+  tinyhome: TinyHomeTemplate,
   flowspace: FlowspaceTemplate,
   workscape: WorkscapeTemplate,
   brixspace: BrixspaceTemplate,
   worpace: WorpaceTemplate,
+  coplace: CoPlaceTemplate,
+  cobox: CoboxTemplate,
   qerja: QerjaTemplate,
   tulum: TulumTemplate,
   grindelwald: GrindelwaldTemplate,

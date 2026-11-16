@@ -741,6 +741,7 @@ const Product = () => {
               companyId={companyDetails?.companyId}
               businessId={companyDetails?.businessId}
               isVerified={companyDetails?.verifiedBadgeVisible}
+              verificationExpiresAt={companyDetails?.verificationExpiresAt}
             />
           </h1>
         </div>
@@ -1625,6 +1626,7 @@ const Product = () => {
               companyId={companyDetails?.companyId}
               businessId={companyDetails?.businessId}
               isVerified={companyDetails?.verifiedBadgeVisible}
+              verificationExpiresAt={companyDetails?.verificationExpiresAt}
             />
           </h1>
         </div>

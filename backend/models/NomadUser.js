@@ -74,6 +74,30 @@ const userSchema = new mongoose.Schema(
         ref: "StateWiseWeight",
       },
     ],
+    favoriteBlogs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Blog" }],
+    favoriteNews: [{ type: mongoose.Schema.Types.ObjectId, ref: "News" }],
+    favoritePlaces: [{ type: mongoose.Schema.Types.ObjectId, ref: "Place" }],
+    favoriteEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }],
+    isBlogger: {
+      type: Boolean,
+      default: false,
+    },
+    isNewsWriter: {
+      type: Boolean,
+      default: false,
+    },
+    isEventWriter: {
+      type: Boolean,
+      default: false,
+    },
+    isPlaceWriter: {
+      type: Boolean,
+      default: false,
+    },
+    contributionsActivationEmailSentAt: {
+      type: Date,
+      default: null,
+    },
     refreshToken: {
       type: String,
     },

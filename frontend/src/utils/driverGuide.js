@@ -1,4 +1,6 @@
 import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+import "../styles/driverGuide.css";
 
 let activeGuide = null;
 
@@ -103,6 +105,10 @@ export const createDriverGuide = (options) => {
   let guide;
   guide = driver({
     ...driverOptions,
+    popoverClass: ["wono-driver-popover", driverOptions.popoverClass]
+      .filter(Boolean)
+      .filter((className, index, classes) => classes.indexOf(className) === index)
+      .join(" "),
     onDestroyed: (...args) => {
       if (activeGuide === guide) {
         activeGuide = null;

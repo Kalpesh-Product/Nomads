@@ -3,8 +3,102 @@ import { Readable } from "stream";
 import csvParser from "csv-parser";
 import Blog from "../models/Blog.js";
 import TestBlog from "../models/TestBlog.js";
+import { uploadFileToS3 } from "../config/s3Config.js";
 
 const RSS2JSON_BASE = "https://api.rss2json.com/v1/api.json";
+
+const sanitizeS3PathSegment = (value, fallback = "untitled") => {
+    const cleaned = String(value || "")
+        .replace(/[/\\?%*:|"<>]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    return cleaned || fallback;
+};
+
+const sanitizeFileName = (value, fallback = "image") => {
+    const cleaned = String(value || "")
+        .replace(/[/\\?%*:|"<>]/g, "_")
+        .replace(/\s+/g, "_")
+        .trim();
+
+    return cleaned || fallback;
+};
+
+const getS3KeyFromUrl = (fileUrl) => {
+    try {
+        if (!fileUrl) return "";
+        const url = new URL(fileUrl);
+        return decodeURIComponent(url.pathname.slice(1));
+    } catch {
+        return "";
+    }
+};
+
+const parseSections = (sections) => {
+    if (Array.isArray(sections)) return sections;
+
+    if (typeof sections !== "string") return [];
+
+    try {
+        const parsed = JSON.parse(sections);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+};
+
+const buildBlogPayloadWithUploads = async (req) => {
+    const payload = {
+        ...req.body,
+        sections: parseSections(req.body.sections),
+    };
+    const files = Array.isArray(req.files) ? req.files : [];
+
+    if (!files.length) return payload;
+
+    const destinationFolder = sanitizeS3PathSegment(payload.destination, "Destination");
+    const blogFolder = sanitizeS3PathSegment(payload.mainTitle, "Blog");
+    const baseFolder = `nomads/blogs/${destinationFolder}/${blogFolder}`;
+    const mainImageFile = files.find((file) => file.fieldname === "mainImageFile");
+
+    if (mainImageFile) {
+        const key =
+            getS3KeyFromUrl(payload.mainImage) ||
+            `${baseFolder}/Main Image/${sanitizeFileName(mainImageFile.originalname)}`;
+        const uploaded = await uploadFileToS3(key, mainImageFile);
+        payload.mainImage = uploaded.url;
+    }
+
+    const sectionImageUploads = files
+        .map((file) => {
+            const match = file.fieldname.match(/^sectionImageFiles\[(\d+)\]$/);
+            return match ? { index: Number(match[1]), file } : null;
+        })
+        .filter(Boolean);
+
+    await Promise.all(
+        sectionImageUploads.map(async ({ index, file }) => {
+            if (!payload.sections[index]) {
+                payload.sections[index] = { title: "", content: "", image: "" };
+            }
+
+            const key =
+                getS3KeyFromUrl(payload.sections[index].image) ||
+                `${baseFolder}/Section ${index + 1} Image/${sanitizeFileName(
+                    file.originalname,
+                )}`;
+            const uploaded = await uploadFileToS3(key, file);
+
+            payload.sections[index] = {
+                ...payload.sections[index],
+                image: uploaded.url,
+            };
+        }),
+    );
+
+    return payload;
+};
 
 // RSS feeds for different locations (can expand later)
 // const RSS_FEEDS = {
@@ -59,11 +153,19 @@ const RSS_FEEDS = {
 export const getBlogs = async (req, res, next) => {
     try {
         const { keyword, destination } = req.query;
-        let query = {};
+        let query = {
+            deletedAt: null,
+            isDraft: { $ne: true },
+            isActive: { $ne: false },
+            $or: [{ status: "approved" }, { status: { $exists: false } }],
+        };
 
         const searchKeyword = destination || keyword;
         if (searchKeyword) {
-            query.destination = { $regex: searchKeyword, $options: "i" };
+            query = {
+                ...query,
+                destination: { $regex: searchKeyword, $options: "i" },
+            };
         }
 
         const blogs = await Blog.find(query).sort({ date: -1 });
@@ -80,7 +182,14 @@ export const getBlogs = async (req, res, next) => {
 export const getBlogDestinationCounts = async (req, res, next) => {
     try {
         const counts = await Blog.aggregate([
-            { $match: { isActive: { $ne: false } } },
+            {
+                $match: {
+                    deletedAt: null,
+                    isActive: { $ne: false },
+                    isDraft: { $ne: true },
+                    $or: [{ status: "approved" }, { status: { $exists: false } }],
+                },
+            },
             { $group: { _id: "$destination", count: { $sum: 1 } } },
         ]);
         return res.status(200).json(
@@ -268,11 +377,245 @@ export const createBlog = async (req, res, next) => {
     }
 };
 
+export const getMyBlogs = async (req, res, next) => {
+    try {
+        const user = req.userData._id;
+        const blogs = await Blog.find({ contributor: user, deletedAt: null }).sort({
+            updatedAt: -1,
+            date: -1,
+        });
+
+        return res.status(200).json({
+            count: blogs.length,
+            data: blogs,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getBlogContributions = async (req, res, next) => {
+    try {
+        const { status, search } = req.query;
+        const query = {
+            contributor: { $exists: true, $ne: null },
+            isDraft: { $ne: true },
+        };
+
+        if (status && status !== "all") {
+            if (status === "deleted") {
+                query.deletedAt = { $ne: null };
+            } else {
+                query.status = status;
+                query.deletedAt = null;
+            }
+        }
+
+        if (search) {
+            const pattern = { $regex: search, $options: "i" };
+            query.$or = [
+                { mainTitle: pattern },
+                { mainContent: pattern },
+                { author: pattern },
+                { source: pattern },
+                { destination: pattern },
+            ];
+        }
+
+        const blogs = await Blog.find(query)
+            .populate("contributor", "firstName lastName fullName name email")
+            .sort({ updatedAt: -1, date: -1 });
+
+        return res.status(200).json({
+            count: blogs.length,
+            // Keep the stored review status for the timeline; deletion takes precedence in moderation.
+            data: blogs.map((blog) => blog.deletedAt ? {
+                ...blog.toObject(),
+                statusBeforeDeletion: blog.status,
+                status: "deleted",
+            } : blog),
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const createMyBlog = async (req, res, next) => {
+    try {
+        const user = req.userData._id;
+        const payload = await buildBlogPayloadWithUploads(req);
+        // Review metadata is owned by moderation, not contributor form fields.
+        for (const field of ["reviewedBy", "reviewedById", "reviewedAt", "moderationHistory"]) {
+            delete payload[field];
+        }
+        const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
+
+        const blog = await Blog.create({
+            ...payload,
+            contributor: user,
+            status: "pending",
+            rejectionReason: "",
+            isDraft,
+            isActive: !isDraft,
+        });
+
+        res.status(201).json({
+            message: isDraft
+                ? "Blog saved as draft successfully"
+                : "Blog submitted successfully",
+            blog,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateMyBlog = async (req, res, next) => {
+    try {
+        const user = req.userData._id;
+        const { id } = req.params;
+        const payload = await buildBlogPayloadWithUploads(req);
+        // Review metadata is owned by moderation, not contributor form fields.
+        for (const field of ["reviewedBy", "reviewedById", "reviewedAt", "moderationHistory"]) {
+            delete payload[field];
+        }
+        const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
+
+        const editedAt = new Date();
+        const blog = await Blog.findOneAndUpdate(
+            {
+                _id: id,
+                contributor: user,
+                deletedAt: null,
+            },
+            {
+                ...payload,
+                contributor: user,
+                lastEditedAt: editedAt,
+                reviewedAt: null,
+                reviewedBy: "",
+                reviewedById: "",
+                ...(!isDraft ? { $push: { moderationHistory: {
+                    status: "pending", date: editedAt, actor: "Contributor",
+                } } } : {}),
+                status: "pending",
+                rejectionReason: "",
+                isDraft,
+                isActive: !isDraft,
+            },
+            { new: true, runValidators: true },
+        );
+
+        if (!blog) {
+            return res.status(404).json({ message: "Blog contribution not found" });
+        }
+
+        return res.status(200).json({
+            message: isDraft
+                ? "Blog draft updated successfully"
+                : "Blog submitted successfully",
+            blog,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateBlogContributionStatus = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { status, rejectionReason } = req.body;
+        const normalizedStatus = String(status || "").toLowerCase();
+        const normalizedReason = String(rejectionReason || "").trim();
+
+        if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
+            return res.status(400).json({ message: "Invalid blog status" });
+        }
+
+        if (normalizedStatus === "rejected" && !normalizedReason) {
+            return res.status(400).json({ message: "Rejection reason is required" });
+        }
+
+        // This endpoint is protected by the admin API key; the Master Panel
+        // supplies the identity from its verified staff session.
+        const reviewedBy = typeof req.body.reviewedBy === "string" ? req.body.reviewedBy.trim() : "";
+        const reviewedById = typeof req.body.reviewedById === "string" ? req.body.reviewedById.trim() : "";
+        const reviewedAt = new Date();
+        const blog = await Blog.findOneAndUpdate(
+            {
+                _id: id,
+                contributor: { $exists: true, $ne: null },
+                deletedAt: null,
+                isDraft: { $ne: true },
+            },
+            {
+                status: normalizedStatus,
+                rejectionReason: normalizedStatus === "rejected" ? normalizedReason : "",
+                isActive: normalizedStatus === "approved",
+                reviewedAt,
+                reviewedBy,
+                reviewedById,
+                $push: {
+                    moderationHistory: {
+                        status: normalizedStatus,
+                        date: reviewedAt,
+                        reason: normalizedStatus === "rejected" ? normalizedReason : "",
+                        actor: reviewedBy || "Master Panel",
+                        actorId: reviewedById,
+                    },
+                },
+            },
+            { new: true },
+        ).populate("contributor", "firstName lastName fullName name email");
+
+        if (!blog) {
+            return res.status(404).json({ message: "Blog contribution not found" });
+        }
+
+        return res.status(200).json({
+            message: `Blog ${normalizedStatus} successfully`,
+            blog,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Retain the contributor's reason while removing the blog from active lists.
+export const deleteMyBlog = async (req, res, next) => {
+    try {
+        const user = req.userData?._id;
+        if (!user) return res.status(401).json({ message: "Authentication required" });
+
+        const { deletionReason, agreedToDelete } = req.body || {};
+        if (agreedToDelete !== true) {
+            return res.status(400).json({ message: "Please agree before deleting this blog." });
+        }
+        if (typeof deletionReason !== "string" || !deletionReason.trim()) {
+            return res.status(400).json({ message: "Reason for deleting is required." });
+        }
+        const reason = deletionReason.trim();
+        if (reason.length > 500) {
+            return res.status(400).json({ message: "Deletion reason must be 500 characters or fewer." });
+        }
+
+        const blog = await Blog.findOneAndUpdate(
+            { _id: req.params.id, contributor: user, deletedAt: null },
+            { $set: { deletedAt: new Date(), deletionReason: reason, isActive: false } },
+            { new: true, runValidators: true },
+        );
+        if (!blog) return res.status(404).json({ message: "Blog contribution not found" });
+        return res.status(200).json({ message: "Blog deleted successfully" });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // PUT: Update a single blog item
 export const updateBlog = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const blog = await Blog.findByIdAndUpdate(id, req.body, { new: true });
+        const blog = await Blog.findOneAndUpdate({ _id: id, deletedAt: null }, req.body, { new: true });
         if (!blog) return res.status(404).json({ message: "Blog not found" });
         res.status(200).json({ message: "Blog updated", blog });
     } catch (error) {

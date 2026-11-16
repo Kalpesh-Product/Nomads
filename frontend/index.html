@@ -57,6 +57,13 @@
       src="https://www.googletagmanager.com/gtag/js?id=G-6F7YK18TQK"
     ></script>
     <script>
+      document.addEventListener("contextmenu", (event) => {
+        if (!event.target.matches?.('textarea[data-allow-context-menu]')) {
+          event.preventDefault();
+        }
+      }, true);
+    </script>
+    <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
         dataLayer.push(arguments);
@@ -67,7 +74,7 @@
     </script>
   </head>
 
-  <body oncontextmenu="return false;">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

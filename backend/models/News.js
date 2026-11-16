@@ -1,3 +1,4 @@
+import { contributionLifecycleFields } from "../utils/contributionLifecycle.js";
 import mongoose from "mongoose";
 const blogSchema = new mongoose.Schema({
   mainTitle: {
@@ -22,8 +23,24 @@ const blogSchema = new mongoose.Schema({
   blogType: {
     type: String,
   },
+  link: {
+    type: String,
+  },
   source: {
     type: String,
+  },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "approved",
+  },
+  contributor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "NomadUser",
+  },
+  isDraft: {
+    type: Boolean,
+    default: false,
   },
   sections: [
     {
@@ -36,7 +53,9 @@ const blogSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-});
+}, { timestamps: true });
+
+blogSchema.add(contributionLifecycleFields);
 
 const News = mongoose.model("News", blogSchema);
 export default News;

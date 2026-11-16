@@ -100,6 +100,10 @@ export const login = async (req, res) => {
         saves: user.saves,
         likes: user.likes,
         favoriteDestination: user.favoriteDestination,
+        isBlogger: user.isBlogger,
+        isNewsWriter: user.isNewsWriter,
+        isEventWriter: user.isEventWriter,
+        isPlaceWriter: user.isPlaceWriter,
       },
       accessToken,
     });

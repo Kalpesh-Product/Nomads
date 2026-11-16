@@ -1,3 +1,11 @@
+import {
+  applyContributionStatusFilter,
+  serializeContribution,
+  stripLifecycleFields,
+  resubmissionFields,
+  createDeleteContribution,
+  createModerateContribution,
+} from "../utils/contributionLifecycle.js";
 // // controllers/newsController.js
 // import axios from "axios";
 // import NewsCache from "../models/NewsCache.js";
@@ -5,6 +13,7 @@ import News from "../models/News.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import TestNews from "../models/TestNews.js";
+import { buildContributionPayloadWithUploads } from "../utils/contributionImageUploads.js";
 
 // const BASE = "https://gnews.io/api/v4";
 // const APIKEY = process.env.GNEWS_API_KEY;
@@ -106,15 +115,23 @@ export const getNews = async (req, res, next) => {
   try {
     const { keyword, destination } = req.query;
 
-    let query = {};
+    let query = {
+      isDraft: { $ne: true },
+      deletedAt: null,
+      isActive: { $ne: false },
+      $or: [{ status: "approved" }, { status: { $exists: false } }],
+    };
     const searchKeyword = destination || keyword;
     if (searchKeyword) {
-      query.destination = { $regex: searchKeyword, $options: "i" };
+      query = {
+        ...query,
+        destination: { $regex: searchKeyword, $options: "i" },
+      };
     }
 
-    const blogs = await News.find(query).sort({ date: -1 });
+    const news = await News.find(query).sort({ date: -1 });
 
-    return res.status(200).json(blogs);
+    return res.status(200).json(news);
   } catch (error) {
     next(error);
   }
@@ -127,7 +144,14 @@ export const getNews = async (req, res, next) => {
 export const getNewsDestinationCounts = async (req, res, next) => {
   try {
     const counts = await News.aggregate([
-      { $match: { isActive: { $ne: false } } },
+      {
+        $match: {
+          deletedAt: null,
+          isActive: { $ne: false },
+          isDraft: { $ne: true },
+          $or: [{ status: "approved" }, { status: { $exists: false } }],
+        },
+      },
       { $group: { _id: "$destination", count: { $sum: 1 } } },
     ]);
     return res.status(200).json(
@@ -232,11 +256,142 @@ export const createNews = async (req, res, next) => {
   }
 };
 
+export const getMyNews = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const news = await News.find({ contributor: user, deletedAt: null }).sort({
+      updatedAt: -1,
+      date: -1,
+    });
+
+    return res.status(200).json({
+      count: news.length,
+      data: news,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getNewsContributions = async (req, res, next) => {
+  try {
+    const { status, search } = req.query;
+    const query = {
+      contributor: { $exists: true, $ne: null },
+      isDraft: { $ne: true },
+    };
+
+    applyContributionStatusFilter(query, status);
+
+    if (search) {
+      const pattern = { $regex: search, $options: "i" };
+      query.$or = [
+        { mainTitle: pattern },
+        { mainContent: pattern },
+        { author: pattern },
+        { source: pattern },
+        { destination: pattern },
+      ];
+    }
+
+    const news = await News.find(query)
+      .populate("contributor", "firstName lastName fullName name email")
+      .sort({ updatedAt: -1, date: -1 });
+
+    return res.status(200).json({
+      count: news.length,
+      data: news.map(serializeContribution),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createMyNews = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const payload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "news",
+      title: req.body?.mainTitle,
+    });
+    stripLifecycleFields(payload);
+    const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
+
+    const news = await News.create({
+      ...payload,
+      contributor: user,
+      status: "pending",
+      isDraft,
+      isActive: !isDraft,
+    });
+
+    res.status(201).json({
+      message: isDraft
+        ? "News saved as draft successfully"
+        : "News submitted successfully",
+      news,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateMyNews = async (req, res, next) => {
+  try {
+    const user = req.userData._id;
+    const { id } = req.params;
+    const payload = await buildContributionPayloadWithUploads({
+      body: req.body,
+      files: req.files,
+      folderType: "news",
+      title: req.body?.mainTitle,
+    });
+    stripLifecycleFields(payload);
+    const isDraft = String(payload?.isDraft) === "true" || payload?.isDraft === true;
+
+    const news = await News.findOneAndUpdate(
+      {
+        _id: id,
+        contributor: user,
+        deletedAt: null,
+      },
+      {
+        ...payload,
+        ...resubmissionFields(isDraft),
+        contributor: user,
+        status: "pending",
+        isDraft,
+        isActive: !isDraft,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!news) {
+      return res.status(404).json({ message: "News contribution not found" });
+    }
+
+    return res.status(200).json({
+      message: isDraft
+        ? "News draft updated successfully"
+        : "News submitted successfully",
+      news,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateNewsContributionStatus = createModerateContribution(News, "News", "news");
+
+export const deleteMyNews = createDeleteContribution(News, "News");
+
 // PUT: Update a single news item
 export const updateNews = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const news = await News.findByIdAndUpdate(id, req.body, { new: true });
+    const news = await News.findOneAndUpdate({ _id: id, deletedAt: null }, req.body, { new: true });
     if (!news) return res.status(404).json({ message: "News not found" });
     res.status(200).json({ message: "News updated", news });
   } catch (error) {

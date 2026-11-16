@@ -1,3 +1,4 @@
+import { contributionLifecycleFields } from "../utils/contributionLifecycle.js";
 import mongoose from "mongoose";
 
 const placeSchema = new mongoose.Schema(
@@ -77,6 +78,19 @@ const placeSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "approved",
+    },
+    contributor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "NomadUser",
+    },
+    isDraft: {
+      type: Boolean,
+      default: false,
+    },
     sections: [
       {
         title: { type: String, default: "" },
@@ -93,6 +107,8 @@ const placeSchema = new mongoose.Schema(
 );
 
 placeSchema.index({ destination: 1 });
+
+placeSchema.add(contributionLifecycleFields);
 
 const Place = mongoose.model("Place", placeSchema, "places");
 

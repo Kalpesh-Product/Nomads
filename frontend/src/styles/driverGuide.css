@@ -1,0 +1,106 @@
+/* Shared Host Panel guide design, using the website's primary-blue token. */
+.driver-popover.wono-driver-popover {
+  --guide-primary: theme("colors.primary.blue");
+  max-width: min(390px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f8fbff 0, #ffffff 64px);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+  padding: 22px;
+  font-family: "Poppins", sans-serif;
+}
+
+.driver-popover.wono-driver-popover::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    theme("colors.primary.dark"),
+    var(--guide-primary),
+    color-mix(in srgb, var(--guide-primary), white 45%)
+  );
+  content: "";
+}
+
+.driver-popover.wono-driver-popover .driver-popover-title {
+  padding-right: 22px;
+  color: #0f172a;
+  font-family: "Poppins", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.driver-popover.wono-driver-popover .driver-popover-description {
+  color: #475569;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.driver-popover.wono-driver-popover .driver-popover-progress-text {
+  border-radius: 999px;
+  background: #eff6ff;
+  padding: 4px 8px;
+  color: #64748b;
+  font-family: "Poppins", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.driver-popover.wono-driver-popover button {
+  min-height: 34px;
+  border-radius: 8px;
+  padding: 7px 13px;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: none;
+}
+
+.driver-popover.wono-driver-popover .driver-popover-next-btn {
+  border-color: var(--guide-primary);
+  background: var(--guide-primary);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--guide-primary) 22%, transparent);
+  color: #ffffff;
+  transition: transform 150ms ease, background 150ms ease;
+}
+
+.driver-popover.wono-driver-popover .driver-popover-next-btn:hover {
+  background: color-mix(in srgb, var(--guide-primary), black 12%);
+  transform: translateY(-1px);
+}
+
+.driver-popover.wono-driver-popover .driver-popover-prev-btn {
+  border-color: #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+}
+
+.driver-popover.wono-driver-popover .driver-popover-close-btn {
+  top: 13px;
+  right: 13px;
+  min-height: auto;
+  padding: 4px;
+  color: #64748b;
+  font-size: 22px;
+}
+
+.driver-popover.wono-driver-popover button:focus-visible {
+  outline: 2px solid var(--guide-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .driver-popover.wono-driver-popover {
+    padding: 18px;
+  }
+
+  .driver-popover.wono-driver-popover .driver-popover-title {
+    font-size: 15px;
+  }
+}

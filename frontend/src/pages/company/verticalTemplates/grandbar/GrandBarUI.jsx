@@ -2,7 +2,7 @@ import React from "react";
 import { motion as Motion } from "../motion";
 import { priceWithUnit } from "../templateKit";
 import { useGrandBar } from "./GrandBarContext";
-const motion = Motion; // eslint-disable-line no-unused-vars -- JSX member expressions are not marked as used by this repo's lint config.
+const motion = Motion; // eslint-disable-line no-unused-vars -- JSX member expressions are not marked as used by this repository lint config.
 const svg = (children, size = 18, viewBox = "0 0 24 24") => (
   <svg
     width={size}
@@ -169,7 +169,34 @@ export const GbMenuCard = ({ service, item, index }) => {
     </GbReveal>
   );
 };
-export const mapSrc = (address) =>
-  "https://www.google.com/maps?q=" +
-  encodeURIComponent(address || "Bengaluru") +
-  "&output=embed";
+export const mapSrc = (address, configuredUrl) => {
+  const fallback =
+    "https://www.google.com/maps?q=" +
+    encodeURIComponent(address || "Bengaluru") +
+    "&output=embed";
+  const value = String(configuredUrl || "").trim();
+  if (!value) return fallback;
+
+  try {
+    const url = new URL(value);
+    const isGoogleMap =
+      /(^|\.)google\.[a-z.]+$/i.test(url.hostname) ||
+      url.hostname === "maps.google.com";
+    const isEmbeddable =
+      url.pathname.includes("/maps/embed") ||
+      url.searchParams.get("output") === "embed";
+    if (isGoogleMap && isEmbeddable) return value;
+
+    const query =
+      url.searchParams.get("q") ||
+      url.searchParams.get("query") ||
+      address;
+    return query
+      ? "https://www.google.com/maps?q=" +
+          encodeURIComponent(query) +
+          "&output=embed"
+      : fallback;
+  } catch {
+    return fallback;
+  }
+};

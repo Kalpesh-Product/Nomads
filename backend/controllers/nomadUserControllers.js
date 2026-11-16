@@ -168,6 +168,10 @@ export const updateProfile = async (req, res) => {
         designation: updatedUser.designation,
         contactCode: updatedUser.contactCode,
         contactNumber: updatedUser.contactNumber,
+        isBlogger: updatedUser.isBlogger,
+        isNewsWriter: updatedUser.isNewsWriter,
+        isEventWriter: updatedUser.isEventWriter,
+        isPlaceWriter: updatedUser.isPlaceWriter,
       },
     });
   } catch (error) {
@@ -233,6 +237,17 @@ export const changePassword = async (req, res) => {
   } catch (error) {
     console.error("[changePassword] error:", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getContributorRoles = async (req, res, next) => {
+  try {
+    const user = await NomadUser.findById(req.userData?._id)
+      .select("isBlogger isNewsWriter isEventWriter isPlaceWriter").lean();
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.status(200).json({ user });
+  } catch (error) {
+    return next(error);
   }
 };
 
