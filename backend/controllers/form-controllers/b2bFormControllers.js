@@ -19,7 +19,7 @@ import {
   renderNotificationEmail,
 } from "../../utils/emailTemplates.js";
 import { checkHostPanelEmail } from "../../utils/hostPanelAccounts.js";
-import { getProfessionalPlanPricing } from "../../utils/planPricing.js";
+import { getProfessionalPlanPricing, getBasicPlanPricing } from "../../utils/planPricing.js";
 
 // Unverified leads never reached the master panel, so they don't count as
 // "used". Each new submission replaces them and invalidates their links/codes.
@@ -69,11 +69,15 @@ async function planDisplayName(goals, billingCycle = "monthly") {
 // directly (avoids CORS and keeps the "which service owns pricing" line
 // clean — Nomads' backend, not its frontend, talks cross-service).
 export const getPublicPlanPricing = async (req, res) => {
-  const { professionalPlanPriceUsd, professionalAnnualPlanPriceUsd } =
-    await getProfessionalPlanPricing();
+  const [
+    { professionalPlanPriceUsd, professionalAnnualPlanPriceUsd },
+    { basicPlanPriceUsd, basicPlanAnnualPriceUsd },
+  ] = await Promise.all([getProfessionalPlanPricing(), getBasicPlanPricing()]);
   return res.status(200).json({
     professionalPlanPriceUsd,
     professionalAnnualPlanPriceUsd,
+    basicPlanPriceUsd,
+    basicPlanAnnualPriceUsd,
   });
 };
 
