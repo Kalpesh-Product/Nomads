@@ -335,6 +335,8 @@ const AiHostSignup = () => {
   const professionalPlanPriceUsd = planPricing?.professionalPlanPriceUsd;
   const professionalAnnualPlanPriceUsd =
     planPricing?.professionalAnnualPlanPriceUsd;
+  const basicPlanPriceUsd = planPricing?.basicPlanPriceUsd;
+  const basicPlanAnnualPriceUsd = planPricing?.basicPlanAnnualPriceUsd;
   const countries = useMemo(
     () => locationApi?.Country?.getAllCountries() || [],
     [locationApi],
@@ -942,7 +944,13 @@ const AiHostSignup = () => {
                   value={field.value || selectedPlan}
                   InputLabelProps={{ sx: floatingLabelSx }}
                 >
-                  <MenuItem value="BASIC">BASIC - FREE</MenuItem>
+                  <MenuItem value="BASIC">
+                    {billingCycle === "annual" && basicPlanAnnualPriceUsd
+                      ? `BASIC - $${basicPlanAnnualPriceUsd} / Year`
+                      : basicPlanPriceUsd
+                        ? `BASIC - $${basicPlanPriceUsd} / Month`
+                        : "BASIC - FREE"}
+                  </MenuItem>
                   <MenuItem value="PROFESSIONAL">
                     {billingCycle === "annual"
                       ? `PROFESSIONAL - $${
