@@ -151,6 +151,8 @@ const AiHostPricing = ({
   const professionalPlanPriceUsd = planPricing?.professionalPlanPriceUsd;
   const professionalAnnualPlanPriceUsd =
     planPricing?.professionalAnnualPlanPriceUsd;
+  const basicPlanPriceUsd = planPricing?.basicPlanPriceUsd;
+  const basicPlanAnnualPriceUsd = planPricing?.basicPlanAnnualPriceUsd;
   // annual price = FULL yearly total (e.g. $1,999/yr). Save is the discount
   // vs paying the monthly rate for 12 months (199×12 = 2,388 → ~16%).
   const annualSavePercent =
@@ -169,6 +171,19 @@ const AiHostPricing = ({
   const cards = useMemo(
     () =>
       recommendationCards.map((card) => {
+        if (card.title === "BASIC") {
+          // 0/unset keeps the static "FREE*" copy — Basic has no real price
+          // until staff set one above $0 on MasterPanel's Plan Pricing page.
+          const isAnnual = billingCycle === "annual";
+          const rate = isAnnual ? basicPlanAnnualPriceUsd : basicPlanPriceUsd;
+          if (!rate) return card;
+          return {
+            ...card,
+            price: `$${Number(rate).toLocaleString()}`,
+            priceSuffix: isAnnual ? "/year" : "/month",
+            billingCycle,
+          };
+        }
         if (card.title !== "PROFESSIONAL") return card;
         const monthly =
           professionalPlanPriceUsd ?? FALLBACK_PROFESSIONAL_PLAN_PRICE_USD;
@@ -197,6 +212,8 @@ const AiHostPricing = ({
     [
       professionalPlanPriceUsd,
       professionalAnnualPlanPriceUsd,
+      basicPlanPriceUsd,
+      basicPlanAnnualPriceUsd,
       annualSavePercent,
       billingCycle,
     ],
