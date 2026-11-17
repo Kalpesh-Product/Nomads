@@ -321,10 +321,16 @@ export const useWebsiteTemplateData = () => {
             String(room?.title || room?.name || room?.heading || "").trim().toLowerCase() === String(roomName).trim().toLowerCase());
         const isMonthlyCoLiving = (draft?.coLivingRooms || []).includes(selectedRoom) && selectedRoom?.stayType === "monthly";
         const isStay = !isMonthlyCoLiving && ((draft?.coLivingRooms || []).includes(selectedRoom) || (draft?.dorms || []).includes(selectedRoom));
+        // Day Pass is a whole-day coworking package, not one of the
+        // configuredRooms lists above (it never matches selectedRoom) and has
+        // no hourly time slot on the form — only a date.
+        const isDayPass = /day\s*pass/i.test(roomName);
         const hasSchedule = isStay
             ? Boolean(leadForm.startDate && leadForm.endDate)
-            : Boolean(leadForm.startDate && leadExtras.time && leadExtras.endTime);
-        if (!selectedRoom || !hasSchedule) {
+            : isDayPass
+                ? Boolean(leadForm.startDate)
+                : Boolean(leadForm.startDate && leadExtras.time && leadExtras.endTime);
+        if ((!selectedRoom && !isDayPass) || !hasSchedule) {
             setLeadAvailability({ status: "idle", message: "" });
             return undefined;
         }
@@ -339,7 +345,9 @@ export const useWebsiteTemplateData = () => {
                     startDate: leadForm.startDate,
                     ...(isStay
                         ? { endDate: leadForm.endDate, attendees: leadForm.people || 1 }
-                        : { startTime: leadExtras.time, endTime: leadExtras.endTime }),
+                        : isDayPass
+                            ? { attendees: leadForm.people || 1 }
+                            : { startTime: leadExtras.time, endTime: leadExtras.endTime }),
                 });
                 if (cancelled) return;
                 setLeadAvailability(response?.data?.available
