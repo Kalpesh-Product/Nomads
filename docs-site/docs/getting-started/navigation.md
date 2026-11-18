@@ -23,3 +23,5 @@ The sidebar groups features into three sections. When collapsed it shows only th
 ## Guided tours
 
 On your first visit to some pages, a short tour points out the main controls. Select Next to continue or close the tour to explore on your own. The browser remembers completed tours.
+
+![First-visit guided tour highlighting the home page goal cards](/img/guide/guided-tour.png)
