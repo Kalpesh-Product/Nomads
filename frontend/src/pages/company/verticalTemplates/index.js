@@ -12,6 +12,7 @@ import GrandBarTemplate from "./grandbar/GrandBarTemplate";
 import AromaticaTemplate from "./aromatica/AromaticaTemplate";
 import ItalianoTemplate from "./italiano/ItalianoTemplate";
 import RestobarTemplate from "./restobar/RestobarTemplate";
+import CabinTemplate from "./cabin/CabinTemplate";
 import TinyHomeTemplate from "./tinyhome/TinyHomeTemplate";
 import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
 import WorkscapeTemplate from "./workscape/WorkscapeTemplate";
@@ -41,6 +42,8 @@ export const VERTICAL_TEMPLATES = {
   aromatica: AromaticaTemplate,
   italiano: ItalianoTemplate,
   restobar: RestobarTemplate,
+  cabin: CabinTemplate,
+
   tinyhome: TinyHomeTemplate,
   flowspace: FlowspaceTemplate,
   workscape: WorkscapeTemplate,

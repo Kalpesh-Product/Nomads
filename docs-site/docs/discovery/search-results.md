@@ -5,6 +5,12 @@ sidebar_position: 8
 
 Choose a region in Where Do You Want To Go? and a preference in Choose Your Goal! The results show ranked destinations for those choices. Use the dropdowns again whenever you want to compare a different region or goal.
 
+![Search results before choosing a region or goal](/img/guide/search-results-initial.jpg)
+
+![Search results with the region dropdown open](/img/guide/search-results-region.jpg)
+
+![Search results with the Work From Anywhere goal dropdown open](/img/guide/search-results-goal.jpg)
+
 ![Loaded destination cards with rankings, favorites and comparison scores](/img/guide/ranked-results.png)
 
 - Where Do You Want To Go? narrows by continent (Explore The World, Africa, Asia, Europe, North America, Oceania, South America).

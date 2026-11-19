@@ -11,3 +11,11 @@ In **Contributions**, choose **Add** for a type approved for your account. Selec
 | News | /contributions/news/add | Same as Blog | Save as Draft, Publish News, Cancel |
 | Event | /contributions/event/add | Event Name, Main Image, Category, Venue, Type, Short Description | Save as Draft, Publish Event, Cancel |
 | Place | /contributions/places/add | Place Name, Main Image, Address, Google Maps Link, Category, Venue (optional), Latitude, Longitude, Short Description | Save as Draft, Publish Place, Cancel |
+
+![Add Blog contribution form](/img/guide/add-blog.jpg)
+
+![Add News contribution form](/img/guide/add-news.jpg)
+
+![Add Event contribution form](/img/guide/add-event.jpg)
+
+![Add Place contribution form](/img/guide/add-place.jpg)
