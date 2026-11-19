@@ -5,6 +5,7 @@ import { FaTwitter, FaLinkedinIn } from "react-icons/fa";
 import { FaGlobe, FaRupeeSign, FaFacebookF, FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { AiOutlineClose } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 const languages = [
   { code: "en-US", name: "English (US)" },
@@ -45,6 +46,7 @@ const AiFooter = () => {
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const [selectedLang, setSelectedLang] = useState(languages[0]);
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
+  const navigate = useNavigate();
 
   const goToHostsPrivacy = () => {
     if (window.location.hostname.includes("localhost")) {
@@ -67,13 +69,10 @@ const AiFooter = () => {
       window.location.href = "https://wono.co/content-and-copyright";
     }
   };
-  const goToHostsContentUseRemoval = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/content-use-removal";
-    } else {
-      window.location.href = "https://wono.co/content-use-removal";
-    }
-  };
+
+const goToHostsContentUseRemoval = () => {
+  navigate("/content-use-removal");
+};
 
   const footerSections = [
     {
