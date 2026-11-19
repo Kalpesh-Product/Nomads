@@ -23,7 +23,7 @@ const s3Client = new S3Client({
   },
 });
 
-export async function uploadFileToS3(route, file) {
+export async function uploadFileToS3(route, file, { createOnly = false } = {}) {
   try {
     const uploadParams = {
       Bucket: process.env.PROJECT_S3_BUCKET_NAME,
@@ -31,6 +31,7 @@ export async function uploadFileToS3(route, file) {
       Body: file.buffer,
       ContentType: file.mimetype,
       ACL: "public-read",
+      ...(createOnly && { IfNoneMatch: "*" }),
     };
 
     const command = new PutObjectCommand(uploadParams);
@@ -42,7 +43,7 @@ export async function uploadFileToS3(route, file) {
       url: fileUrl,
     };
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error, { cause: error });
   }
 }
 

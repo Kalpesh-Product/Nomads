@@ -1,9 +1,10 @@
+import { randomUUID } from "node:crypto";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import Restaurant from "../models/Restaurant.js";
 import RestaurantReview from "../models/RestaurantReview.js";
-import { uploadFileToS3 } from "../config/s3Config.js";
+import { deleteFileFromS3ByKey, uploadFileToS3 } from "../config/s3Config.js";
 
 const REQUIRED_COLUMNS = [
   "Business ID",
@@ -336,51 +337,178 @@ export const addRestaurantImagesBulk = async (req, res, next) => {
   }
 };
 
+const restaurantMediaFolder = (restaurant, type) =>
+  `nomads/restaurants/${restaurant.country}/${sanitizeFolderName(
+    restaurant.restaurantName || restaurant.businessName,
+  )}/${type}`;
+
+const uploadReplacementMedia = async (key, file, options) => {
+  const { url } = await uploadFileToS3(key, file, options);
+  return { key, url: `${new URL(url).origin}/${key.split("/").map(encodeURIComponent).join("/")}` };
+};
+
+const uploadGalleryPhoto = async (folder, batch, file, position) => {
+  const name = sanitizeFileName(file.originalname);
+  const createOnly = { createOnly: true };
+  try {
+    return await uploadReplacementMedia(`${folder}/${name}`, file, createOnly);
+  } catch (error) {
+    const status = error.cause?.$metadata?.httpStatusCode;
+    if (status !== 409 && status !== 412) throw error;
+    // Keep an existing file available until this gallery has been committed.
+    const fileName = `${name.slice(0, -5)}-${batch}-${position}.webp`;
+    return uploadReplacementMedia(`${folder}/${fileName}`, file, createOnly);
+  }
+};
+
+const deleteRestaurantMedia = async (keys) => {
+  const results = await Promise.allSettled(keys.map((key) => deleteFileFromS3ByKey(key)));
+  return results.filter((result) => result.status === "rejected" || !result.value.success).length;
+};
+
+const removeSupersededRestaurantMedia = async (restaurant, urls, type, origin) => {
+  const prefix = `${restaurantMediaFolder(restaurant, type)}/`;
+  const oldRetryPrefix = `nomads/restaurants/${restaurant._id}/images/reuploads/`;
+  const seen = new Set();
+  for (const url of urls) {
+    if (typeof url !== "string" || !url.startsWith(`${origin}/`)) continue;
+    const path = url.slice(origin.length + 1);
+    let key;
+    try {
+      key = decodeURIComponent(path);
+    } catch {
+      continue;
+    }
+    if (!key.startsWith(prefix) && !(type === "images" && key.startsWith(oldRetryPrefix))) continue;
+
+    const encodedUrl = `${origin}/${key.split("/").map(encodeURIComponent).join("/")}`;
+    const references = [url, encodedUrl, `${origin}/${key}`];
+    const stillUsed = await Restaurant.exists({
+      $or: [
+        { "images.url": { $in: references } },
+        { logo: { $in: references } },
+        { mainImage: { $in: references } },
+      ],
+    });
+    if (!stillUsed) seen.add(key);
+  }
+  return deleteRestaurantMedia([...seen]);
+};
+
+export const reuploadRestaurantImages = async (req, res, next) => {
+  try {
+    const { restaurantId } = req.body || {};
+    const files = req.files || [];
+    if (!mongoose.isValidObjectId(restaurantId) || !files.length) {
+      return res.status(400).json({ message: "Select a restaurant and at least one photo." });
+    }
+    if (files.some((file) => file.mimetype !== "image/webp" || !/\.webp$/i.test(file.originalname))) {
+      return res.status(400).json({ message: "Only .webp photos are allowed." });
+    }
+
+    const restaurant = await Restaurant.findById(restaurantId).lean();
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found." });
+    }
+    const previousImages = (restaurant.images || []).filter((image) => image?.url);
+    if (!previousImages.length) {
+      return res.status(409).json({ message: "Use Bulk Restaurant Images Upload for an empty gallery." });
+    }
+
+    const batch = randomUUID();
+    const folder = restaurantMediaFolder(restaurant, "images");
+    const results = await Promise.allSettled(
+      files.map((file, index) => uploadGalleryPhoto(folder, batch, file, index + 1)),
+    );
+    const uploaded = results.filter((result) => result.status === "fulfilled").map((result) => result.value);
+    const failed = results.flatMap((result, index) => result.status === "rejected" ? [files[index].originalname] : []);
+    const newKeys = uploaded.map(({ key }) => key);
+    if (failed.length) {
+      await deleteRestaurantMedia(newKeys);
+      return res.status(502).json({
+        message: `Could not upload: ${failed.join(", ")}. The current gallery is intact. Retry the complete replacement set.`,
+      });
+    }
+
+    const images = uploaded.map(({ url }, index) => ({ url, index: index + 1 }));
+    // Check the version so another completed gallery replacement wins over this stale request.
+    const version = restaurant.__v ?? { $exists: false };
+    const update = await Restaurant.updateOne(
+      { _id: restaurantId, __v: version },
+      { $set: { images, mainImage: images[0].url }, $inc: { __v: 1 } },
+    );
+    if (!update.modifiedCount) {
+      await deleteRestaurantMedia(newKeys);
+      return res.status(409).json({ message: "The gallery changed during upload. Refresh and retry." });
+    }
+
+    const cleanupFailed = await removeSupersededRestaurantMedia(
+      restaurant,
+      previousImages.map(({ url }) => url),
+      "images",
+      new URL(images[0].url).origin,
+    ).catch(() => previousImages.length);
+    return res.status(200).json({
+      message: cleanupFailed
+        ? `Gallery replaced with ${images.length} photos. Some previous S3 files could not be removed.`
+        : `Gallery replaced with ${images.length} photos.`,
+      cleanupFailed,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const uploadRestaurantLogo = async (req, res, next) => {
   try {
     const file = req.file;
     const { restaurantId, businessId } = req.body || {};
-
-    if (!file) {
-      return res.status(400).json({ message: "No file provided" });
+    if (!file || !["image/jpeg", "image/png", "image/webp"].includes(file.mimetype)) {
+      return res.status(400).json({ message: "Select a JPG, PNG, or WebP logo." });
     }
 
     let restaurant;
-    if (restaurantId) {
-      if (!mongoose.isValidObjectId(restaurantId)) {
-        return res.status(400).json({
-          message: "Valid restaurant identifier is required",
-        });
-      }
-      restaurant = await Restaurant.findById(restaurantId).exec();
-    } else if (businessId) {
-      restaurant = await Restaurant.findOne({ businessId }).exec();
+    if (restaurantId && mongoose.isValidObjectId(restaurantId)) {
+      restaurant = await Restaurant.findById(restaurantId).lean();
+    } else if (!restaurantId && businessId) {
+      restaurant = await Restaurant.findOne({ businessId }).lean();
     } else {
-      return res
-        .status(400)
-        .json({ message: "Provide restaurantId or businessId" });
+      return res.status(400).json({ message: "Provide a valid restaurant identifier." });
     }
-
     if (!restaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
+      return res.status(404).json({ message: "Restaurant not found on the Nomads backend used for uploads." });
     }
 
-    const folderPath = `nomads/restaurants/${restaurant.country}/${sanitizeFolderName(
-      restaurant.restaurantName || restaurant.businessName,
-    )}`;
-    const key = `${folderPath}/logo/${sanitizeFileName(file.originalname)}`;
-    const data = await uploadFileToS3(key, file);
+    const folder = restaurantMediaFolder(restaurant, "logo");
+    const key = `${folder}/${randomUUID()}/1-${sanitizeFileName(file.originalname)}`;
+    const replacement = await uploadReplacementMedia(key, file).catch(() => null);
+    if (!replacement) {
+      return res.status(502).json({ message: "S3 did not accept the logo. The current logo is intact." });
+    }
 
-    restaurant.logo = data.url;
-    await restaurant.save({ validateBeforeSave: false });
+    const fields = { logo: replacement.url };
+    if (!restaurant.images?.some((image) => image?.url) &&
+        (!restaurant.mainImage || restaurant.mainImage === restaurant.logo)) {
+      fields.mainImage = replacement.url;
+    }
+    const update = await Restaurant.updateOne(
+      { _id: restaurant._id, __v: restaurant.__v ?? { $exists: false } },
+      { $set: fields, $inc: { __v: 1 } },
+    );
+    if (!update.modifiedCount) {
+      await deleteRestaurantMedia([replacement.key]);
+      return res.status(409).json({ message: "The restaurant media changed during upload. Refresh and retry." });
+    }
 
+    const cleanupFailed = await removeSupersededRestaurantMedia(
+      restaurant, [restaurant.logo], "logo", new URL(replacement.url).origin,
+    ).catch(() => 1);
     return res.status(200).json({
-      message: "Restaurant logo uploaded successfully",
-      data: {
-        restaurantId: restaurant._id,
-        businessId: restaurant.businessId,
-        logo: restaurant.logo,
-      },
+      message: cleanupFailed
+        ? "Logo uploaded. The previous S3 file could not be removed."
+        : "Restaurant logo uploaded successfully.",
+      cleanupFailed,
+      data: { restaurantId: restaurant._id, businessId: restaurant.businessId, logo: replacement.url },
     });
   } catch (error) {
     next(error);
