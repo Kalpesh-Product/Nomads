@@ -102,7 +102,8 @@ const VerifyBusinessButton = ({
           listingUrl: window.location.href,
           referrer: document.referrer || "",
         },
-        { timeout: TRACK_TIMEOUT_MS },
+        // Send nomadCookie so a logged-in visitor can be attributed to the click.
+        { timeout: TRACK_TIMEOUT_MS, withCredentials: true },
       );
       if (data?.clickId) {
         target = `${target}${target.includes("?") ? "&" : "?"}vc=${encodeURIComponent(data.clickId)}`;
