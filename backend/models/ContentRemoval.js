@@ -16,6 +16,16 @@ const contentRemovalSchema = new mongoose.Schema(
       required: true,
     },
     sheetName: { type: String, trim: true, default: "Content_Removal_Requests" },
+    // Operational state set from the Master Panel "Content Removal" tab.
+    // Legacy rows have no value, so readers must default this to "Pending".
+    // TODO(next): add a `statusHistory` array ({ from, to, changedBy, changedAt })
+    // once these updates are authenticated — changing a takedown decision
+    // needs an append-only audit trail.
+    status: {
+      type: String,
+      enum: ["Pending", "In Review", "Resolved", "Rejected"],
+      default: "Pending",
+    },
     submittedAt: { type: Date, default: Date.now },
   },
   { timestamps: true, collection: "contentRemoval" },

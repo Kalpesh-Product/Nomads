@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import WebsiteTemplate from "../../models/WebsiteTemplate.js";
 import HostUser from "../../models/HostUser.js";
 import Otp from "../../models/Otp.js";
+import JobApplication from "../../models/JobApplication.js";
 import {
   attachHostUserToClick,
   findUnusedVerifyClick,
@@ -756,6 +757,17 @@ export const addB2BFormSubmission = async (req, res, next) => {
     );
     const resumeLink = data.url;
 
+    // Sidecar MongoDB write: the Apps Script row and emails remain the
+    // authoritative flow, so log-and-continue if Mongo is unavailable.
+    try {
+      await JobApplication.create({ ...payload, resumeLink });
+    } catch (error) {
+      console.error(
+        "Failed to persist job application to MongoDB:",
+        error.message,
+      );
+    }
+
     // 4) forward to Apps Script
     const apsBody = {
       formName: "jobApplication",
@@ -1501,5 +1513,17 @@ export const registerFormSubmission = async (req, res) => {
     return res
       .status(500)
       .json({ error: "Unexpected server error", detail: err.message });
+  }
+};
+
+export const getJobApplicationSubmissions = async (req, res, next) => {
+  try {
+    const submissions = await JobApplication.find()
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({ data: submissions });
+  } catch (error) {
+    return next(error);
   }
 };
