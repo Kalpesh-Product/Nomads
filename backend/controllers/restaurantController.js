@@ -4,7 +4,7 @@ import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import Restaurant from "../models/Restaurant.js";
 import RestaurantReview from "../models/RestaurantReview.js";
-import { deleteFileFromS3ByKey, uploadFileToS3 } from "../config/s3Config.js";
+import { deleteFileFromS3ByKey, listS3FolderObjects, uploadFileToS3 } from "../config/s3Config.js";
 
 const REQUIRED_COLUMNS = [
   "Business ID",
@@ -347,52 +347,82 @@ const uploadReplacementMedia = async (key, file, options) => {
   return { key, url: `${new URL(url).origin}/${key.split("/").map(encodeURIComponent).join("/")}` };
 };
 
-const uploadGalleryPhoto = async (folder, batch, file, position) => {
-  const name = sanitizeFileName(file.originalname);
-  const createOnly = { createOnly: true };
-  try {
-    return await uploadReplacementMedia(`${folder}/${name}`, file, createOnly);
-  } catch (error) {
-    const status = error.cause?.$metadata?.httpStatusCode;
-    if (status !== 409 && status !== 412) throw error;
-    // Keep an existing file available until this gallery has been committed.
-    const fileName = `${name.slice(0, -5)}-${batch}-${position}.webp`;
-    return uploadReplacementMedia(`${folder}/${fileName}`, file, createOnly);
+const snapshotUntrackedGalleryPhotos = async (restaurant, folder) => {
+  const otherRestaurants = await Restaurant.find(
+    { country: restaurant.country, _id: { $ne: restaurant._id } },
+    "country restaurantName businessName",
+  ).lean();
+  // Different restaurant names can sanitize to the same S3 folder.
+  if (otherRestaurants.some((other) => restaurantMediaFolder(other, "images") === folder)) {
+    return new Map();
   }
+  const prefix = `${folder}/`;
+  const objects = await listS3FolderObjects(prefix);
+  return new Map(
+    objects
+      .filter(({ Key, ETag }) =>
+        ETag && Key?.startsWith(prefix) &&
+        !Key.slice(prefix.length).includes("/") && /\.webp$/i.test(Key),
+      )
+      .map(({ Key, ETag }) => [Key, ETag]),
+  );
 };
 
-const deleteRestaurantMedia = async (keys) => {
-  const results = await Promise.allSettled(keys.map((key) => deleteFileFromS3ByKey(key)));
+const deleteRestaurantMedia = async (keys, etags = new Map()) => {
+  const results = await Promise.allSettled(
+    keys.map((key) => deleteFileFromS3ByKey(key, etags.get(key))),
+  );
   return results.filter((result) => result.status === "rejected" || !result.value.success).length;
 };
 
-const removeSupersededRestaurantMedia = async (restaurant, urls, type, origin) => {
+const removeSupersededRestaurantMedia = async (restaurant, urls, type, etags = new Map()) => {
   const prefix = `${restaurantMediaFolder(restaurant, type)}/`;
   const oldRetryPrefix = `nomads/restaurants/${restaurant._id}/images/reuploads/`;
-  const seen = new Set();
+  const bucket = escapeRegex(process.env.PROJECT_S3_BUCKET_NAME);
+  const endpoint = String.raw`s3(?:[.-](?:dualstack\.)?[a-z0-9-]+)?\.amazonaws\.com`;
+  const urlPrefix = `https?://(?:${bucket}\\.${endpoint}|${endpoint}/${bucket})/`;
+  const bucketUrl = new RegExp(`^${urlPrefix}`, "i");
+  const candidates = new Map();
+  const getKeyPaths = (key) => new Set([key, key.split("/").map(encodeURIComponent).join("/")]);
+  for (const key of etags.keys()) candidates.set(key, getKeyPaths(key));
+
   for (const url of urls) {
-    if (typeof url !== "string" || !url.startsWith(`${origin}/`)) continue;
-    const path = url.slice(origin.length + 1);
+    if (typeof url !== "string") continue;
+    let path;
     let key;
     try {
+      const parsed = new URL(url);
+      const objectUrl = parsed.origin + parsed.pathname;
+      const match = objectUrl.match(bucketUrl);
+      if (!match) continue;
+      path = objectUrl.slice(match[0].length);
       key = decodeURIComponent(path);
     } catch {
       continue;
     }
     if (!key.startsWith(prefix) && !(type === "images" && key.startsWith(oldRetryPrefix))) continue;
 
-    const encodedUrl = `${origin}/${key.split("/").map(encodeURIComponent).join("/")}`;
-    const references = [url, encodedUrl, `${origin}/${key}`];
+    if (!candidates.has(key)) {
+      candidates.set(key, getKeyPaths(key));
+    }
+    candidates.get(key).add(path);
+  }
+
+  const unused = [];
+  for (const [key, paths] of candidates) {
+    // The same key can be stored under different S3 endpoints or with a query string.
+    const keyPaths = [...paths].map(escapeRegex).join("|");
+    const reference = { $regex: `^(?i:${urlPrefix})(?:${keyPaths})(?:[?#]|$)` };
     const stillUsed = await Restaurant.exists({
       $or: [
-        { "images.url": { $in: references } },
-        { logo: { $in: references } },
-        { mainImage: { $in: references } },
+        { "images.url": reference },
+        { logo: reference },
+        { mainImage: reference },
       ],
     });
-    if (!stillUsed) seen.add(key);
+    if (!stillUsed) unused.push(key);
   }
-  return deleteRestaurantMedia([...seen]);
+  return deleteRestaurantMedia(unused, etags);
 };
 
 export const reuploadRestaurantImages = async (req, res, next) => {
@@ -415,10 +445,16 @@ export const reuploadRestaurantImages = async (req, res, next) => {
       return res.status(409).json({ message: "Use Bulk Restaurant Images Upload for an empty gallery." });
     }
 
-    const batch = randomUUID();
     const folder = restaurantMediaFolder(restaurant, "images");
+    const previousObjects = await snapshotUntrackedGalleryPhotos(restaurant, folder);
+    // Stage each batch outside the flat image list so concurrent uploads cannot be swept.
+    const batchFolder = `${folder}/reuploads/${randomUUID()}`;
     const results = await Promise.allSettled(
-      files.map((file, index) => uploadGalleryPhoto(folder, batch, file, index + 1)),
+      files.map((file, index) => uploadReplacementMedia(
+        `${batchFolder}/${index + 1}-${sanitizeFileName(file.originalname)}`,
+        file,
+        { createOnly: true },
+      )),
     );
     const uploaded = results.filter((result) => result.status === "fulfilled").map((result) => result.value);
     const failed = results.flatMap((result, index) => result.status === "rejected" ? [files[index].originalname] : []);
@@ -446,8 +482,8 @@ export const reuploadRestaurantImages = async (req, res, next) => {
       restaurant,
       previousImages.map(({ url }) => url),
       "images",
-      new URL(images[0].url).origin,
-    ).catch(() => previousImages.length);
+      previousObjects,
+    ).catch(() => 1);
     return res.status(200).json({
       message: cleanupFailed
         ? `Gallery replaced with ${images.length} photos. Some previous S3 files could not be removed.`
@@ -501,7 +537,7 @@ export const uploadRestaurantLogo = async (req, res, next) => {
     }
 
     const cleanupFailed = await removeSupersededRestaurantMedia(
-      restaurant, [restaurant.logo], "logo", new URL(replacement.url).origin,
+      restaurant, [restaurant.logo], "logo",
     ).catch(() => 1);
     return res.status(200).json({
       message: cleanupFailed
