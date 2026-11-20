@@ -51,6 +51,39 @@ const contactFields = () => [
     { key: "mobile", label: "Mobile number", type: "tel", required: true, target: "form", half: true },
     { key: "email", label: "Email", type: "email", required: true, target: "form" },
 ];
+const isoFromDate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+/** YYYY-MM-DD shifted by whole days (used for the minimum 1-night hostel stay). */
+export const addDaysISO = (value, days) => {
+    const date = new Date(`${value || ""}T12:00:00`);
+    return Number.isNaN(date.getTime()) ? "" : isoFromDate(new Date(date.setDate(date.getDate() + days)));
+};
+/** YYYY-MM-DD shifted by whole months, clamped to the last day of the target month. */
+export const addMonthsISO = (value, months) => {
+    const date = new Date(`${value || ""}T12:00:00`);
+    if (Number.isNaN(date.getTime()))
+        return "";
+    const day = date.getDate();
+    date.setDate(1);
+    date.setMonth(date.getMonth() + months);
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    date.setDate(Math.min(day, lastDay));
+    return isoFromDate(date);
+};
+/** "14:30" + 90 => "16:00"; keeps meeting end time in sync with the duration pick-list. */
+export const addMinutesToTime = (hhmm, minutes) => {
+    const start = toMinutes(hhmm);
+    return Number.isFinite(start) && Number.isFinite(Number(minutes)) ? fmt(start + Number(minutes)) : "";
+};
+export const DURATION_OPTIONS = [
+    { value: "30", label: "30 mins" },
+    { value: "60", label: "1 hr" },
+    { value: "90", label: "1.5 hrs" },
+    { value: "120", label: "2 hrs" },
+    { value: "180", label: "3 hrs" },
+    { value: "240", label: "4 hrs" },
+    { value: "480", label: "8 hrs" },
+];
+const businessHourSlots = () => Array.from({ length: 18 }, (_, i) => fmt((9 * 60) + (i * 30))); // 09:00 – 18:00
 export const getLeadFormDefinition = (kind, ctx = {}) => {
     const profile = getServiceProfile(kind);
     const base = {
@@ -59,6 +92,17 @@ export const getLeadFormDefinition = (kind, ctx = {}) => {
         successMessage: profile.labels.leadSuccess,
         inquiryType: profile.inquiryType,
     };
+    if (kind === "dayPass") {
+        return {
+            ...base,
+            fields: [
+                ...contactFields(),
+                { key: "startDate", label: "Pass date", type: "date", required: true, target: "form", half: true, min: ctx.today },
+                { key: "people", label: "Number of passes", type: "number", required: true, target: "form", half: true, min: 1, default: 1 },
+                { key: "notes", label: "Special requests / notes", type: "textarea", target: "extra" },
+            ],
+        };
+    }
     if (kind === "menu") {
         const maxGuests = Math.max(1, Number(ctx.reservation?.maxGuests) || 10);
         const slots = generateTimeSlots(ctx.openingHours, ctx.date, ctx.reservation?.slotIntervalMinutes || 30);
@@ -103,15 +147,16 @@ export const getLeadFormDefinition = (kind, ctx = {}) => {
         };
     }
     if (kind === "hostel" || kind === "workation") {
+        const minCheckout = ctx.minCheckoutDate || ctx.date || ctx.today;
         return {
             ...base,
             fields: [
                 ...contactFields(),
                 { key: "startDate", label: "Check-in", type: "date", required: true, target: "form", half: true, min: ctx.today },
-                { key: "endDate", label: "Check-out", type: "date", required: true, target: "form", half: true, min: ctx.date || ctx.today },
+                { key: "endDate", label: "Check-out", type: "date", required: true, target: "form", half: true, min: minCheckout },
                 {
                     key: "people",
-                    label: kind === "hostel" ? "Number of beds required" : "Guests",
+                    label: kind === "hostel" && ctx.roomKind === "private" ? "Guests" : kind === "hostel" ? "Number of beds required" : "Guests",
                     type: "number",
                     required: true,
                     target: "form",
@@ -146,15 +191,27 @@ export const getLeadFormDefinition = (kind, ctx = {}) => {
                 ],
             };
         }
-        const monthly = ctx.stayType === "monthly";
+        const customStay = ctx.stayDurationChoice === "Custom";
         return {
             ...base,
             fields: [
                 ...contactFields(),
                 { key: "startDate", label: "Move-in date", type: "date", required: true, target: "form", half: true, min: ctx.today },
-                { key: "endDate", label: monthly ? "Staying until (optional)" : "Check-out", type: "date", required: !monthly, target: "form", half: true, min: ctx.date || ctx.today },
+                {
+                    key: "stayDuration",
+                    label: "Stay duration",
+                    type: "select",
+                    required: true,
+                    target: "extra",
+                    half: true,
+                    options: ["1 Month", "2 Months", "3 Months", "6 Months", "11 Months", "Custom"].map((value) => ({ value, label: value })),
+                    placeholder: "Select duration",
+                },
+                ...(customStay
+                    ? [{ key: "endDate", label: "Move-out date", type: "date", required: true, target: "form", half: true, min: ctx.minCheckoutDate || ctx.date || ctx.today }]
+                    : []),
                 { key: "people", label: "Occupants", type: "number", required: true, target: "form", min: 1 },
-                { key: "notes", label: "Anything we should know?", type: "textarea", target: "extra" },
+                { key: "notes", label: "Special requests / move-in notes", type: "textarea", target: "extra" },
             ],
         };
     }
@@ -211,15 +268,36 @@ export const getLeadFormDefinition = (kind, ctx = {}) => {
         };
     }
     if (kind === "meeting") {
+        const slots = generateTimeSlots(ctx.openingHours, ctx.date, 30);
+        const hasHours = (ctx.openingHours || []).length > 0;
+        const options = hasHours ? slots || [] : businessHourSlots();
         return {
             ...base,
             fields: [
                 ...contactFields(),
                 { key: "people", label: "Attendees", type: "number", required: true, target: "form", half: true, min: 1 },
                 { key: "startDate", label: "Meeting date", type: "date", required: true, target: "form", half: true, min: ctx.today },
-                { key: "time", label: "Start time", type: "time", required: true, target: "extra", half: true },
-                { key: "endTime", label: "End time", type: "time", target: "extra", half: true },
-                { key: "notes", label: "Requirements", type: "textarea", target: "extra" },
+                {
+                    key: "time",
+                    label: "Start time",
+                    type: "select",
+                    required: true,
+                    target: "extra",
+                    half: true,
+                    options: options.map((slot) => ({ value: slot, label: formatTime12h(slot) })),
+                    placeholder: hasHours && slots === null ? "Pick a date first" : options.length ? "Select a time" : "Closed on this day",
+                },
+                {
+                    key: "duration",
+                    label: "Duration",
+                    type: "select",
+                    required: true,
+                    target: "extra",
+                    half: true,
+                    options: DURATION_OPTIONS,
+                    placeholder: "Select duration",
+                },
+                { key: "notes", label: "Requirements (e.g., projector, whiteboard)", type: "textarea", target: "extra" },
             ],
         };
     }

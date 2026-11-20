@@ -18,18 +18,38 @@ const PROFILES = {
             cta: "Reserve a table",
             itemCta: "Reserve a table",
             leadTitle: "Reserve a table",
-            leadSubmit: "Request reservation",
+            leadSubmit: "Reserve table",
             leadSuccess: "Thanks! We've received your reservation request and will confirm shortly.",
         },
         defaultPriceUnit: "",
         palette: { bg: "#fff7ed", text: "#2a1a12", accent: "#e4572e" },
         recommendedTemplate: "savor",
     },
+    dayPass: {
+        kind: "dayPass",
+        presenter: "booking",
+        leadKind: "day-pass-booking",
+        inquiryType: "Day Pass",
+        labels: {
+            listing: "Day Passes",
+            tag: "Flexi Desk",
+            item: "day pass",
+            items: "day passes",
+            cta: "Get a Day Pass",
+            itemCta: "Book Pass",
+            leadTitle: "Book a Day Pass",
+            leadSubmit: "Request Day Pass",
+            leadSuccess: "Thanks! We've received your day pass request and will email your confirmation shortly.",
+        },
+        defaultPriceUnit: "per pass",
+        palette: { bg: "#f6f7f9", text: "#0b1f3a", accent: "#ffc21a" },
+        recommendedTemplate: "commons",
+    },
     hostel: {
         kind: "hostel",
         presenter: "booking",
         leadKind: "stay-enquiry",
-        inquiryType: "Stay Enquiry",
+        inquiryType: "Hostel Reservation",
         labels: {
             listing: "Rooms & Dorms",
             tag: "Stay",
@@ -37,8 +57,8 @@ const PROFILES = {
             items: "rooms",
             cta: "Book your stay",
             itemCta: "Book now",
-            leadTitle: "Book your stay",
-            leadSubmit: "Send booking request",
+            leadTitle: "Reserve your stay",
+            leadSubmit: "Request reservation",
             leadSuccess: "Thanks! We've received your booking request and will confirm availability shortly.",
         },
         defaultPriceUnit: "per night",
@@ -49,16 +69,16 @@ const PROFILES = {
         kind: "coLiving",
         presenter: "stay",
         leadKind: "stay-enquiry",
-        inquiryType: "Stay Enquiry",
+        inquiryType: "Co-Living Reservation",
         labels: {
             listing: "Rooms",
             tag: "Live",
             item: "room",
             items: "rooms",
             cta: "Schedule a visit",
-            itemCta: "Enquire",
-            leadTitle: "Enquire about this room",
-            leadSubmit: "Send enquiry",
+            itemCta: "Reserve",
+            leadTitle: "Reserve a room",
+            leadSubmit: "Request room reservation",
             leadSuccess: "Thanks! Our team will get back to you shortly.",
         },
         defaultPriceUnit: "per month",
@@ -133,6 +153,8 @@ const norm = (value) => String(value || "")
 /** Same slug rules the builder uses to pick a section form for a service page. */
 export const resolveServiceKind = (slugOrName) => {
     const s = norm(slugOrName);
+    if (s.includes("day-pass") || s.includes("daypass") || s.includes("day pass") || s.includes("flex-desk") || s.includes("flexdesk") || s === "pass" || s.endsWith("-pass") || s.endsWith(" pass"))
+        return "dayPass";
     if (s.includes("cafe") || s.includes("menu"))
         return "menu";
     if (s.includes("meeting"))
@@ -150,6 +172,8 @@ export const kindFromVertical = (vertical) => {
     const v = norm(vertical);
     if (v === "cafe")
         return "menu";
+    if (v === "day-pass" || v === "daypass")
+        return "dayPass";
     if (v === "hostel")
         return "hostel";
     if (v === "co-living")
@@ -163,6 +187,7 @@ export const kindFromVertical = (vertical) => {
 /** Human label for a kind, used in "Recommended for your cafe" badges. */
 export const KIND_LABEL = {
     menu: "cafe",
+    dayPass: "day passes",
     hostel: "hostel",
     coLiving: "co-living space",
     workation: "workation stay",

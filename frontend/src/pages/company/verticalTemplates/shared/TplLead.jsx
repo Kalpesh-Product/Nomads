@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "../motion";
-import { getLeadFormDefinition, nightsBetween, parsePriceNumber, todayISO, } from "../leadForms";
-import { currencyPrefix } from "../templateKit";
+import { addDaysISO, addMinutesToTime, addMonthsISO, getLeadFormDefinition, nightsBetween, parsePriceNumber, todayISO, } from "../leadForms";
+import { currencyPrefix, priceWithUnit } from "../templateKit";
+import { resolveServiceKind } from "../verticalProfiles";
 import { Icon } from "./TplUI";
 import { useTpl } from "./TplContext";
 /** Rough total for stay-type items: price × nights (× beds for shared dorm beds). */
@@ -17,12 +18,49 @@ export const estimateTotal = (item, start, end, people) => {
     const total = unit * nights * beds;
     return { nights, beds: perBed ? beds : 0, text: `${currencyPrefix(item.price)}${total.toLocaleString()}` };
 };
+const nextDayISO = (value) => addDaysISO(value, 1);
+/** Cover-charge policy mirrored from HostPanel CafeSettings onto the published template. */
+const coverPolicyOf = (draft) => {
+    const policy = draft?.reservation?.reservationPolicy;
+    return policy?.type === "cover_charge" && Number(policy.coverChargeAmount) > 0 ? policy : null;
+};
+/** Estimate badge for the verticals that can show a live price before enquiry. */
+export const estimateBooking = (kind, item, form, extras, draft) => {
+    if (!item)
+        return null;
+    const unit = parsePriceNumber(item.price);
+    if (unit === null)
+        return null;
+    const money = (amount) => priceWithUnit(String(Math.round(amount)), "", draft?.currency);
+    if (kind === "hostel") {
+        const stay = estimateTotal(item, form?.startDate, form?.endDate, form?.people);
+        return stay ? { detail: `${stay.nights} night${stay.nights > 1 ? "s" : ""}${stay.beds ? ` · ${stay.beds} bed${stay.beds > 1 ? "s" : ""}` : ""}`, text: stay.text } : null;
+    }
+    if (kind === "dayPass") {
+        const passes = Math.max(1, Number(form?.people) || 1);
+        return { detail: `${passes} day pass${passes > 1 ? "es" : ""}`, text: money(unit * passes) };
+    }
+    if (kind === "meeting") {
+        const hours = Number(extras?.duration) / 60;
+        return hours > 0 ? { detail: `${hours} hr${hours !== 1 ? "s" : ""}`, text: money(unit * hours) } : null;
+    }
+    if (kind === "menu") {
+        const policy = coverPolicyOf(draft);
+        if (!policy)
+            return null;
+        const guests = Math.max(1, Number(form?.people) || 1);
+        const basis = policy.chargeBasis === "per_person" ? "per person" : "per table";
+        const amount = policy.chargeBasis === "per_person" ? Number(policy.coverChargeAmount) * guests : Number(policy.coverChargeAmount);
+        return { detail: `Cover charge · ${basis}`, text: money(amount) };
+    }
+    return null;
+};
 const Field = ({ def, value, onChange }) => {
     const id = `tp-lead-${def.key}`;
     const common = {
         id,
         required: def.required,
-        value,
+        value: value === "" && def.default != null ? String(def.default) : value,
         className: "tp-input",
         onChange: (event) => onChange(event.target.value),
     };
@@ -43,9 +81,13 @@ const Field = ({ def, value, onChange }) => {
 export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" }) => {
     const { t, draft } = useTpl();
     const [mode, setMode] = useState(defaultMode);
-    const canVisit = (service.kind === "coLiving" || service.kind === "workspace") && draft?.tourBooking?.enabled !== false;
+    // A generic "Spaces" page can mix cabins/desks/day-passes under one workspace
+    // service — the card (item) the user actually clicked picks the real kind.
+    const itemKind = service.kind === "workspace" && item ? resolveServiceKind(item.title) : null;
+    const kind = itemKind && itemKind !== "workspace" ? itemKind : service.kind;
+    const canVisit = (kind === "coLiving" || kind === "workspace") && draft?.tourBooking?.enabled !== false;
     const spaces = useMemo(() => (item ? [] : service.items.map((entry) => entry.title)), [item, service.items]);
-    const def = useMemo(() => getLeadFormDefinition(service.kind, {
+    const def = useMemo(() => getLeadFormDefinition(kind, {
         reservation: draft?.reservation,
         openingHours: draft?.openingHours,
         date: t.leadForm?.startDate,
@@ -53,21 +95,51 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
         spaces,
         stayType: item?.raw?.stayType || "short_stay",
         today: todayISO(),
-    }), [service.kind, draft?.reservation, draft?.openingHours, t.leadForm?.startDate, mode, canVisit, spaces, item?.raw?.stayType]);
+        roomKind: item?.raw?.roomKind,
+        minCheckoutDate: nextDayISO(t.leadForm?.startDate),
+        stayDurationChoice: t.leadExtras?.stayDuration,
+    }), [kind, draft?.reservation, draft?.openingHours, t.leadForm?.startDate, mode, canVisit, spaces, item?.raw?.stayType, item?.raw?.roomKind, t.leadExtras?.stayDuration]);
     const setField = (field, value) => {
         if (field.target === "form") {
             t.setLeadForm((prev) => ({ ...prev, [field.key]: value }));
-            // A new date invalidates the chosen time slot (hours differ by weekday).
-            if (field.key === "startDate" && service.kind === "menu")
-                t.setLeadExtras((prev) => ({ ...prev, time: "" }));
+            if (field.key === "startDate") {
+                // A new date invalidates the chosen time slot (hours differ by weekday).
+                if (kind === "menu")
+                    t.setLeadExtras((prev) => ({ ...prev, time: "" }));
+                // A hostel stay is at least one night; keep Check-out ahead of Check-in.
+                if (kind === "hostel" && value) {
+                    const minCheckout = nextDayISO(value);
+                    if (!t.leadForm?.endDate || t.leadForm.endDate <= minCheckout)
+                        t.setLeadForm((prev) => ({ ...prev, endDate: minCheckout }));
+                }
+                // Co-living dates are derived from the selected duration, not picked twice.
+                if (kind === "coLiving" && t.leadExtras?.stayDuration && t.leadExtras.stayDuration !== "Custom") {
+                    const endDate = addMonthsISO(value, parseInt(t.leadExtras.stayDuration, 10));
+                    if (endDate)
+                        t.setLeadForm((prev) => ({ ...prev, endDate }));
+                }
+            }
         }
         else {
             t.setLeadExtras((prev) => ({ ...prev, [field.key]: value }));
+            if (field.key === "duration" || field.key === "time") {
+                const endTime = addMinutesToTime(field.key === "time" ? value : t.leadExtras?.time, field.key === "duration" ? value : t.leadExtras?.duration);
+                if (endTime)
+                    t.setLeadExtras((prev) => ({ ...prev, endTime }));
+            }
+            if (field.key === "stayDuration") {
+                if (value === "Custom")
+                    t.setLeadForm((prev) => ({ ...prev, endDate: "" }));
+                else {
+                    const endDate = addMonthsISO(t.leadForm?.startDate, parseInt(value, 10));
+                    if (endDate)
+                        t.setLeadForm((prev) => ({ ...prev, endDate }));
+                }
+            }
         }
     };
-    const estimate = service.kind === "hostel"
-        ? estimateTotal(item, t.leadForm?.startDate, t.leadForm?.endDate, t.leadForm?.people)
-        : null;
+    const estimate = estimateBooking(kind, item, t.leadForm, t.leadExtras, draft);
+    const coverPolicy = coverPolicyOf(draft);
     if (t.leadSubmitted) {
         return (<div className="tp-soft p-8 text-center" role="status">
         <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full" style={{ background: "var(--t-accent)", color: "var(--t-accent-text,#fff)" }}>
@@ -75,7 +147,7 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
         </span>
         <h3 className="text-[24px]">You're all set</h3>
         <p className="tp-muted mt-2 text-[15px]">{def.successMessage}</p>
-        {draft?.reservation?.confirmationNote && service.kind === "menu" ? (<p className="tp-muted mt-2 text-[13px]">{draft.reservation.confirmationNote}</p>) : null}
+        {draft?.reservation?.confirmationNote && kind === "menu" ? (<p className="tp-muted mt-2 text-[13px]">{draft.reservation.confirmationNote}</p>) : null}
         <button type="button" className="tp-btn tp-btn-ghost tp-btn-sm mt-5" onClick={() => t.setLeadSubmitted(false)}>
           Make another request
         </button>
@@ -85,12 +157,12 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
         inquiryType: def.inquiryType,
         productType: service.name,
         ...(item ? { roomType: item.title, packageName: item.title, dormType: item.title } : {}),
-        ...(service.kind === "coLiving" ? { stayType: item?.raw?.stayType || "short_stay" } : {}),
+        ...(kind === "coLiving" ? { stayType: item?.raw?.stayType || "short_stay" } : {}),
     };
     return (<form onSubmit={(event) => t.submitLeadForm(event, overrides)} className="grid grid-cols-2 gap-x-4 gap-y-4" aria-label={def.title}>
       {canVisit ? (<div className="col-span-2 flex gap-2" role="group" aria-label="Request type">
           <button type="button" className="tp-tab" aria-pressed={mode === "enquiry"} onClick={() => setMode("enquiry")}>
-            Enquire
+            {kind === "coLiving" ? "Reserve a room" : "Enquire"}
           </button>
           <button type="button" className="tp-tab" aria-pressed={mode === "visit"} onClick={() => setMode("visit")}>
             Schedule a visit
@@ -99,23 +171,26 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
 
       {def.fields.map((field) => (<Field key={`${mode}-${field.key}`} def={field} value={String((field.target === "form" ? t.leadForm?.[field.key] : t.leadExtras?.[field.key]) ?? "")} onChange={(value) => setField(field, value)}/>))}
 
+      {kind === "menu" && (coverPolicy || draft?.reservation?.reservationPolicy?.type === "free") ? (<p className="tp-soft tp-muted col-span-2 px-4 py-3 text-[13px] leading-relaxed">
+          {coverPolicy
+            ? `${priceWithUnit(String(coverPolicy.coverChargeAmount), "", draft?.currency)} advance cover charge ${coverPolicy.chargeBasis === "per_person" ? "per guest" : "per table"} — adjusted against your final food and drink bill.`
+            : "Free table reservation — no advance payment required."}
+        </p>) : null}
+
       {estimate ? (<div className="tp-soft col-span-2 flex items-center justify-between gap-3 px-4 py-3 text-[14px]">
-          <span className="tp-muted">
-            {estimate.nights} night{estimate.nights > 1 ? "s" : ""}
-            {estimate.beds ? ` · ${estimate.beds} bed${estimate.beds > 1 ? "s" : ""}` : ""}
-          </span>
+          <span className="tp-muted">{estimate.detail}</span>
           <span className="tp-display text-[20px]" style={{ color: "var(--t-accent-fg, var(--t-accent))" }}>
             ≈ {estimate.text}
           </span>
         </div>) : null}
 
-      {service.kind === "hostel" || service.kind === "workation" || service.kind === "coLiving" ? (<p className="tp-muted col-span-2 text-[12px] leading-relaxed">
-          {service.kind === "hostel"
+      {kind === "hostel" || kind === "workation" || kind === "coLiving" ? (<p className="tp-muted col-span-2 text-[12px] leading-relaxed">
+          {kind === "hostel"
             ? "Enter the total number of guests. One bed is requested for each guest. This is one group booking under the primary contact above."
             : "This sends a booking request. Our team confirms availability and gets back to you."}
         </p>) : null}
 
-      {draft?.stayPolicy?.cancellationNote && (service.kind === "hostel" || service.kind === "coLiving") ? (<p className="tp-muted col-span-2 text-[12px]">{draft.stayPolicy.cancellationNote}</p>) : null}
+      {draft?.stayPolicy?.cancellationNote && (kind === "hostel" || kind === "coLiving") ? (<p className="tp-muted col-span-2 text-[12px]">{draft.stayPolicy.cancellationNote}</p>) : null}
 
       {t.leadSubmitError ? (<p className="col-span-2 text-[13px]" role="alert" style={{ color: "#c0392b" }}>
           {t.leadSubmitError}

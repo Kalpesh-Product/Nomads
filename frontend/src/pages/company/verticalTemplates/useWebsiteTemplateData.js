@@ -870,6 +870,16 @@ export const useWebsiteTemplateData = () => {
         try {
             const slug = normalizeSlug(selectedLeadProduct?.slug || selectedLeadProduct?.name || "");
             const roomName = selectedLeadProduct?.name || selectedLeadProduct?.heading || "";
+            // Meeting rooms now send a duration pick-list value (minutes); older
+            // templates still send start/end times. Keep both, normalised to text.
+            const durationText = (minutes) => {
+                const value = Number(minutes);
+                if (!Number.isFinite(value) || value <= 0)
+                    return String(minutes || "");
+                const hours = Math.floor(value / 60);
+                const mins = value % 60;
+                return [hours ? `${hours} hr${hours > 1 ? "s" : ""}` : "", mins ? `${mins} min` : ""].filter(Boolean).join(" ");
+            };
             await api.post("/leads/create-lead", {
                 fullName: leadForm.fullName,
                 name: leadForm.fullName,
@@ -889,23 +899,22 @@ export const useWebsiteTemplateData = () => {
                 dormType: roomName,
                 noOfPeople: leadForm.people || 1,
                 attendees: leadForm.people || 1,
-                stayDuration: leadForm.endDate ? `${leadForm.startDate || ""} to ${leadForm.endDate}` : "",
+                stayDuration: extras.stayDuration || (leadForm.endDate ? `${leadForm.startDate || ""} to ${leadForm.endDate}` : ""),
                 startDate: leadForm.startDate,
                 endDate: leadForm.endDate,
                 ...extras,
                 // Surface free-text notes as the lead's message so they show in the leads list.
                 ...(extras.notes ? { message: extras.notes } : {}),
                 timeSlot: extras.time || "",
-                // How long a meeting-room booking is, worked out from its start and end time.
-                duration: (() => {
-                  const [sh, sm] = String(extras.time || "").split(":").map(Number);
-                  const [eh, em] = String(extras.endTime || "").split(":").map(Number);
-                  const mins = eh * 60 + em - (sh * 60 + sm);
-                  if (!(mins > 0)) return "";
-                  const h = Math.floor(mins / 60);
-                  const m = mins % 60;
-                  return [h ? `${h} hr${h > 1 ? "s" : ""}` : "", m ? `${m} min` : ""].filter(Boolean).join(" ");
-                })(),
+                endTime: extras.endTime || "",
+                duration: extras.duration
+                    ? durationText(extras.duration)
+                    : (() => {
+                        const [sh, sm] = String(extras.time || "").split(":").map(Number);
+                        const [eh, em] = String(extras.endTime || "").split(":").map(Number);
+                        const mins = eh * 60 + em - (sh * 60 + sm);
+                        return mins > 0 ? durationText(mins) : "";
+                    })(),
                 inquiryType: extras.inquiryType || (slug.includes("cafe") ? "Cafe" : ""),
                 stayType: extras.stayType || "",
                 websiteUrl: window.location.href,
