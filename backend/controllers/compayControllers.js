@@ -454,6 +454,68 @@ export const bulkUpdateCompanyInclusions = async (req, res, next) => {
   }
 };
 
+// Recurring data-team refresh (master panel → Data Upload → Listings Data
+// Update). Updates ratings / totalReviews per listing and pulls a listing
+// off the public site (isPublic:false) when the sheet marks it IN-ACTIVE.
+// Never flips a listing public and never touches isActive — publishing
+// stays a manual action.
+export const bulkUpdateCompanyStats = async (req, res, next) => {
+  try {
+    const updates = Array.isArray(req.body?.updates) ? req.body.updates : [];
+
+    const ops = [];
+    const businessIds = [];
+    let markedPrivate = 0;
+
+    for (const u of updates) {
+      const businessId = String(u?.businessId || "").trim();
+      if (!businessId) continue;
+
+      const set = {};
+      if (Number.isFinite(u.ratings) && u.ratings >= 0 && u.ratings <= 5) {
+        set.ratings = u.ratings;
+      }
+      if (Number.isFinite(u.totalReviews) && u.totalReviews >= 0) {
+        set.totalReviews = u.totalReviews;
+      }
+      if (u.makePrivate === true) {
+        set.isPublic = false;
+        markedPrivate += 1;
+      }
+
+      if (!Object.keys(set).length) continue;
+      businessIds.push(businessId);
+      ops.push({
+        updateOne: { filter: { businessId }, update: { $set: set } },
+      });
+    }
+
+    if (!ops.length) {
+      return res.status(400).json({ message: "No usable updates provided" });
+    }
+
+    const result = await Company.bulkWrite(ops, { ordered: false });
+    const foundIds = new Set(
+      await Company.distinct("businessId", { businessId: { $in: businessIds } })
+    );
+    const unmatched = businessIds.filter((id) => !foundIds.has(id));
+
+    return res.status(200).json({
+      message: "Listings stats update completed",
+      received: updates.length,
+      processed: ops.length,
+      matched: result.matchedCount,
+      modified: result.modifiedCount,
+      markedPrivate,
+      unmatchedCount: unmatched.length,
+      unmatchedBusinessIds: unmatched,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 export const createCompany = async (req, res, next) => {
   try {
     const {

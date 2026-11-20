@@ -1,4 +1,5 @@
 import CharacterLimitedField from "../components/CharacterLimitedField";
+import BlogSectionPreview from "../components/BlogSectionPreview";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import CategorySelect from "../components/CategorySelect";
@@ -16,7 +17,7 @@ import {
 } from "react-icons/hi";
 import { FaCheck } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { useLocation, useNavigate } from "react-router-dom";
+import { matchPath, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useSpecialUserEmails from "../hooks/useSpecialUserEmails";
@@ -76,7 +77,10 @@ const buildExactKeyword = (label) => {
   return `^${escaped}$`;
 };
 
+let nextSectionId = 0;
+
 const emptySection = () => ({
+  id: nextSectionId++,
   title: "",
   image: "",
   imageFile: null,
@@ -241,7 +245,7 @@ const MonthSelect = ({ value, onChange, error, required = true }) => (
   </TextField>
 );
 
-const ContributionTextField = ({ as, maxLength, ...props }) => (
+const ContributionTextField = ({ as, maxLength, allowContextMenu, ...props }) => (
   <CharacterLimitedField
     as={TextField}
     {...props}
@@ -255,15 +259,13 @@ const ContributionTextField = ({ as, maxLength, ...props }) => (
     minRows={as === "textarea" ? 6 : undefined}
     error={Boolean(props["aria-invalid"])}
     maxLength={maxLength}
-    slotProps={{ htmlInput: { maxLength } }}
+    slotProps={{
+      htmlInput: {
+        maxLength,
+        "data-allow-context-menu": allowContextMenu ? "" : undefined,
+      },
+    }}
   />
-);
-
-const RequiredLabel = ({ children }) => (
-  <label className={labelClassName}>
-    {children}
-    <span className="ml-0.5 text-red-500">*</span>
-  </label>
 );
 
 const FieldError = ({ message }) =>
@@ -274,52 +276,88 @@ const BlogImageFileInput = ({
   label,
   file,
   error,
+  maxSizeMB,
   required = false,
   onChange,
   onClear,
-}) => (
-  <div>
-    {required ? (
-      <RequiredLabel>{label}</RequiredLabel>
-    ) : (
-      <label className={labelClassName}>{label}</label>
-    )}
-    <div
-      className={`contribution-upload flex min-h-[32px] items-center gap-3 border-b bg-white text-sm transition ${
-        error
-          ? "border-red-500"
-          : "border-black/40 hover:border-black focus-within:border-primary-blue"
-      }`}
-    >
-      <input
-        id={id}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        className="sr-only"
-        onChange={(event) => onChange(event.target.files?.[0] || null)}
-      />
-      <label
-        htmlFor={id}
-        className="shrink-0 cursor-pointer rounded-md bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
-      >
-        Choose image
+}) => {
+  const [selectionError, setSelectionError] = useState("");
+  const errorMessage = selectionError || error;
+  const hintId = `${id}-hint`;
+  const errorId = `${id}-error`;
+  const limitBytes = maxSizeMB * 1024 * 1024;
+  const sizeHint = `Up to ${maxSizeMB} MB`;
+
+  const handleFileChange = (event) => {
+    const input = event.currentTarget;
+    const selectedFile = input.files?.[0];
+    input.value = "";
+    if (!selectedFile) return;
+
+    if (selectedFile.size > limitBytes) {
+      setSelectionError(`Image was not added. ${sizeHint} per image.`);
+      return;
+    }
+
+    setSelectionError("");
+    onChange(selectedFile);
+  };
+
+  return (
+    <div>
+      <label htmlFor={id} className={labelClassName}>
+        {label}
+        {required && <span className="ml-0.5 text-red-500">*</span>}
       </label>
-      <span className="min-w-0 flex-1 truncate text-slate-600">
-        {file?.name || "No file selected"}
-      </span>
-      {file ? (
-        <button
-          type="button"
-          onClick={onClear}
-          className="shrink-0 text-xs font-semibold text-red-500 hover:text-red-600"
+      <div
+        className={`contribution-upload flex min-h-[32px] items-center gap-3 border-b bg-white text-sm transition ${
+          errorMessage
+            ? "border-red-500"
+            : "border-black/40 hover:border-black focus-within:border-primary-blue"
+        }`}
+      >
+        <input
+          id={id}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="sr-only"
+          aria-label={label}
+          aria-required={required || undefined}
+          aria-describedby={errorMessage ? `${hintId} ${errorId}` : hintId}
+          aria-invalid={Boolean(errorMessage)}
+          onChange={handleFileChange}
+        />
+        <label
+          htmlFor={id}
+          className="shrink-0 cursor-pointer rounded-md bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
         >
-          Remove
-        </button>
-      ) : null}
+          Choose image
+        </label>
+        <span className="min-w-0 flex-1 truncate text-slate-600">
+          {file?.name || "No file selected"}
+        </span>
+        {file ? (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectionError("");
+              onClear();
+            }}
+            className="shrink-0 text-xs font-semibold text-red-500 hover:text-red-600"
+          >
+            Remove
+          </button>
+        ) : null}
+      </div>
+      <p id={hintId} className="mt-1 text-xs text-slate-600">
+        JPG, PNG, or WebP. {sizeHint} per image.
+      </p>
+      <div id={errorId} role="status">
+        <FieldError message={errorMessage} />
+      </div>
     </div>
-    <FieldError message={error} />
-  </div>
-);
+  );
+};
 
 const DropdownBadge = ({
   label,
@@ -615,6 +653,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
   const hasAccess = Boolean(user?.[config.accessFlag]);
   const contributorName = user?.fullName?.trim() || user?.name || "";
   const isAddRoute = routeLocation.pathname.endsWith("/add");
+  const allowContentContextMenu = Boolean(
+    matchPath(config.addPath, routeLocation.pathname),
+  );
 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [selectedContinent, setSelectedContinent] = useState("");
@@ -1448,8 +1489,9 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       ) : (
         <section className="mt-0 bg-transparent px-0 py-2">
           <div className="w-full py-6">
-            <h1 className="mb-8 text-2xl font-semibold uppercase text-slate-700">
+            <h1 className="mb-8 flex flex-wrap items-center gap-3 text-2xl font-semibold uppercase text-slate-700">
               Add {config.contentLabel}
+              <BlogSectionPreview contentLabel={config.contentLabel} layout={isArticleContribution ? "article" : "destination"} />
             </h1>
 
             <div
@@ -1619,6 +1661,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                   <BlogImageFileInput
                     id="blog-main-image"
                     label="Main Image"
+                    maxSizeMB={3}
                     file={formValues.mainImageFile}
                     error={getErrorMessage("mainImage")}
                     required
@@ -1874,6 +1917,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                     : "Main Content"
                 }
                 as="textarea"
+                allowContextMenu={allowContentContextMenu}
                 className={`${getFieldClassName(
                   isEventForm || isPlaceForm
                     ? "shortDescription"
@@ -1923,16 +1967,17 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
             {config.formType === "event" ||
             config.formType === "place" ? null : (
               <>
-                <h2 className="mt-5 text-lg font-semibold text-slate-700">
+                <h2 className="mt-5 flex flex-wrap items-center gap-3 text-lg font-semibold text-slate-700">
                   Sections
                 </h2>
 
                 <div className="mt-3 space-y-4">
                   {formValues.sections.map((section, index) => (
-                    <div key={index} className="border-t border-slate-200 pt-5">
+                    <div key={section.id} className="border-t border-slate-200 pt-5">
                       <div className="mb-4 flex items-center justify-between gap-3">
-                        <h3 className="text-sm font-medium text-slate-600">
+                        <h3 className="flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
                           Section {index + 1}
+                          <BlogSectionPreview contentLabel={config.contentLabel} section="section" index={index} />
                         </h3>
                         {formValues.sections.length > 1 ? (
                           <button
@@ -1973,6 +2018,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                             <BlogImageFileInput
                               id={`blog-section-image-${index}`}
                               label={`Section ${index + 1} Image (optional)`}
+                              maxSizeMB={1}
                               file={section.imageFile}
                               error={getErrorMessage(`sections.${index}.image`)}
                               onChange={(file) =>
@@ -2015,6 +2061,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                           <ContributionTextField
                             label="Section Content"
                             as="textarea"
+                            allowContextMenu={allowContentContextMenu}
                             className={`${getFieldClassName(
                               `sections.${index}.content`,
                             )} min-h-[150px] resize-y leading-relaxed`}

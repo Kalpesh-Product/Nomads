@@ -1,107 +1,156 @@
-# Nomads Developer Documentation
+# Nomads
 
-Nomads is a full-stack JavaScript application for the WONO nomad platform. The repository is split into a Vite/React frontend and an Express/MongoDB backend.
+Developer documentation for **Nomads** — the public WONO platform for digital nomads and the companies that host them.
 
-## Project Structure
+The repository is a two-app monorepo: a React single-page application in `frontend/` and an Express/MongoDB API in `backend/`. A Docusaurus site in `docs-site/` holds the end-user guide that ships with the frontend build, and `docs/` holds internal engineering notes.
+
+| Documentation | Audience |
+| ------------- | -------- |
+| This file | Developers working on the Nomads codebase |
+| [`docs-site/`](docs-site) | End users (published under `/docs/`) |
+| [`docs/`](docs) | Engineering notes for individual features |
+
+## Table of contents
+
+- [What Nomads does](#what-nomads-does)
+- [Repository layout](#repository-layout)
+- [Tech stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Getting started](#getting-started)
+- [Environment variables](#environment-variables)
+- [npm scripts](#npm-scripts)
+- [API overview](#api-overview)
+- [How the main flows fit together](#how-the-main-flows-fit-together)
+- [Integrations](#integrations)
+- [User documentation site](#user-documentation-site)
+- [Tests and checks](#tests-and-checks)
+- [Deployment](#deployment)
+- [Working in this repository](#working-in-this-repository)
+- [Troubleshooting](#troubleshooting)
+
+## What Nomads does
+
+- **Discover destinations** — listings, places, restaurants, events, blogs and news, global listings map and list views, world ranking, visa rules and workation content.
+- **AI Nomad** — an AI-assisted search experience (`frontend/src/pages/Ai*.jsx`) alongside the classic search flows.
+- **Host and company sites** — company profile pages plus generated template websites (`frontend/src/pages/company/`) that pull their content and theme from the Master Panel website builder.
+- **Host onboarding** — B2B/B2C lead forms, plans and pricing, conversations routed to the Host Panel.
+- **Contributor program** — nomads request contributor roles (blogger, news writer, place writer, event writer); approved contributors publish content through the contribution dashboard.
+- **Accounts** — JWT access tokens with refresh cookies, profile management, saved favourites and password reset by OTP.
+
+## Repository layout
 
 ```text
 Nomads/
-  backend/              Express API, MongoDB models, controllers, routes, middleware
-  frontend/             React 19 + Vite client app
-  docs/                 Supporting project documentation
-  scripts/              Repository-level helper scripts
+  backend/                  Express API (ES modules)
+    server.js               Entrypoint: middleware, route mounts, DB connect, listen
+    routes/                 Route modules grouped by domain (39 files)
+    controllers/            Request handlers and business logic
+    models/                 Mongoose schemas
+    config/                 db, CORS, mailer, multer, S3
+    middlewares/            verifyJwt, verifyAdminApiKey, contributorAccess, credentials, errorHandler
+    utils/                  Shared helpers (plan pricing, contributor lifecycle, listing status, email templates)
+    tests/                  node:test suites
+    scripts/                Maintenance scripts
+  frontend/                 React 19 + Vite SPA
+    src/pages/              Route-level pages (classic and Ai-prefixed variants, company templates, host flows)
+    src/components/         Shared UI
+    src/hooks/              Data and auth hooks
+    src/redux/              Redux Toolkit store and slices
+    src/context/            Auth and sidebar context
+    middleware.js           Vercel edge middleware (Open Graph tags for link crawlers)
+    tests/                  node:test suites
+  docs-site/                Docusaurus user guide (built into frontend/dist/docs)
+  docs/                     Internal engineering notes
+  .github/workflows/        EC2 deployment workflow
 ```
 
-Important backend folders:
+Backend domains follow a **route → controller → model** shape, with cross-cutting behaviour in `middlewares/` and `utils/`.
 
-- `backend/server.js` - API entrypoint, middleware registration, route mounting, database connection, and server startup.
-- `backend/routes/` - Express route modules grouped by domain.
-- `backend/controllers/` - Request handlers and business logic.
-- `backend/models/` - Mongoose models.
-- `backend/config/` - Database, CORS, mailer, multer, S3, and static config.
-- `backend/middlewares/` - Shared Express middleware such as JWT verification and error handling.
-- `backend/scripts/` - One-off or maintenance scripts.
+## Tech stack
 
-Important frontend folders:
+**Backend**
 
-- `frontend/src/main.jsx` - React entrypoint.
-- `frontend/src/App.jsx` and `frontend/src/routes.jsx` - Application shell and route definitions.
-- `frontend/src/pages/` - Route-level pages for Nomad, AI Nomad, Host, and company template experiences.
-- `frontend/src/components/` - Shared UI components.
-- `frontend/src/hooks/` - Shared React hooks.
-- `frontend/src/redux/` and `frontend/src/context/` - Client state and auth context.
-- `frontend/public/` and `frontend/src/assets/` - Static images, icons, fonts, and public assets.
+| Technology | Use |
+| ---------- | --- |
+| Node.js (ES modules) | Runtime |
+| Express 5 | HTTP framework |
+| MongoDB + Mongoose 8 | Persistence |
+| JSON Web Tokens + cookie-parser | Auth (bearer access token, refresh cookie) |
+| Multer + Sharp | Uploads and image resizing |
+| AWS SDK v3 (S3) | Object storage |
+| Nodemailer | Transactional email |
+| Axios | Outbound calls to Master Panel and external APIs |
+| ExcelJS, csv-parser | Bulk import/export |
+| libphonenumber-js, Yup | Validation |
 
-## Tech Stack
+**Frontend**
 
-Backend:
-
-- Node.js with ES modules
-- Express 5
-- MongoDB with Mongoose
-- JWT auth with cookie support
-- Multer and Sharp for uploads/image handling
-- AWS S3 for file storage
-- Nodemailer for email
-
-Frontend:
-
-- React 19
-- Vite 6
-- React Router
-- Redux Toolkit and Redux Persist
-- TanStack React Query
-- Axios
-- Tailwind CSS, MUI, Headless UI, lucide-react, react-icons
+| Technology | Use |
+| ---------- | --- |
+| React 19 + Vite 6 | Application and build tooling |
+| React Router 7 | Routing |
+| Redux Toolkit + Redux Persist | Global state |
+| TanStack React Query | Server-state fetching |
+| Tailwind CSS, MUI 6, Headless UI, lucide-react, react-icons | Styling and icons |
+| Google Maps (`@react-google-maps/api`), react-three-fiber | Map and 3D content |
+| Formik-free forms with react-hook-form, SweetAlert2, Sonner, react-hot-toast | Forms and feedback |
 
 ## Prerequisites
 
-- Node.js 20+ recommended
+- Node.js 20 or newer (both apps and the docs site)
 - npm
-- Access to the required backend `.env` values
-- MongoDB connection string
-- AWS S3 credentials if testing upload flows
-- Google Maps/Places keys if testing map, review, or place lookup flows
+- A MongoDB connection string
+- Backend `.env` values for the integrations you intend to exercise
+- AWS S3 credentials for upload flows
+- Google Maps/Places API keys for map, place and review flows
 
-## Installation
+## Getting started
 
-Install backend dependencies:
+Install each app separately (there is no workspace-level `package.json`):
 
 ```bash
 cd backend
 npm install
-```
 
-Install frontend dependencies:
+cd ../frontend
+npm install
 
-```bash
-cd frontend
+cd ../docs-site
 npm install
 ```
 
-This repository currently has separate `package.json` files for `backend` and `frontend`, so install dependencies in both folders.
+Run the API and the client in separate terminals:
 
-## Environment Configuration
+```bash
+# Terminal 1 — API on http://localhost:3000
+cd backend
+npm run dev
 
-Create environment files in:
+# Terminal 2 — SPA on http://localhost:5173
+cd frontend
+npm run dev
+```
 
-- `backend/.env`
-- `frontend/.env`
+The backend only starts listening after MongoDB connects, so a blank terminal or an immediate exit almost always means `MONGO_URL` is missing or unreachable.
 
-Do not commit real secrets.
+## Environment variables
 
-Common backend variables used by the codebase:
+Create `backend/.env` and `frontend/.env`. Never commit real secrets.
+
+**Backend**
 
 ```env
 PORT=3000
 MONGO_URL=
+
 ACCESS_TOKEN_SECRET=
 REFRESH_TOKEN_SECRET=
 PASSWORD_RESET_OTP_SECRET=
+ADMIN_API_KEY=
+
 FRONTEND_DEV_LINK=http://localhost:5173/
 FRONTEND_PROD_LINK=
 NOMADS_FRONTEND_URL=http://localhost:5173
-ADMIN_API_KEY=
 
 PROJECT_AWS_REGION=
 PROJECT_AWS_ACCESS_KEY=
@@ -121,152 +170,188 @@ B2C_APPS_SCRIPT_URL=
 FORCE_GOOGLE_DNS=false
 ```
 
-Common frontend variables used by the codebase:
+`FORCE_GOOGLE_DNS=true` points Node's resolver at `8.8.8.8`/`8.8.4.4`; it is a local-development escape hatch for networks with broken DNS.
+
+**Frontend**
 
 ```env
 VITE_GOOGLE_API_KEY=
 VITE_GOOGLE_MAPS_API_KEY=
 VITE_MASTER_PANEL_BE_URL=http://localhost:5007
 VITE_AI_SCORE_RANGE_MIN=
+
+# Used by the production build and the deploy workflow
+VITE_PROD_LINK=
+VITE_DEV_LINK=
+VITE_HOST_PANEL_URL=
 ```
 
-Some flows also use hardcoded production URLs or external APIs. Check the relevant page/controller before testing integrations locally.
+`ADMIN_API_KEY` must match `NOMADS_ADMIN_API_KEY` in the Master Panel. The deploy workflow writes `VITE_PROD_LINK`, `VITE_DEV_LINK`, `VITE_GOOGLE_API_KEY`, `VITE_MASTER_PANEL_BE_URL` and `VITE_HOST_PANEL_URL`, so those names are the ones to keep in CI secrets.
 
-## Running Locally
+Some flows also reference fixed production URLs (for example the Host Panel and Master Panel base URLs); check the page or controller before assuming an integration can be pointed at a local service.
 
-Start the backend API:
+## npm scripts
+
+**Backend**
+
+| Script | Command | Notes |
+| ------ | ------- | ----- |
+| `npm start` | `node --tls-min-v1.2 server.js` | Production entrypoint |
+| `npm run dev` | `nodemon --exec "node --tls-min-v1.2" server.js` | Local development |
+| `npm run backfill:event-reviews` | `node scripts/backfillEventReviewDetails.js` | One-off data backfill |
+| `npm test` | placeholder | Exits with an error; run the suites in `backend/tests` directly |
+
+**Frontend**
+
+| Script | Command |
+| ------ | ------- |
+| `npm run dev` | Vite dev server (`0.0.0.0:5173`) |
+| `npm run build` | Production build to `dist/` |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | ESLint |
+
+**Docs site**
+
+| Script | Command |
+| ------ | ------- |
+| `npm start` | Docusaurus dev server |
+| `npm run build` | Static build to `build/` |
+| `npm run serve` | Serve the built site |
+| `npm run typecheck` | TypeScript check |
+
+## API overview
+
+All routes are mounted under `/api` in `backend/server.js`.
+
+| Prefix | Purpose |
+| ------ | ------- |
+| `/api/auth` | Login, refresh, logout, password reset |
+| `/api/user` | Signed-in nomad profile, roles, favourites, contributions (**JWT**) |
+| `/api/company` | Company and listing data, uploads, host onboarding |
+| `/api/poc`, `/api/review` | Points of contact and reviews |
+| `/api/forms` | Public lead forms, plan pricing proxy |
+| `/api/job` | Careers listings and applications |
+| `/api/world-ranking`, `/api/state-wise-weight`, `/api/state-wise-weight-v2` | Ranking data and weights |
+| `/api/visa-support`, `/api/visa-rules`, `/api/visa-rules-v2` | Visa content |
+| `/api/consultation`, `/api/consultation-support` | Consultation funnels |
+| `/api/company-setup-support`, `/api/activation-support`, `/api/workation-support`, `/api/overall-activation-support`, `/api/new-company-setup`, `/api/workation` | Service request funnels |
+| `/api/become-contributor` | Contributor leads and role requests |
+| `/api/editor` | Website template/editor data shared with the Master Panel |
+| `/api/leads`, `/api/special-access`, `/api/analytics` | Leads, access lists, analytics |
+| `/api/admin/nomad-users` | Internal user export (**`x-admin-api-key`**) |
+| `/api/admin/verification-requests` | Verification leads and payment confirmation (**`x-admin-api-key`**) |
+| `/api/admin/verify-business-clicks` | Business verification click data (**`x-admin-api-key`**) |
+| `/api/news`, `/api/blogs`, `/api/events`, `/api/places`, `/api/restaurants` | Content |
+| `/api/restaurant-reviews`, `/api/restaurantreviews`, `/api/restaurantpocs`, `/api/restaurant-pocs` | Restaurant reviews and POCs (two spellings are kept for backwards compatibility) |
+| `/api/event-reviews`, `/api/place-reviews`, `/api/content-comments` | Event/place reviews and comments |
+
+**Authentication and errors**
+
+- `verifyJwt` guards `/api/user` and expects `Authorization: Bearer <accessToken>`.
+- `verifyAdminApiKey` guards the `/api/admin/*` routes and expects the `x-admin-api-key` header.
+- Unknown routes return 404 as HTML, JSON or plain text depending on the request's `Accept` header.
+- Multer `LIMIT_FILE_SIZE` and oversized JSON bodies return `413` with a readable message; everything else falls through to the shared error handler.
+
+## How the main flows fit together
+
+**Authentication** — `POST /api/auth/login` returns an access token (kept by the client) and sets a refresh cookie; `GET /api/auth/refresh` rotates it. CORS is credentialed and cookie parsing is enabled globally, so the frontend origin must be listed in `backend/config/corsConfig.js`. Frontend helpers live in `frontend/src/hooks/` and `frontend/src/context/AuthContext.jsx`.
+
+**Contributors** — submitting the contributor form creates a lead; it does not grant roles. Accounts start with all four contributor flags `false`, and the Master Panel approves or revokes each role through its authenticated proxy. Full detail, including the activation email, is in [`docs/contributor-approval.md`](docs/contributor-approval.md); the user-facing version is in [`docs-site/docs/contributing/`](docs-site/docs/contributing).
+
+**Listings and hosts** — listing content, verification state and plan/pricing live in the Master Panel. Nomads reads live Professional and Basic pricing through `/api/forms/plan-pricing` (which proxies the Master Panel) and checks listing status with `backend/utils/nomadListingStatus.js` rather than duplicating host state.
+
+**Content moderation** — blogs, news, events, places and restaurant submissions are reviewed in the Master Panel. Review actions recorded here store the actor as `Master Panel` so the audit trail stays readable.
+
+## Integrations
+
+| Integration | Direction | Where |
+| ----------- | --------- | ----- |
+| Master Panel (`WoNoMasterPanel`) | Nomads → Master Panel | Plan pricing proxy (`backend/utils/planPricing.js`), listing status (`backend/utils/nomadListingStatus.js`), logo sync, POC sync, recruitment applications |
+| Master Panel | Master Panel → Nomads | Contributor lead proxy, nomad user export, verification requests and Stripe payment confirmation, all under `/api/admin/*` with the admin API key |
+| Host Panel | Nomads → Host Panel | Host onboarding and account flows (`HOST_PANEL_BE`, `backend/utils/hostPanelAccounts.js`) |
+| AWS S3 | Outbound | Image and document storage (`backend/config/s3Config.js`) |
+| Google Places/Maps | Outbound | Place lookup and map rendering |
+| Nodemailer | Outbound | Account, contributor and lead notifications |
+| Google Apps Script | Outbound | B2B/B2C sheet handoff |
+
+Because the Master Panel is the source of truth for plans, pricing and host state, failures there must not break public pages — the pricing and listing helpers swallow upstream errors and fall back to defaults. Keep that behaviour when changing them.
+
+## User documentation site
+
+`docs-site/` is a Docusaurus 3 site containing the end-user Nomads guide (getting started, account, discovery, destinations, contributing, help). Edit Markdown under `docs-site/docs/`; the sidebar is driven by folder metadata and each page's `sidebar_position`.
 
 ```bash
-cd backend
-npm run dev
-```
-
-The backend defaults to `http://localhost:3000` unless `PORT` is set.
-
-Start the frontend:
-
-```bash
-cd frontend
-npm run dev
-```
-
-The Vite dev server is configured for `http://localhost:5173` and host `0.0.0.0`.
-
-Run both services in separate terminals. The backend CORS configuration allows local frontend origins including `5173`, `5174`, `3000`, `3001`, `3006`, and `3007`.
-
-## Available Scripts
-
-Backend scripts:
-
-```bash
-npm start
-npm run dev
-npm run backfill:event-reviews
-npm test
-```
-
-Notes:
-
-- `npm start` runs `node --tls-min-v1.2 server.js`.
-- `npm run dev` runs the backend through `nodemon`.
-- `npm test` is currently a placeholder and exits with an error.
-
-Frontend scripts:
-
-```bash
-npm run dev
+cd docs-site
+npm start          # default port 3000 clashes with the API — use: npm start -- --port 3100
 npm run build
-npm run lint
-npm run preview
+npm run serve
 ```
 
-## Backend API Overview
+The deploy workflow builds the site and copies `build/` into `frontend/dist/docs/`, so the guide is served from the same origin as the SPA. The web server should serve directory indexes under `/docs/` and return the docs 404 for missing pages instead of falling back to the SPA:
 
-The backend mounts these main route groups from `backend/server.js`:
+```nginx
+location ^~ /docs/ {
+    index index.html;
+    try_files $uri $uri/ =404;
+    error_page 404 /docs/404.html;
+}
+```
 
-- `/api/auth`
-- `/api/user`
-- `/api/company`
-- `/api/poc`
-- `/api/review`
-- `/api/forms`
-- `/api/job`
-- `/api/world-ranking`
-- `/api/visa-support`
-- `/api/visa-rules`
-- `/api/consultation-support`
-- `/api/company-setup-support`
-- `/api/overall-activation-support`
-- `/api/new-company-setup`
-- `/api/consultation`
-- `/api/workation`
-- `/api/become-contributor`
-- `/api/state-wise-weight`
-- `/api/editor`
-- `/api/leads`
-- `/api/special-access`
-- `/api/analytics`
-- `/api/admin/nomad-users`
-- `/api/news`
-- `/api/blogs`
-- `/api/events`
-- `/api/places`
-- `/api/restaurants`
-- `/api/restaurant-reviews`
-- `/api/restaurantreviews`
-- `/api/restaurantpocs`
-- `/api/restaurant-pocs`
-- `/api/event-reviews`
-- `/api/place-reviews`
+## Tests and checks
 
-Protected routes:
+- `frontend`: `npm run lint` before shipping frontend changes, plus `npm run build` to catch bundling errors.
+- `backend`: `npm test` is a placeholder. Test suites live in `backend/tests/` (`blogDeletion`, `contentComments`, `contentFavorites`, `contributionLifecycle`, `contributorActivationEmail`, `contributorApproval`) and run with Node's built-in runner, for example:
 
-- `/api/user` uses JWT verification.
-- `/api/admin/nomad-users` uses the admin API key middleware.
+  ```bash
+  cd backend
+  node --test tests/contributorApproval.test.js
+  ```
 
-Unknown routes return a 404 response in HTML, JSON, or plain text depending on the request `Accept` header.
+- `frontend/tests/` holds the matching client-side suite (`contributionFavorites.test.js`).
+- For backend changes without a focused suite, exercise the affected endpoint manually; there is no integration harness.
 
-## Development Workflow
+## Deployment
 
-1. Pull the latest code.
-2. Install dependencies in both `backend` and `frontend` if package files changed.
-3. Confirm `.env` files are present locally.
-4. Run the backend and frontend in separate terminals.
-5. Use `npm run lint` in `frontend` before shipping frontend changes.
-6. For backend changes, run the affected flow manually because the backend test script is currently a placeholder.
-7. Keep changes scoped to the relevant route/controller/model/component.
+Two paths exist:
 
-## Data and Upload Notes
+**GitHub Actions → EC2** (`.github/workflows/deploy.yml`, manual `workflow_dispatch`)
 
-- MongoDB connection is required before the API starts.
-- File uploads rely on `multer`, `sharp`, and AWS S3 configuration.
-- Upload-related code lives primarily in `backend/config/multerConfig.js`, `backend/config/s3Config.js`, and the feature controllers.
-- Several controllers create, update, or delete S3 objects. Use non-production buckets for local testing whenever possible.
+1. Installs and builds `frontend` with secrets written to `.env`.
+2. Builds `docs-site` and copies it into `frontend/dist/docs`.
+3. rsyncs `frontend/dist/` to `/home/ubuntu/apps/Nomads/frontend/dist/`.
+4. On the server: `git pull origin main`, `npm install` in `backend` when `backend/package.json` changed, then `pm2 restart nomads`.
 
-## Authentication Notes
+Required repository secrets: `VITE_PROD_LINK`, `VITE_DEV_LINK`, `VITE_GOOGLE_API_KEY`, `VITE_MASTER_PANEL_BE_URL`, `VITE_HOST_PANEL_URL`, `EC2_SSH_KEY`, `EC2_HOST`, `EC2_USER`.
 
-- Access tokens use `ACCESS_TOKEN_SECRET`.
-- Refresh tokens use `REFRESH_TOKEN_SECRET`.
-- Cookie parsing and CORS credentials are enabled globally.
-- Frontend auth helpers live in `frontend/src/hooks/` and `frontend/src/context/AuthContext.jsx`.
+**Vercel** — `backend/vercel.json` and `frontend/vercel.json` both deploy `main` only; the frontend rewrites every path to `/`, the backend routes everything to `server.js`. Configure the same environment variables in the project settings.
 
-## Deployment Notes
+Neither path runs migrations; schema changes are plain Mongoose model changes.
 
-Both `backend/` and `frontend/` include `vercel.json`, indicating they can be deployed separately. Confirm environment variables are configured in the deployment platform before deploying.
+## Working in this repository
+
+1. Pull the latest code and install dependencies in the app you are changing.
+2. Confirm the relevant `.env` files exist locally.
+3. Keep changes scoped to the matching route/controller/model or page/component.
+4. Run `npm run lint` (frontend) and the affected flow before opening a pull request.
+5. Never commit secrets, local env files, `node_modules`, or build output.
+6. Add a short note under `docs/` when a change introduces a workflow another developer will need to understand.
+
+**Conventions**
+
+- ES modules in both apps; backend files use `.js` with `import`/`export`.
+- Backend domains are organised as route → controller → model; shared behaviour belongs in `middlewares/` or `utils/`.
+- Pages are route-level components; reusable UI belongs in `frontend/src/components`.
+- The `Ai*` prefix marks the current AI-assisted page variants; older non-prefixed pages are kept for legacy routes.
 
 ## Troubleshooting
 
-- Backend exits immediately: confirm `MONGO_URL` is set and reachable.
-- Browser CORS error: confirm the frontend origin is included in `backend/config/corsConfig.js`.
-- Uploads fail: confirm S3 region, bucket, access key, and secret key values.
-- Email flows fail: confirm `EMAIL_USER` and `EMAIL_PASS`.
-- Google map/place flows fail: confirm the required Google API key variable is set.
-- Master panel or host panel integrations fail locally: confirm `MASTERPANEL_API_BASE_URL`, `WONOMASTER_BE`, `HOST_PANEL_BE`, and `VITE_MASTER_PANEL_BE_URL`.
-
-## Conventions
-
-- The codebase uses ES modules in both apps.
-- Backend domains are generally organized as route -> controller -> model.
-- Frontend pages are route-level components; shared UI belongs in `frontend/src/components`.
-- Keep environment-specific values in `.env` files.
-- Avoid committing generated files, local secrets, logs, and dependency folders.
+| Symptom | Likely cause |
+| ------- | ------------ |
+| Backend exits immediately | `MONGO_URL` missing or unreachable |
+| Browser CORS error | Frontend origin missing from `backend/config/corsConfig.js` |
+| Uploads fail | S3 region, bucket, or key/secret invalid |
+| Email flows fail | `EMAIL_USER` / `EMAIL_PASS` missing or rejected by the provider |
+| Map or place search empty | `GOOGLE_PLACES_API_KEY` / `VITE_GOOGLE_MAPS_API_KEY` missing |
+| Plan price shows a fallback | Master Panel unreachable; check `MASTERPANEL_API_BASE_URL` and `VITE_MASTER_PANEL_BE_URL` |
+| Host or verification actions fail locally | `WONOMASTER_BE` / `HOST_PANEL_BE` point at services that need to be running on ports 5007 / 5006 |
+| 404 on `/docs/` after deploy | Docs build not copied into `frontend/dist/docs`, or the web server falls back to the SPA |

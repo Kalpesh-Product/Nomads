@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import AiHeader from "../components/AiHeader";
 import AiSidebar from "../components/AiSidebar";
-import AiFooter from "../components/AiFooter";
+import AiFooter, { AiBetaBanner } from "../components/AiFooter";
 import BackToTopButton from "../components/BackToTopButton";
 import AiStickyBackBreadcrumb from "../components/AiStickyBackBreadcrumb";
 import { navigateBackWithinApp } from "../utils/navigationHistory";
@@ -438,6 +438,10 @@ const NomadAiLayout = () => {
           {/* <Toaster /> */}
           {(location.pathname !== "/verticals" ||
             window.innerWidth >= 1024) && <AiFooter />}
+          {location.pathname === "/verticals" &&
+            new URLSearchParams(location.search).get("view") !== "map" && (
+              <AiBetaBanner className="sm:hidden" />
+            )}
         </div>
         <BackToTopButton scrollContainerRef={contentRef} />
       </div>

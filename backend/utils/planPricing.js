@@ -46,3 +46,23 @@ export const getProfessionalPlanPriceUsd = async () => {
   const { professionalPlanPriceUsd } = await getProfessionalPlanPricing();
   return professionalPlanPriceUsd;
 };
+
+// Basic's equivalent — 0/unset stays 0 (Basic is genuinely free until staff
+// set a real price on MasterPanel), unlike Professional which always falls
+// back to a non-zero default.
+export const getBasicPlanPricing = async () => {
+  try {
+    const { data } = await axios.get(`${MASTERPANEL_API_BASE_URL}/public/plan-pricing`, {
+      timeout: 5000,
+    });
+    const monthly = Number(data?.basicPlanPriceUsd);
+    const resolvedMonthly = Number.isFinite(monthly) && monthly > 0 ? monthly : 0;
+    const annual = Number(data?.basicPlanAnnualPriceUsd);
+    const resolvedAnnual =
+      Number.isFinite(annual) && annual > 0 ? annual : Math.round(resolvedMonthly * 12 * 100) / 100;
+    return { basicPlanPriceUsd: resolvedMonthly, basicPlanAnnualPriceUsd: resolvedAnnual };
+  } catch (error) {
+    console.error("Failed to fetch live Basic plan price from MasterPanel:", error.message);
+    return { basicPlanPriceUsd: 0, basicPlanAnnualPriceUsd: 0 };
+  }
+};

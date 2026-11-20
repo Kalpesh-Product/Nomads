@@ -19,6 +19,9 @@ const verifyBusinessClickSchema = new mongoose.Schema(
     // Anonymous browser id kept in localStorage, so repeat clicks by the same
     // visitor can be de-duplicated and counted.
     visitorId: { type: String, trim: true, default: "", index: true },
+    // Caller's IP at click time and, when they are logged in, the Nomad user —
+    // mirrors the destination-click analytics so staff can see who clicked.
+    ipAddress: { type: String, trim: true, default: "" },
     nomadUser: { type: mongoose.Schema.Types.ObjectId, ref: "NomadUser", default: null },
     listingUrl: { type: String, trim: true, default: "" },
     referrer: { type: String, trim: true, default: "" },

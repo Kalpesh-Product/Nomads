@@ -1,3 +1,4 @@
+import { contributionLifecycleFields } from "../utils/contributionLifecycle.js";
 import mongoose from "mongoose";
 
 const placeSchema = new mongoose.Schema(
@@ -106,6 +107,8 @@ const placeSchema = new mongoose.Schema(
 );
 
 placeSchema.index({ destination: 1 });
+
+placeSchema.add(contributionLifecycleFields);
 
 const Place = mongoose.model("Place", placeSchema, "places");
 

@@ -12,7 +12,7 @@ export const goalFilterMap = {
   ],
   "Work From Anywhere": [
     "Best for Remote Work Setup",
-    "Cheapest Places",
+    "Most Affordable",
     "Best Connected Cities (Flights)",
     "Strong Nomad Community",
     "Fast Internet Cities",
@@ -40,7 +40,7 @@ export const goalFilterMap = {
     "Social & Party Lifestyle",
     "Chill & Wellness Lifestyle",
     "Adventure & Exploration",
-    "Nomad Community & Networking",
+    "Strong Nomad Community",
     "Couple - Friendly Lifestyle",
     "Family - Friendly Lifestyle",
     "Female - Friendly Lifestyle",
