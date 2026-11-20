@@ -9,6 +9,13 @@ import useAuth from "../hooks/useAuth";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import AiPrimaryButton from "../components/AiPrimaryButton";
 
+// Matches AiHostSignup's label styling: black until focused/filled, then blue.
+const floatingLabelSx = {
+  color: "black",
+  "&.Mui-focused": { color: "#1976d2" },
+  "&.MuiInputLabel-shrink": { color: "#1976d2" },
+};
+
 export default function AiResetPassword() {
   const { token } = useParams();
   const location = useLocation();
@@ -132,8 +139,8 @@ export default function AiResetPassword() {
                 label="New Password"
                 type={showPassword ? "text" : "password"}
                 fullWidth
-                required
                 variant="standard"
+                InputLabelProps={{ sx: floatingLabelSx }}
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 InputProps={{
@@ -168,8 +175,8 @@ export default function AiResetPassword() {
                 label="Confirm Password"
                 type={showConfirmPassword ? "text" : "password"}
                 fullWidth
-                required
                 variant="standard"
+                InputLabelProps={{ sx: floatingLabelSx }}
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 InputProps={{

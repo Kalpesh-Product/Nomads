@@ -8,6 +8,13 @@ import { useEffect } from "react";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import AiPrimaryButton from "./../components/AiPrimaryButton";
 
+// Matches AiHostSignup's label styling: black until focused/filled, then blue.
+const floatingLabelSx = {
+  color: "black",
+  "&.Mui-focused": { color: "#1976d2" },
+  "&.MuiInputLabel-shrink": { color: "#1976d2" },
+};
+
 export default function AiForgotPassword() {
   const { auth } = useAuth();
   const navigate = useNavigate();
@@ -62,8 +69,8 @@ export default function AiForgotPassword() {
                   label="Email"
                   type="email"
                   fullWidth
-                  required
                   variant="standard"
+                  InputLabelProps={{ sx: floatingLabelSx }}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />

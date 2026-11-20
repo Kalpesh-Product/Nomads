@@ -6,6 +6,13 @@ import AiPrimaryButton from "../components/AiPrimaryButton";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
+// Matches AiHostSignup's label styling: black until focused/filled, then blue.
+const floatingLabelSx = {
+  color: "black",
+  "&.Mui-focused": { color: "#1976d2" },
+  "&.MuiInputLabel-shrink": { color: "#1976d2" },
+};
+
 export default function AiVerifyForgotPasswordOtp() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -86,8 +93,16 @@ export default function AiVerifyForgotPasswordOtp() {
               variant="standard"
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              inputProps={{ inputMode: "numeric", maxLength: 6 }}
-              required
+              onPaste={(e) => {
+                e.preventDefault();
+                setOtp(e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6));
+              }}
+              inputProps={{
+                inputMode: "numeric",
+                maxLength: 6,
+                "data-allow-context-menu": true,
+              }}
+              InputLabelProps={{ sx: floatingLabelSx }}
               fullWidth
             />
 
@@ -112,7 +127,7 @@ export default function AiVerifyForgotPasswordOtp() {
               title="Verify"
               type="submit"
               isLoading={isVerifying}
-              disabled={isVerifying}
+              disabled={isVerifying || otp.length !== 6}
               bgColor="bg-black"
               hoverColor="hover:bg-gray-800"
               fontSize="text-lg"
@@ -121,11 +136,11 @@ export default function AiVerifyForgotPasswordOtp() {
             />
           </div>
 
-          <p className="text-[0.9rem] text-gray-600">
-            Already have an account?{" "}
-            <Link to="/login" className="underline hover:text-black">
-              Login
-            </Link>
+          <p className="text-center">
+            Already have an account?&nbsp;
+            <span className="underline">
+              <Link to="/login">Login</Link>
+            </span>
           </p>
         </form>
       </div>

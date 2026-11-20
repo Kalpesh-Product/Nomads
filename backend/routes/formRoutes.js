@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addB2CformSubmission,
+  checkB2cUserEmail,
   getConnectWithUsSubmissions,
   getContentRemovalSubmissions,
 } from "../controllers/form-controllers/b2cFormControllers.js";
@@ -55,6 +56,7 @@ router.patch("/connect-with-us/:id/status", updateConnectWithUsStatus);
 router.patch("/job-applications/:id/status", updateJobApplicationStatus);
 router.patch("/content-removal/:id/status", updateContentRemovalStatus);
 router.get("/check-host-user-email", checkHostUserEmail);
+router.get("/check-b2c-user-email", checkB2cUserEmail);
 router.get("/plan-pricing", getPublicPlanPricing);
 // Pre-fills the host signup for a visitor who clicked "Verify Business" on a listing.
 router.get("/verify-click/:id", getVerifyBusinessClick);

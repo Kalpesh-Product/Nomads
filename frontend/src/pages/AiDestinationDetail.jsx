@@ -136,6 +136,14 @@ const AiDestinationDetail = ({ type }) => {
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
       item.address || item.title,
     )}`;
+  const placeMapEmbedQuery =
+    [item.title, item.address].filter(Boolean).join(", ") ||
+    (mapLatitude !== null && mapLongitude !== null
+      ? `${mapLatitude},${mapLongitude}`
+      : "");
+  const placeMapEmbedUrl = placeMapEmbedQuery
+    ? `https://www.google.com/maps?q=${encodeURIComponent(placeMapEmbedQuery)}&output=embed`
+    : null;
   const reviewTargetId = isEvent ? eventId : placeId || restaurantId;
   const reviewEndpoint = isEvent ? "/event-reviews" : "/place-reviews";
   const reviewIdParam = isEvent ? "eventId" : "placeId";
@@ -630,28 +638,25 @@ const AiDestinationDetail = ({ type }) => {
           data-tour="place-map-section"
           className="mt-5 h-[500px] w-full overflow-hidden rounded-xl border-b border-gray-200 pb-8"
         >
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-title font-medium uppercase text-gray-700">
-              Where you'll be
-            </h1>
-            {placeMapsLink && (
-              <a
-                data-tour="place-get-direction"
-                href={placeMapsLink}
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium text-blue-600 underline"
-              >
-                Get Direction
-              </a>
-            )}
-          </div>
+          <h1 className="mb-8 text-title font-medium uppercase text-gray-700">
+            Where you'll be
+          </h1>
           <div className="h-[410px] w-full overflow-hidden rounded-xl">
-            <Map
-              locations={placeMapLocations}
-              disableNavigation
-              disableTwoFingerScroll
-            />
+            {placeMapEmbedUrl ? (
+              <iframe
+                title={item.title || "Map location"}
+                src={placeMapEmbedUrl}
+                className="h-full w-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            ) : (
+              <Map
+                locations={placeMapLocations}
+                disableNavigation
+                disableTwoFingerScroll
+              />
+            )}
           </div>
         </section>
       )}
