@@ -27,6 +27,16 @@ export const VERTICAL_TEMPLATE_CATALOG = [
     heroImageMobile: "/hosts/themes/wayfarer-hero-mobile.jpg",
   },
   {
+    id: "orchard",
+    name: "Orchard Living",
+    tag: "hostel",
+    description:
+      "Residential-editorial hostel style — oversized Outfit type, warm off-white canvas, roomy amenity galleries, floor-plan cards and a calm tour request. Inspired by Orchard Living, works for any service.",
+    swatch: { bg: "#fafaf9", fg: "#353b41", accent: "#9aa88f", font: "'Outfit', ui-sans-serif, sans-serif" },
+    heroImage: "/hosts/themes/orchard-hero.jpg",
+    heroImageMobile: "/hosts/themes/orchard-hero-mobile.jpg",
+  },
+  {
     id: "haven",
     name: "Haven",
     tag: "co-living",

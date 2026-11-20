@@ -6,6 +6,7 @@ import CommonsTemplate from "./commons/CommonsTemplate";
 import HuddleTemplate from "./huddle/HuddleTemplate";
 import TravigoTemplate from "./travigo/TravigoTemplate";
 import LodgeTemplate from "./lodge/LodgeTemplate";
+import OrchardTemplate from "./orchard/OrchardTemplate";
 import CaliHostelTemplate from "./caliHostel/CaliHostelTemplate";
 import TastycTemplate from "./tastyc/TastycTemplate";
 import GrandBarTemplate from "./grandbar/GrandBarTemplate";
@@ -36,6 +37,7 @@ export const VERTICAL_TEMPLATES = {
   huddle: HuddleTemplate,
   travigo: TravigoTemplate,
   lodge: LodgeTemplate,
+  orchard: OrchardTemplate,
   "cali-hostel": CaliHostelTemplate,
   tastyc: TastycTemplate,
   grandbar: GrandBarTemplate,
