@@ -11,6 +11,8 @@ import Consultation from "../../models/Consultation.js";
 import Workation from "../../models/Workation.js";
 import BecomeContributor from "../../models/BecomeContributor.js";
 import ContentRemoval from "../../models/ContentRemoval.js";
+import ConnectWithUs from "../../models/ConnectWithUs.js";
+import JobApplication from "../../models/JobApplication.js";
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { uploadFileToS3 } from "../../config/s3Config.js";
@@ -529,6 +531,22 @@ export const addB2CformSubmission = async (req, res, next) => {
         req.file,
       );
       const resumeLink = data.url;
+
+      // Sidecar MongoDB write: Sheets + email stay authoritative for this
+      // flow, so a DB failure must never block the applicant's submission.
+      try {
+        await JobApplication.create({
+          ...payload,
+          submissionDate,
+          submissionTime,
+          resumeLink,
+        });
+      } catch (error) {
+        console.error(
+          "Failed to persist job application to MongoDB:",
+          error.message,
+        );
+      }
 
       // Post to Google Apps Script
       const apsBody = {
@@ -1054,6 +1072,20 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     // Build payload
     const payload = config.map(validatedData);
+
+    if (sheetName === "Connect_with_us") {
+      // Sidecar MongoDB write: keep it non-fatal so the existing Apps Script
+      // sync and notification emails are unaffected by a DB outage.
+      try {
+        await ConnectWithUs.create(payload);
+      } catch (error) {
+        console.error(
+          "Failed to persist Connect With Us lead to MongoDB:",
+          error.message,
+        );
+      }
+    }
+
     if (sheetName === "AI_Become_Contributor") {
       payload.nomadUser = req.userData?._id || null;
       await BecomeContributor.create(payload);
@@ -1326,5 +1358,29 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
     if (responseSent) return;
     next(err);
+  }
+};
+
+export const getConnectWithUsSubmissions = async (req, res, next) => {
+  try {
+    const submissions = await ConnectWithUs.find()
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({ data: submissions });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getContentRemovalSubmissions = async (req, res, next) => {
+  try {
+    const submissions = await ContentRemoval.find()
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({ data: submissions });
+  } catch (error) {
+    return next(error);
   }
 };
