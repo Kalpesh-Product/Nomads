@@ -37,6 +37,16 @@ export const VERTICAL_TEMPLATE_CATALOG = [
     heroImageMobile: "/hosts/themes/orchard-hero-mobile.jpg",
   },
   {
+    id: "destinflow",
+    name: "DestinFlow",
+    tag: "hostel",
+    description:
+      "Editorial hostel style — a centered photographic hero, square dark buttons, pale-blue facilities and a dark gallery strip. Inspired by DestinFlow, works for any service.",
+    swatch: { bg: "#ffffff", fg: "#666b73", accent: "#3ba7da", font: "'Cormorant Garamond', Georgia, serif" },
+    heroImage: "/hosts/themes/destinflow-hero.jpg",
+    heroImageMobile: "/hosts/themes/destinflow-hero-mobile.jpg",
+  },
+  {
     id: "haven",
     name: "Haven",
     tag: "co-living",
