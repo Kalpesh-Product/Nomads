@@ -1110,6 +1110,8 @@ const AiGlobalListingsList = () => {
         businessId: item.businessId,
         type: item.companyType,
         sourceView: "list",
+        searchOrigin: location.state?.searchOrigin,
+        searchContext: location.state?.searchContext,
         selectedStateLabel: selectedLocationLabel,
         selectedFilters: location.state?.selectedFilters,
         searchBarBadges,

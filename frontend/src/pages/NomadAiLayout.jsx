@@ -261,7 +261,7 @@ const NomadAiLayout = () => {
               !isLast && item?.path
                 ? () =>
                     navigate(item.path, {
-                      state: {
+                      state: item.state ?? {
                         ...location.state,
                       },
                     })
