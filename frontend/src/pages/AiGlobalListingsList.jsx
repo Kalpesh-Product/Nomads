@@ -744,8 +744,9 @@ const AiGlobalListingsList = () => {
   );
   const popularLocationRestaurants = useMemo(
     () =>
-      (Array.isArray(restaurantsData) ? restaurantsData : []).map(
-        (restaurant) => {
+      (Array.isArray(restaurantsData) ? restaurantsData : [])
+        .filter((restaurant) => restaurant.isActive === true)
+        .map((restaurant) => {
           const title =
             restaurant.restaurantName ||
             restaurant.businessName ||
@@ -771,8 +772,7 @@ const AiGlobalListingsList = () => {
               restaurant.about ||
               restaurant.sections?.[0]?.content,
           };
-        },
-      ),
+        }),
     [restaurantsData],
   );
   const isAnnualEventsExpanded = expandedCategories.includes("annualevents");

@@ -495,6 +495,13 @@ const AiListings = ({ forceListView = false }) => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const activeDestinationRestaurantsData = useMemo(
+    () =>
+      destinationRestaurantsData.filter(
+        (restaurant) => restaurant.isActive === true,
+      ),
+    [destinationRestaurantsData],
+  );
   const { data: destinationNewsData = [] } = useQuery({
     queryKey: ["ai-news-availability", destinationAvailability],
     queryFn: async () => {
@@ -536,7 +543,7 @@ const AiListings = ({ forceListView = false }) => {
         }
 
         if (option.value === RESTAURANTS_CATEGORY) {
-          return destinationRestaurantsData.length > 0;
+          return activeDestinationRestaurantsData.length > 0;
         }
 
         if (option.value === NEWS_CATEGORY) {
@@ -609,7 +616,7 @@ const AiListings = ({ forceListView = false }) => {
     destinationBlogsData.length,
     destinationEventsData.length,
     destinationNewsData.length,
-    destinationRestaurantsData.length,
+    activeDestinationRestaurantsData.length,
     destinationPlacesData.length,
     isLisitingLoading,
     listingsData,
@@ -1142,33 +1149,35 @@ const AiListings = ({ forceListView = false }) => {
   );
   const restaurants = useMemo(
     () =>
-      restaurantsData.map((restaurant) => {
-        const title =
-          restaurant.restaurantName ||
-          restaurant.businessName ||
-          restaurant.restaurantTitle;
-        const rating = restaurant.rating || restaurant.ratings;
+      restaurantsData
+        .filter((restaurant) => restaurant.isActive === true)
+        .map((restaurant) => {
+          const title =
+            restaurant.restaurantName ||
+            restaurant.businessName ||
+            restaurant.restaurantTitle;
+          const rating = restaurant.rating || restaurant.ratings;
 
-        return {
-          ...restaurant,
-          id:
-            restaurant._id ||
-            restaurant.restaurantId ||
-            restaurant.businessId ||
-            restaurant.serialNumber ||
+          return {
+            ...restaurant,
+            id:
+              restaurant._id ||
+              restaurant.restaurantId ||
+              restaurant.businessId ||
+              restaurant.serialNumber ||
+              title,
             title,
-          title,
-          image: restaurant.mainImage || restaurant.images || restaurant.logo,
-          location: restaurant.address || restaurant.destination,
-          meta: rating,
-          category: restaurant.category || restaurant.restaurantType,
-          region: restaurant.destination,
-          description:
-            restaurant.shortDescription ||
-            restaurant.about ||
-            restaurant.sections?.[0]?.content,
-        };
-      }),
+            image: restaurant.mainImage || restaurant.images || restaurant.logo,
+            location: restaurant.address || restaurant.destination,
+            meta: rating,
+            category: restaurant.category || restaurant.restaurantType,
+            region: restaurant.destination,
+            description:
+              restaurant.shortDescription ||
+              restaurant.about ||
+              restaurant.sections?.[0]?.content,
+          };
+        }),
     [restaurantsData],
   );
   const newsItems = useMemo(
