@@ -18,6 +18,7 @@ import CabinTemplate from "./cabin/CabinTemplate";
 import TinyHomeTemplate from "./tinyhome/TinyHomeTemplate";
 import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
 import WorkscapeTemplate from "./workscape/WorkscapeTemplate";
+import WaveXTemplate from "./wavex/WaveXTemplate";
 import WorkhubTemplate from "./workhub/WorkhubTemplate";
 import BrixspaceTemplate from "./brixspace/BrixspaceTemplate";
 import WorpaceTemplate from "./worpace/WorpaceTemplate";
@@ -52,6 +53,7 @@ export const VERTICAL_TEMPLATES = {
   tinyhome: TinyHomeTemplate,
   flowspace: FlowspaceTemplate,
   workscape: WorkscapeTemplate,
+  wavex: WaveXTemplate,
   workhub: WorkhubTemplate,
   brixspace: BrixspaceTemplate,
   worpace: WorpaceTemplate,
