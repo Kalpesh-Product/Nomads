@@ -87,6 +87,16 @@ export const VERTICAL_TEMPLATE_CATALOG = [
     heroImageMobile: "/hosts/themes/huddle-hero-mobile.jpg",
   },
   {
+    id: "wavex",
+    name: "WaveX Rooms",
+    tag: "meeting-rooms",
+    description:
+      "Warm editorial meeting-room design — coral accents, natural-light photography, community storytelling and a friendly booking flow. Made for meeting rooms, works for any service.",
+    swatch: { bg: "#ffffff", fg: "#2b2b2f", accent: "#ed4e36", font: "'Inter', sans-serif" },
+    heroImage: "/hosts/themes/wavex-hero.jpg",
+    heroImageMobile: "/hosts/themes/wavex-hero-mobile.jpg",
+  },
+  {
     id: "travigo",
     name: "Travigo",
     tag: "hostel",

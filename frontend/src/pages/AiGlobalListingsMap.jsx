@@ -935,6 +935,8 @@ const AiGlobalListingsMap = () => {
         businessId: item.businessId,
         type: item.companyType || "ss",
         sourceView: "map",
+        searchOrigin: location.state?.searchOrigin,
+        searchContext: location.state?.searchContext,
         selectedStateLabel: selectedLocationLabel,
         selectedFilters: location.state?.selectedFilters,
         searchBarBadges,
