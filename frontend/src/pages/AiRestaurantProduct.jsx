@@ -22,8 +22,9 @@ import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import DetailIconButton from "../components/DetailIconButton";
 import { FiShare2 } from "react-icons/fi";
-import { ArrowLeft, Globe } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import {
   FaFacebookF,
   FaLinkedinIn,
@@ -46,6 +47,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import { setFormValues } from "../features/locationSlice.js";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
+import { buildEntryPageReturnTarget } from "../utils/aiSearchOriginNavigation.js";
 import { navigateBackWithinApp } from "../utils/navigationHistory.js";
 
 dayjs.extend(relativeTime);
@@ -182,6 +184,12 @@ const AiRestaurantProduct = () => {
   const { company, restaurantId } = useParams();
   const [searchParams] = useSearchParams();
   const locationState = location.state || {};
+  // The country/continent crumbs must return to whichever WoNo Intelligence
+  // page started this journey, not a hardcoded goal results page.
+  const entryPageReturnTarget = useMemo(
+    () => buildEntryPageReturnTarget(locationState),
+    [locationState],
+  );
   const { companyId: stateCompanyId, type: stateType } = locationState;
   const typeFromQuery = searchParams.get("companyType")?.trim() || null;
   const companyName = company ? company.trim() : "";
@@ -363,10 +371,12 @@ const AiRestaurantProduct = () => {
     selectedDestination?.city === companyDetails?.state?.trim().toLowerCase()
       ? selectedDestination?.title
       : "";
-  const displayStateLabel =
-    location.state?.selectedStateLabel ||
-    matchedSessionTitle ||
-    companyDetails?.state;
+  // The breadcrumb must describe whichever listing actually came back from
+  // companyDetails — location.state?.selectedStateLabel is whatever the user
+  // searched with on the previous page and can point at a different
+  // location entirely once a company has multiple listings of the same
+  // type, so it's deliberately not used here.
+  const displayStateLabel = matchedSessionTitle || companyDetails?.state;
   const breadcrumbState = {
     continent: companyDetails?.continent || "Asia",
     country: companyDetails?.country,
@@ -395,14 +405,20 @@ const AiRestaurantProduct = () => {
   ]);
 
   useEffect(() => {
+    const entryPagePath = {
+      pathname: entryPageReturnTarget.pathname,
+      search: entryPageReturnTarget.search,
+    };
     const trail = [
       {
         label: breadcrumbState.continent,
-        path: "/search/worldranking/results",
+        path: entryPagePath,
+        state: entryPageReturnTarget.state,
       },
       {
         label: breadcrumbState.country,
-        path: `/search/worldranking/results`,
+        path: entryPagePath,
+        state: entryPageReturnTarget.state,
       },
       {
         label: breadcrumbState.stateLabel,
@@ -443,6 +459,7 @@ const AiRestaurantProduct = () => {
     breadcrumbState.stateLabel,
     companyDetails?.companyName,
     companyName,
+    entryPageReturnTarget,
     location.pathname,
     location.search,
     location.state,
@@ -474,16 +491,31 @@ const AiRestaurantProduct = () => {
     const normalizedCategory = normalizeValue(breadcrumbState.companyType);
 
     const isCompanyTypeClick = breadcrumbKey === "companyType";
+    const isEntryPageClick =
+      breadcrumbKey === "continent" || breadcrumbKey === "country";
 
     dispatch(
       setFormValues({
         continent: normalizedContinent || "",
         country: normalizedCountry || "",
-        location: normalizedLocation || "",
+        location: isEntryPageClick ? "" : normalizedLocation || "",
         category: isCompanyTypeClick ? normalizedCategory || "" : "",
         count: "",
       }),
     );
+
+    if (isEntryPageClick) {
+      navigate(
+        {
+          pathname: entryPageReturnTarget.pathname,
+          search: entryPageReturnTarget.search,
+        },
+        {
+          state: entryPageReturnTarget.state,
+        },
+      );
+      return;
+    }
 
     if (isCompanyTypeClick) {
       navigate(
@@ -540,18 +572,23 @@ const AiRestaurantProduct = () => {
             returnTo.search ||
             `?country=${fallbackCountry || ""}&state=${fallbackState || ""}`,
         },
-        { state: location.state },
+        {
+          state: {
+            ...location.state,
+            returnedFromListing: true,
+          },
+        },
       );
       return;
     }
 
     if (fallbackCountry && fallbackState) {
-      navigate(
-        `/verticals?country=${fallbackCountry}&state=${fallbackState}`,
-        {
-          state: location.state,
+      navigate(`/verticals?country=${fallbackCountry}&state=${fallbackState}`, {
+        state: {
+          ...location.state,
+          returnedFromListing: true,
         },
-      );
+      });
       return;
     }
 
@@ -770,6 +807,27 @@ const AiRestaurantProduct = () => {
       companyDetails?.images?.[0]?.url ||
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp  ",
   };
+
+  const mapTitleLabel =
+    companyDetails?.companyName || companyDetails?.address || "";
+
+  const mapAddressLabel = [
+    companyDetails?.address,
+    companyDetails?.city,
+    companyDetails?.state,
+    companyDetails?.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  const mapEmbedQuery =
+    [mapTitleLabel, mapAddressLabel].filter(Boolean).join(", ") ||
+    (companyDetails?.latitude && companyDetails?.longitude
+      ? `${companyDetails.latitude},${companyDetails.longitude}`
+      : "");
+  const mapEmbedUrl = mapEmbedQuery
+    ? `https://www.google.com/maps?q=${encodeURIComponent(mapEmbedQuery)}&output=embed`
+    : null;
 
   const shareUrl = (() => {
     if (typeof window !== "undefined") {
@@ -1139,30 +1197,17 @@ const AiRestaurantProduct = () => {
                   </h1>
                   <div className="items-center flex gap-2">
                     <div>
-                      <button
-                        type="button"
+                      <DetailIconButton
+                        aria-label="Share this listing"
                         onClick={() => setShareMenuOpen(true)}
-                        className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 py-1 mr-2 text-small text-gray-600 transition hover:border-gray-400 hover:text-gray-900"
                       >
-                        <FiShare2 className="text-gray-600" size={14} />
-                        Share
-                      </button>
+                        <FiShare2 size={22} aria-hidden="true" />
+                      </DetailIconButton>
                     </div>
 
-                    {companyDetails?.websiteTemplateLink && (
-                      <div>
-                        <a
-                          href={companyDetails?.websiteTemplateLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-small underline text-primary-blue"
-                        >
-                          View Website
-                        </a>
-                      </div>
-                    )}
-
-                    <div
+                    <DetailIconButton
+                      aria-label={heartClicked ? "Remove from favorites" : "Add to favorites"}
+                      aria-pressed={!!heartClicked}
                       onClick={() => {
                         if (!userId) {
                           navigate("/login");
@@ -1172,14 +1217,13 @@ const AiRestaurantProduct = () => {
                         setHeartClicked(newLiked);
                         toggleLike(newLiked);
                       }}
-                      className="cursor-pointer relative"
                     >
                       {heartClicked ? (
                         <IoIosHeart className="text-[#ff5757]" size={22} />
                       ) : (
                         <IoIosHeartEmpty size={22} />
                       )}
-                    </div>
+                    </DetailIconButton>
                   </div>
                 </div>
 
@@ -1616,15 +1660,30 @@ const AiRestaurantProduct = () => {
             <hr className="my-5 lg:my-10" />
 
             {/* Desktop Map */}
-            <div className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden">
+            <div
+              data-tour="product-map-section"
+              className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden"
+            >
               <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
               </h1>
-              <Map
-                locations={mapsData}
-                disableNavigation
-                disableTwoFingerScroll
-              />
+              <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden">
+                {mapEmbedUrl ? (
+                  <iframe
+                    title={mapTitleLabel || "Map location"}
+                    src={mapEmbedUrl}
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : (
+                  <Map
+                    locations={mapsData}
+                    disableNavigation
+                    disableTwoFingerScroll
+                  />
+                )}
+              </div>
             </div>
 
             {/* Desktop Host Section */}
@@ -2070,28 +2129,16 @@ const AiRestaurantProduct = () => {
                   </h1>
 
                   <div className="flex items-center justify-center sm:justify-start gap-3 md:gap-4">
-                    <button
-                      type="button"
+                    <DetailIconButton
+                      aria-label="Share this listing"
                       onClick={() => setShareMenuOpen(true)}
                     >
-                      <FiShare2 className="text-gray-600" size={17} />
-                    </button>
+                      <FiShare2 size={22} aria-hidden="true" />
+                    </DetailIconButton>
 
-                    {companyDetails?.websiteTemplateLink && (
-                      <a
-                        href={companyDetails?.websiteTemplateLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-small font-semibold underline text-primary-blue hover:text-blue-700 transition-colors"
-                      >
-                        <Globe
-                          className="text-primary-blue md:w-[24px] md:h-[24px] lg:w-[32px] lg:h-[32px]"
-                          size={20}
-                        />
-                      </a>
-                    )}
-
-                    <div
+                    <DetailIconButton
+                      aria-label={heartClicked ? "Remove from favorites" : "Add to favorites"}
+                      aria-pressed={!!heartClicked}
                       onClick={() => {
                         if (!userId) {
                           navigate("/login");
@@ -2101,14 +2148,13 @@ const AiRestaurantProduct = () => {
                         setHeartClicked(newLiked);
                         toggleLike(newLiked);
                       }}
-                      className="cursor-pointer relative"
                     >
                       {heartClicked ? (
                         <IoIosHeart className="text-[#ff5757]" size={22} />
                       ) : (
                         <IoIosHeartEmpty size={22} />
                       )}
-                    </div>
+                    </DetailIconButton>
                   </div>
                 </div>
 
@@ -2520,15 +2566,30 @@ const AiRestaurantProduct = () => {
             <hr className="my-5 lg:my-10" />
 
             {/* Mobile Map */}
-            <div className="w-full h-[350px] md:h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden mt-6">
+            <div
+              data-tour="product-map-section"
+              className="w-full h-[350px] md:h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden mt-6"
+            >
               <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
               </h1>
-              <Map
-                locations={mapsData}
-                disableNavigation
-                disableTwoFingerScroll
-              />
+              <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden">
+                {mapEmbedUrl ? (
+                  <iframe
+                    title={mapTitleLabel || "Map location"}
+                    src={mapEmbedUrl}
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : (
+                  <Map
+                    locations={mapsData}
+                    disableNavigation
+                    disableTwoFingerScroll
+                  />
+                )}
+              </div>
             </div>
 
             {/* Host Section - Responsive: Mobile/Tablet stacked, Desktop side-by-side */}
