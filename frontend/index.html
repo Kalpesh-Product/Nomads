@@ -58,7 +58,7 @@
     ></script>
     <script>
       document.addEventListener("contextmenu", (event) => {
-        if (!event.target.matches?.('textarea[data-allow-context-menu]')) {
+        if (!event.target.matches?.('textarea[data-allow-context-menu], input[data-allow-context-menu]')) {
           event.preventDefault();
         }
       }, true);

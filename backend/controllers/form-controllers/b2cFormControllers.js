@@ -24,6 +24,10 @@ import {
   formatLongDate,
   renderNotificationEmail,
 } from "../../utils/emailTemplates.js";
+import {
+  verifySignupSession,
+  validateStrongPassword,
+} from "../authControllers/authControllers.js";
 
 const AI_CONTRIBUTOR_MESSAGE_CHARACTER_LIMIT = 1000;
 const AI_FAST_RESPONSE_SHEETS = new Set([
@@ -495,6 +499,33 @@ function toISODateOnly(v) {
   const dd = String(d.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 }
+
+export const checkB2cUserEmail = async (req, res, next) => {
+  try {
+    const { email } = req.query;
+
+    if (!email || typeof email !== "string") {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const exists = await NomadUser.exists({ email: normalizedEmail });
+
+    return res.status(200).json({
+      exists: Boolean(exists),
+      message: exists
+        ? "This email is already registered. Please use a different email."
+        : "Email is available",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
 
 export const addB2CformSubmission = async (req, res, next) => {
   let responseSent = false;
@@ -1212,8 +1243,30 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
 
     if (sheetName === "Sign_up") {
+      const normalizedSignupEmail = req.body.email?.trim().toLowerCase();
+
+      const { signupSessionToken } = req.body;
+      if (!signupSessionToken) {
+        return res.status(400).json({
+          message: "Please verify your email with the OTP before signing up.",
+        });
+      }
+      let decodedSignupSession;
+      try {
+        decodedSignupSession = verifySignupSession(signupSessionToken);
+      } catch {
+        return res.status(400).json({
+          message: "Email verification expired. Please verify your email again.",
+        });
+      }
+      if (decodedSignupSession.email !== normalizedSignupEmail) {
+        return res.status(400).json({
+          message: "Verified email does not match the signup email.",
+        });
+      }
+
       const existingUser = await NomadUser.findOne({
-        email: req.body.email?.trim().toLowerCase(),
+        email: normalizedSignupEmail,
       });
 
       if (existingUser) {
@@ -1226,10 +1279,9 @@ export const addB2CformSubmission = async (req, res, next) => {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
-      if (password.length < 6) {
-        return res
-          .status(409)
-          .json({ message: "Password must be 6 characters long" });
+      const passwordStrengthMessage = validateStrongPassword(password);
+      if (passwordStrengthMessage) {
+        return res.status(409).json({ message: passwordStrengthMessage });
       }
 
       if (confirmPassword !== password) {

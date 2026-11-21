@@ -222,11 +222,19 @@ export default function AiHostVerifyEmail() {
               setOtp(event.target.value.replace(/\D/g, "").slice(0, OTP_LENGTH));
               setOtpError("");
             }}
+            onPaste={(event) => {
+              event.preventDefault();
+              const pasted = event.clipboardData.getData("text");
+              setOtp(pasted.replace(/\D/g, "").slice(0, OTP_LENGTH));
+              setOtpError("");
+            }}
             error={Boolean(otpError)}
             helperText={otpError}
             inputProps={{
               inputMode: "numeric",
               autoComplete: "one-time-code",
+              maxLength: OTP_LENGTH,
+              "data-allow-context-menu": true,
               style: { letterSpacing: "0.5em", textAlign: "center" },
             }}
           />
