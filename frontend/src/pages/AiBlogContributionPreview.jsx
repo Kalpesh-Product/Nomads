@@ -128,6 +128,18 @@ const buildFormState = (item = {}) => ({
       : [emptySection()],
 });
 
+const hasFormChanges = (current, initial) => {
+  const hasChangedField = (values, initialValues) =>
+    Object.keys(initialValues).some((key) => values[key] !== initialValues[key]);
+
+  if (hasChangedField(current, initial)) return true;
+  if (current.sections.length !== initial.sections.length) return true;
+
+  return current.sections.some((section, index) =>
+    hasChangedField(section, initial.sections[index]),
+  );
+};
+
 const Field = ({ label, children }) => (
   <div>
     <label className={labelClassName}>{label}</label>
@@ -449,7 +461,14 @@ const DestinationPreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   );
 };
 
-const EditActions = ({ config, isSaving, onCancel, onSubmit, deleteAction }) => (
+const EditActions = ({
+  config,
+  isSaving,
+  hasChanges,
+  onCancel,
+  onSubmit,
+  deleteAction,
+}) => (
   <div className="contribution-edit-actions sticky top-0 z-30 -mx-4 mb-6 flex flex-col gap-3 border-b border-black/10 bg-[#fffef2]/95 px-4 pb-5 pt-2 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:-mx-8 md:px-8 lg:-mx-8">
     <div>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-blue">
@@ -458,6 +477,11 @@ const EditActions = ({ config, isSaving, onCancel, onSubmit, deleteAction }) => 
       <h1 className="mt-1 text-lg font-semibold text-slate-900">
         Update public-facing content
       </h1>
+      {!hasChanges ? (
+        <p className="mt-1 text-xs text-slate-500">
+          Make a change to enable Save Draft and {config.submitButtonLabel}.
+        </p>
+      ) : null}
     </div>
     <div className="flex flex-wrap items-center gap-3">
       {deleteAction}
@@ -472,7 +496,8 @@ const EditActions = ({ config, isSaving, onCancel, onSubmit, deleteAction }) => 
       <button
         type="button"
         onClick={() => onSubmit(true)}
-        disabled={isSaving}
+        disabled={isSaving || !hasChanges}
+        title={!hasChanges ? "Make a change before saving a draft" : undefined}
         className="rounded-full border border-sky-100 bg-sky-50 px-5 py-2 text-sm font-semibold text-primary-blue transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-60"
       >
         Save Draft
@@ -480,7 +505,8 @@ const EditActions = ({ config, isSaving, onCancel, onSubmit, deleteAction }) => 
       <button
         type="button"
         onClick={() => onSubmit(false)}
-        disabled={isSaving}
+        disabled={isSaving || !hasChanges}
+        title={!hasChanges ? "Make a change before submitting" : undefined}
         className="rounded-full bg-primary-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-400"
       >
         {config.submitButtonLabel}
@@ -617,10 +643,16 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
   const editConfig = isRepublish
     ? { ...config, submitButtonLabel: `Re-publish ${config.label}` }
     : config;
+  const contentName = config.label === "News" ? "news item" : config.label.toLowerCase();
   const axiosPrivate = useAxiosPrivate();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [formValues, setFormValues] = useState(() => buildFormState(item));
+  const [initialFormValues] = useState(() => buildFormState(item));
+  const [formValues, setFormValues] = useState(initialFormValues);
+  const hasChanges = useMemo(
+    () => hasFormChanges(formValues, initialFormValues),
+    [formValues, initialFormValues],
+  );
   const itemId = item._id || item.id;
   const isEventForm = config.formType === "event";
   const isPlaceForm = config.formType === "place";
@@ -689,29 +721,46 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
     }));
   };
 
-  const confirmRepublish = async (isDraft) => {
-    if (!isRepublish || isDraft) return true;
-    const contentName = config.label === "News" ? "news item" : config.label.toLowerCase();
+  const confirmSubmission = async (isDraft) => {
+    const republishOptions = !isDraft && isRepublish;
     const result = await Swal.fire({
-      icon: "warning",
-      title: `Re-publish this ${contentName}?`,
-      html: `<p>Your current changes will replace the saved version of this ${contentName}.</p>
-        <p>The previous version cannot be restored. Your ${contentName} will be submitted for review again.</p>`,
-      input: "checkbox",
-      inputValue: 0,
-      inputPlaceholder: "I understand and accept these changes",
-      inputValidator: (value) => !value && "Please accept before re-publishing.",
-      didOpen: () => {
-        const checkbox = Swal.getInput();
-        const confirmButton = Swal.getConfirmButton();
-        confirmButton.disabled = true;
-        checkbox.addEventListener("change", () => {
-          confirmButton.disabled = !checkbox.checked;
-        });
-      },
+      icon: isDraft ? "info" : republishOptions ? "warning" : "question",
+      title: isDraft
+        ? `Save this ${contentName} as a draft?`
+        : republishOptions
+          ? `Re-publish this ${contentName}?`
+          : `Submit this ${contentName} for review?`,
+      html: isDraft
+        ? `<p>Your ${contentName} will be saved as a draft${item.isDraft ? "" : " and removed from public view"}.</p>
+          <p>It will not be published until you submit it for review again.</p>`
+        : republishOptions
+          ? `<p>Your current changes will replace the saved version of this ${contentName}.</p>
+            <p>The previous version cannot be restored. Your ${contentName} will be reviewed and, once approved, published live.</p>`
+          : `<p>Your ${contentName} will be submitted for review.</p>
+            <p>Once approved, it will be published live.</p>`,
+      ...(republishOptions
+        ? {
+            input: "checkbox",
+            inputValue: 0,
+            inputPlaceholder: "I understand and accept these changes",
+            inputValidator: (value) => !value && "Please accept before re-publishing.",
+            didOpen: () => {
+              const checkbox = Swal.getInput();
+              const confirmButton = Swal.getConfirmButton();
+              confirmButton.disabled = true;
+              checkbox.addEventListener("change", () => {
+                confirmButton.disabled = !checkbox.checked;
+              });
+            },
+          }
+        : {}),
       showCancelButton: true,
-      confirmButtonText: `Re-publish ${config.label}`,
-      cancelButtonText: "Cancel",
+      confirmButtonText: isDraft
+        ? "Save as Draft"
+        : republishOptions
+          ? `Re-publish ${config.label}`
+          : "Submit for Review",
+      cancelButtonText: "Keep Editing",
       confirmButtonColor: "#49a3dd",
       focusCancel: true,
       heightAuto: false,
@@ -725,15 +774,12 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
       },
     });
 
-    if (result.dismiss === Swal.DismissReason.cancel) {
-      onCancel();
-      return false;
-    }
-
     return result.isConfirmed;
   };
 
   const handleSubmit = async (isDraft) => {
+    if (!hasChanges) return;
+
     if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
       showErrorAlert("Main image is required.");
       return;
@@ -758,7 +804,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
         return;
       }
 
-      if (!(await confirmRepublish(isDraft))) return;
+      if (!(await confirmSubmission(isDraft))) return;
 
       const payload = {
         eventName: formValues.eventName.trim(),
@@ -809,7 +855,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
         return;
       }
 
-      if (!(await confirmRepublish(isDraft))) return;
+      if (!(await confirmSubmission(isDraft))) return;
 
       const payload = {
         placeName: formValues.placeName.trim(),
@@ -864,7 +910,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
       return;
     }
 
-    if (!(await confirmRepublish(isDraft))) return;
+    if (!(await confirmSubmission(isDraft))) return;
 
     const payload = {
       mainTitle: formValues.mainTitle.trim(),
@@ -940,6 +986,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
         }
         handleSubmit={handleSubmit}
         isSaving={isSaving}
+        hasChanges={hasChanges}
         onCancel={onCancel}
       />
     );
@@ -953,6 +1000,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
       updateBlogImageFile={updateBlogImageFile}
       handleSubmit={handleSubmit}
       isSaving={isSaving}
+      hasChanges={hasChanges}
       onCancel={onCancel}
     />
   );
@@ -970,6 +1018,7 @@ const ArticleInlineEdit = ({
   addSection,
   handleSubmit,
   isSaving,
+  hasChanges,
   onCancel,
 }) => {
   const supportsArticleImageUploads = ["blog", "news"].includes(
@@ -989,6 +1038,7 @@ const ArticleInlineEdit = ({
         deleteAction={deleteAction}
         config={config}
         isSaving={isSaving}
+        hasChanges={hasChanges}
         onCancel={onCancel}
         onSubmit={handleSubmit}
       />
@@ -1159,6 +1209,7 @@ const DestinationInlineEdit = ({
   updateBlogImageFile,
   handleSubmit,
   isSaving,
+  hasChanges,
   onCancel,
 }) => {
   const isEvent = config.formType === "event";
@@ -1170,6 +1221,7 @@ const DestinationInlineEdit = ({
       <EditActions
         config={config}
         isSaving={isSaving}
+        hasChanges={hasChanges}
         onCancel={onCancel}
         onSubmit={handleSubmit}
       />
