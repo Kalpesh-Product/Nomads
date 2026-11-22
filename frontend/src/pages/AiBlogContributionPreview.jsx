@@ -465,6 +465,7 @@ const EditActions = ({
   config,
   isSaving,
   hasChanges,
+  canSubmit,
   onCancel,
   onSubmit,
   deleteAction,
@@ -479,7 +480,9 @@ const EditActions = ({
       </h1>
       {!hasChanges ? (
         <p className="mt-1 text-xs text-slate-500">
-          Make a change to enable Save Draft and {config.submitButtonLabel}.
+          {canSubmit
+            ? "You can publish this draft without making changes."
+            : `Make a change to enable Save Draft and ${config.submitButtonLabel}.`}
         </p>
       ) : null}
     </div>
@@ -505,8 +508,8 @@ const EditActions = ({
       <button
         type="button"
         onClick={() => onSubmit(false)}
-        disabled={isSaving || !hasChanges}
-        title={!hasChanges ? "Make a change before submitting" : undefined}
+        disabled={isSaving || !canSubmit}
+        title={!canSubmit ? "Make a change before submitting" : undefined}
         className="rounded-full bg-primary-blue px-5 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-400"
       >
         {config.submitButtonLabel}
@@ -640,9 +643,13 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
   const isRepublish =
     !item.isDraft &&
     ["approved", "rejected"].includes(String(item.status || "").toLowerCase());
-  const editConfig = isRepublish
-    ? { ...config, submitButtonLabel: `Re-publish ${config.label}` }
-    : config;
+  const isDraft = Boolean(item.isDraft);
+  const editConfig = {
+    ...config,
+    submitButtonLabel: isRepublish
+      ? `Re-publish ${config.label}`
+      : `Publish ${config.label}`,
+  };
   const contentName = config.label === "News" ? "news item" : config.label.toLowerCase();
   const axiosPrivate = useAxiosPrivate();
   const queryClient = useQueryClient();
@@ -653,6 +660,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
     () => hasFormChanges(formValues, initialFormValues),
     [formValues, initialFormValues],
   );
+  const canSubmit = hasChanges || isDraft;
   const itemId = item._id || item.id;
   const isEventForm = config.formType === "event";
   const isPlaceForm = config.formType === "place";
@@ -667,12 +675,21 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
   const updateContributionMutation = useMutation({
     mutationFn: async ({ payload }) =>
       axiosPrivate.patch(`${config.myEndpoint}/${itemId}`, payload),
-    onSuccess: async () => {
+    onSuccess: async (_response, variables) => {
       await queryClient.invalidateQueries({ queryKey: [config.queryKey] });
       navigate(config.dashboardPath, { replace: true });
-      showSuccessAlert(config.updateSuccessMessage, {
-        title: config.updateSuccessTitle,
-      });
+      const savedAsDraft = Boolean(variables?.isDraft);
+      showSuccessAlert(
+        savedAsDraft
+          ? `${config.label} draft saved successfully.`
+          : `${config.label} published successfully. Our team will review it and update the status.`,
+        {
+          title: savedAsDraft
+            ? `${config.label} Draft Saved`
+            : `${config.label} Published`,
+          timer: savedAsDraft ? 2500 : 4000,
+        },
+      );
     },
     onError: (error) => {
       showErrorAlert(error?.response?.data?.message || config.errorMessage);
@@ -778,7 +795,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
   };
 
   const handleSubmit = async (isDraft) => {
-    if (!hasChanges) return;
+    if (!canSubmit) return;
 
     if (!formValues.mainImageFile && !formValues.mainImage.trim()) {
       showErrorAlert("Main image is required.");
@@ -836,11 +853,11 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
           formData.append("mainImageFile", formValues.mainImageFile);
         }
 
-        updateContributionMutation.mutate({ payload: formData });
+        updateContributionMutation.mutate({ payload: formData, isDraft });
         return;
       }
 
-      updateContributionMutation.mutate({ payload });
+      updateContributionMutation.mutate({ payload, isDraft });
       return;
     }
 
@@ -892,11 +909,11 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
           formData.append("mainImageFile", formValues.mainImageFile);
         }
 
-        updateContributionMutation.mutate({ payload: formData });
+        updateContributionMutation.mutate({ payload: formData, isDraft });
         return;
       }
 
-      updateContributionMutation.mutate({ payload });
+      updateContributionMutation.mutate({ payload, isDraft });
       return;
     }
 
@@ -948,11 +965,11 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
         }
       });
 
-      updateContributionMutation.mutate({ payload: formData });
+      updateContributionMutation.mutate({ payload: formData, isDraft });
       return;
     }
 
-    updateContributionMutation.mutate({ payload });
+    updateContributionMutation.mutate({ payload, isDraft });
   };
 
   const isSaving = updateContributionMutation.isPending || isDeleting;
@@ -987,6 +1004,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
         handleSubmit={handleSubmit}
         isSaving={isSaving}
         hasChanges={hasChanges}
+        canSubmit={canSubmit}
         onCancel={onCancel}
       />
     );
@@ -1001,6 +1019,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
       handleSubmit={handleSubmit}
       isSaving={isSaving}
       hasChanges={hasChanges}
+      canSubmit={canSubmit}
       onCancel={onCancel}
     />
   );
@@ -1019,6 +1038,7 @@ const ArticleInlineEdit = ({
   handleSubmit,
   isSaving,
   hasChanges,
+  canSubmit,
   onCancel,
 }) => {
   const supportsArticleImageUploads = ["blog", "news"].includes(
@@ -1039,6 +1059,7 @@ const ArticleInlineEdit = ({
         config={config}
         isSaving={isSaving}
         hasChanges={hasChanges}
+        canSubmit={canSubmit}
         onCancel={onCancel}
         onSubmit={handleSubmit}
       />
@@ -1210,6 +1231,7 @@ const DestinationInlineEdit = ({
   handleSubmit,
   isSaving,
   hasChanges,
+  canSubmit,
   onCancel,
 }) => {
   const isEvent = config.formType === "event";
@@ -1222,6 +1244,7 @@ const DestinationInlineEdit = ({
         config={config}
         isSaving={isSaving}
         hasChanges={hasChanges}
+        canSubmit={canSubmit}
         onCancel={onCancel}
         onSubmit={handleSubmit}
       />
