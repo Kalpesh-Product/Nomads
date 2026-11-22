@@ -111,6 +111,48 @@ const initialFormState = (author = "", destination = "") => ({
   sections: [emptySection()],
 });
 
+const sanitizeCoordinateInput = (value = "") => {
+  const cleaned = String(value).replace(/[^\d.-]/g, "");
+  const sign = cleaned.startsWith("-") ? "-" : "";
+  const unsigned = cleaned.replace(/-/g, "");
+  const [whole, ...decimalParts] = unsigned.split(".");
+
+  return `${sign}${whole}${decimalParts.length ? `.${decimalParts.join("")}` : ""}`;
+};
+
+const unsavedFormValueKeys = [
+  "link",
+  "mainTitle",
+  "mainImage",
+  "source",
+  "date",
+  "mainContent",
+  "eventName",
+  "shortDescription",
+  "placeName",
+  "address",
+  "googleMapsLink",
+  "latitude",
+  "longitude",
+  "category",
+  "month",
+  "venue",
+  "eventType",
+];
+
+const hasUnsavedContributionData = (values) =>
+  unsavedFormValueKeys.some(
+    (key) => String(values[key] ?? "").trim() !== "",
+  ) ||
+  Boolean(values.mainImageFile) ||
+  (values.sections || []).some(
+    (section) =>
+      Boolean(section.imageFile) ||
+      ["title", "image", "content"].some(
+        (field) => String(section?.[field] ?? "").trim() !== "",
+      ),
+  );
+
 const contributionAddConfig = {
   blog: {
     contentLabel: "Blog",
@@ -245,7 +287,14 @@ const MonthSelect = ({ value, onChange, error, required = true }) => (
   </TextField>
 );
 
-const ContributionTextField = ({ as, maxLength, allowContextMenu, ...props }) => (
+const ContributionTextField = ({
+  as,
+  maxLength,
+  allowContextMenu,
+  inputMode,
+  type,
+  ...props
+}) => (
   <CharacterLimitedField
     as={TextField}
     {...props}
@@ -259,9 +308,11 @@ const ContributionTextField = ({ as, maxLength, allowContextMenu, ...props }) =>
     minRows={as === "textarea" ? 6 : undefined}
     error={Boolean(props["aria-invalid"])}
     maxLength={maxLength}
+    type={type}
     slotProps={{
       htmlInput: {
         maxLength,
+        inputMode,
         "data-allow-context-menu": allowContextMenu ? "" : undefined,
       },
     }}
@@ -1150,9 +1201,26 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       ) {
         errors.category = "Select between 1 and 4 categories";
       }
-      if (!formValues.latitude.trim()) errors.latitude = "Latitude is required";
-      if (!formValues.longitude.trim())
-        errors.longitude = "Longitude is required";
+      const latitude = formValues.latitude.trim();
+      const longitude = formValues.longitude.trim();
+
+      if (!latitude) errors.latitude = "Latitude is required";
+      else if (
+        !/^-?\d+(?:\.\d+)?$/.test(latitude) ||
+        Number(latitude) < -90 ||
+        Number(latitude) > 90
+      ) {
+        errors.latitude = "Enter a valid latitude between -90 and 90";
+      }
+
+      if (!longitude) errors.longitude = "Longitude is required";
+      else if (
+        !/^-?\d+(?:\.\d+)?$/.test(longitude) ||
+        Number(longitude) < -180 ||
+        Number(longitude) > 180
+      ) {
+        errors.longitude = "Enter a valid longitude between -180 and 180";
+      }
       if (!formValues.shortDescription.trim()) {
         errors.shortDescription = "Short description is required";
       }
@@ -1369,6 +1437,32 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
       sections: cleanedSections,
       isDraft: status === "draft",
     });
+  };
+
+  const handleCancel = async () => {
+    if (hasUnsavedContributionData(formValues)) {
+      const result = await Swal.fire({
+        icon: "warning",
+        title: "Discard your changes?",
+        text: "All filled data will be erased, and this cannot be undone.",
+        showCancelButton: true,
+        confirmButtonText: "Discard",
+        cancelButtonText: "Keep Editing",
+        confirmButtonColor: "#DC2626",
+        focusCancel: true,
+        heightAuto: false,
+        customClass: {
+          popup: "swal2-popup--rounded",
+          title: "swal2-title--serif",
+          confirmButton: "swal2-button--pill",
+          cancelButton: "swal2-button--pill",
+        },
+      });
+
+      if (!result.isConfirmed) return;
+    }
+
+    navigate(config.dashboardPath);
   };
 
   return (
@@ -1831,11 +1925,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       label="Latitude"
                       className={getFieldClassName("latitude")}
                       required
+                      inputMode="decimal"
                       aria-invalid={Boolean(getErrorMessage("latitude"))}
                       value={formValues.latitude}
                       maxLength={contributionFieldLimits.coordinate}
                       onChange={(event) =>
-                        updateFormField("latitude", event.target.value)
+                        updateFormField(
+                          "latitude",
+                          sanitizeCoordinateInput(event.target.value),
+                        )
                       }
                       placeholder="Latitude"
                     />
@@ -1846,11 +1944,15 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
                       label="Longitude"
                       className={getFieldClassName("longitude")}
                       required
+                      inputMode="decimal"
                       aria-invalid={Boolean(getErrorMessage("longitude"))}
                       value={formValues.longitude}
                       maxLength={contributionFieldLimits.coordinate}
                       onChange={(event) =>
-                        updateFormField("longitude", event.target.value)
+                        updateFormField(
+                          "longitude",
+                          sanitizeCoordinateInput(event.target.value),
+                        )
                       }
                       placeholder="Longitude"
                     />
@@ -2126,7 +2228,7 @@ const AiBlogContributionAdd = ({ type = "blog" }) => {
               </button>
               <button
                 type="button"
-                onClick={() => navigate(config.dashboardPath)}
+                onClick={handleCancel}
                 disabled={isSaving}
                 className="rounded-full bg-slate-300 px-6 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-400 disabled:cursor-not-allowed"
               >
