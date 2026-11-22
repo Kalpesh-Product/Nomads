@@ -462,7 +462,7 @@ const AiContributionsHubTwo = () => {
                         <span>Rank</span>
                         <span>Image</span>
                         <span>Title</span>
-                        <span className="justify-self-center">Likes</span>
+                        <span className="justify-self-center">Favorites</span>
                         <span className="justify-self-center">Category</span>
                       </div>
                       <div className="hidden border-t border-black/10 md:block" />
