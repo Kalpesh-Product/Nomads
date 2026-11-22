@@ -389,7 +389,7 @@ const AiContributionsHubTwo = () => {
                             {liveCount}
                           </p>
                           <p className="text-[10px] font-medium text-black/45">
-                            live
+                            Live
                           </p>
                         </div>
                         <div className="rounded-lg bg-slate-50 px-2 py-2">
@@ -397,7 +397,7 @@ const AiContributionsHubTwo = () => {
                             {pendingCount}
                           </p>
                           <p className="text-[10px] font-medium text-black/45">
-                            pending
+                            Pending
                           </p>
                         </div>
                         <div className="rounded-lg bg-slate-50 px-2 py-2">
@@ -405,7 +405,7 @@ const AiContributionsHubTwo = () => {
                             {draftCount}
                           </p>
                           <p className="text-[10px] font-medium text-black/45">
-                            drafts
+                            Drafts
                           </p>
                         </div>
                       </div>
