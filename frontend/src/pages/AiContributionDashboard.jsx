@@ -8,6 +8,7 @@ import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Seo from "../components/Seo";
 import humanDate from "../utils/humanDate";
+import { contributionRefreshOptions } from "../constants/contributionRefresh";
 
 const contributionPageConfig = {
   blog: {
@@ -469,6 +470,7 @@ const AiContributionDashboard = ({ type, initialFilter = "all" }) => {
         },
         enabled: Boolean(userId) && Boolean(auth?.user?.[itemConfig.flag]),
         staleTime: 1000 * 60,
+        ...contributionRefreshOptions,
       };
     }),
   });

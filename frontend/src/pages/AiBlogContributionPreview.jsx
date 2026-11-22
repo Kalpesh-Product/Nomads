@@ -16,6 +16,7 @@ import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import humanDate from "../utils/humanDate";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
+import { contributionRefreshOptions } from "../constants/contributionRefresh";
 
 const inputClassName =
   "min-h-[42px] w-full rounded-md border border-black/10 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100";
@@ -1318,14 +1319,23 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
     },
     enabled: Boolean(auth?.user),
     staleTime: 1000 * 60,
+    ...contributionRefreshOptions,
   });
 
   const item = useMemo(() => {
+    // Prefer the freshly fetched copy so a status changed in the Master Panel
+    // is reflected here even when this page was opened with cached state.
+    const fetchedItem = items.find(
+      (entry) => entry._id === itemId || entry.id === itemId,
+    );
+
+    if (fetchedItem) return fetchedItem;
+
     if (stateItem && (stateItem._id === itemId || stateItem.id === itemId)) {
       return stateItem;
     }
 
-    return items.find((entry) => entry._id === itemId || entry.id === itemId);
+    return undefined;
   }, [itemId, items, stateItem]);
 
   const canEdit = canEditContribution(item, config);

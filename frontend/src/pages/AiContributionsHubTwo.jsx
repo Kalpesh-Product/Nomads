@@ -21,6 +21,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Seo from "../components/Seo";
 import humanDate from "../utils/humanDate";
 import { rankContributionsByFavorites } from "../utils/contributionFavorites";
+import { contributionRefreshOptions } from "../constants/contributionRefresh";
 
 const contributionTypes = [
   {
@@ -206,6 +207,7 @@ const AiContributionsHubTwo = () => {
       },
       enabled: Boolean(userId) && Boolean(auth?.user?.[config.flag]),
       staleTime: 1000 * 60,
+      ...contributionRefreshOptions,
     })),
   });
 
