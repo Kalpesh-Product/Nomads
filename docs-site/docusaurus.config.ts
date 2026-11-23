@@ -19,34 +19,37 @@ const withoutHiddenDocs = (items: SidebarItems): SidebarItems =>
         : item,
     );
 
-// Non-clickable sidebar entry shown after News; the badge style matches the
-// "Coming soon" pill in the Nomads web app sidebar.
-const restaurantsComingSoonItem = {
+// Non-clickable sidebar entries that are announced but not available yet; the
+// badge style matches the "Coming soon" pill in the Nomads web app sidebar.
+const createComingSoonSidebarItem = (label: string) => ({
   type: 'html' as const,
   className: 'sidebar-coming-soon-item',
-  value:
-    '<div class="sidebar-coming-soon"><span>Restaurants</span><span class="sidebar-coming-soon-badge">Coming soon</span></div>',
+  value: `<div class="sidebar-coming-soon"><span>${label}</span><span class="sidebar-coming-soon-badge">Coming soon</span></div>`,
+});
+
+const COMING_SOON_AFTER_DOC_ID: Record<string, string> = {
+  'destinations/news': 'Restaurants',
+  'services/workation': 'Apply for Jobs',
 };
 
-const withRestaurantsComingSoon = (items: SidebarItems): SidebarItems =>
+const withComingSoonEntries = (items: SidebarItems): SidebarItems =>
   items.map((item) => {
     if (item.type !== 'category') return item;
 
-    const children = withRestaurantsComingSoon(item.items);
-    const newsIndex = children.findIndex(
-      (child) => child.type === 'doc' && child.id === 'destinations/news',
-    );
+    const children = withComingSoonEntries(item.items);
+    const withEntries: SidebarItems = [];
 
-    if (newsIndex === -1) return {...item, items: children};
+    for (const child of children) {
+      withEntries.push(child);
 
-    return {
-      ...item,
-      items: [
-        ...children.slice(0, newsIndex + 1),
-        restaurantsComingSoonItem,
-        ...children.slice(newsIndex + 1),
-      ],
-    };
+      if (child.type === 'doc' && COMING_SOON_AFTER_DOC_ID[child.id]) {
+        withEntries.push(
+          createComingSoonSidebarItem(COMING_SOON_AFTER_DOC_ID[child.id]),
+        );
+      }
+    }
+
+    return {...item, items: withEntries};
   });
 
 const config: Config = {
@@ -69,7 +72,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           async sidebarItemsGenerator(args) {
             const items = await args.defaultSidebarItemsGenerator(args);
-            return withRestaurantsComingSoon(withoutHiddenDocs(items));
+            return withComingSoonEntries(withoutHiddenDocs(items));
           },
         },
         blog: false,
