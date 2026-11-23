@@ -11,7 +11,6 @@ Open a destination to discover its workspaces, stays, cafes, events, places, blo
 - [Browse listings](./browse-listings.md)
 - [Listing details](./listing-details.md)
 - [Listing photos](./listing-photos.md)
-- [Cafes and restaurants](./cafes-and-restaurants.md)
 - [Places](./places.md)
 - [Events](./events.md)
 - [Blogs](./blogs.md)

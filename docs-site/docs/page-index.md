@@ -13,7 +13,6 @@ These are paths on the Nomad website. A segment in angle brackets stands for a v
 | Classic Search | `/manual-search` | [Classic Search](./discovery/classic-search.md) |
 | Destination hub and listings | `/verticals`, `/listings`, `/listings-list` | [Destination hub](./destinations/destination-hub.md) |
 | Listing and photos | `/listings/<company>`, `/listings/<company>/images` | [Listing details](./destinations/listing-details.md) |
-| Restaurants and photos | `/restaurants/<id>`, `/restaurants/<id>/images` | [Cafes and restaurants](./destinations/cafes-and-restaurants.md) |
 | Places and events | `/places/<id>`, `/events/<id>` | [Places](./destinations/places.md), [Events](./destinations/events.md) |
 | Articles | `/blog`, `/blog/blog-details`, `/news`, `/news/news-details` | [Blogs](./destinations/blogs.md), [News](./destinations/news.md) |
 | Support requests | `/visa-support`, `/visa-support/thank-you`, `/overall-activation-support`, `/new-company-setup`, `/consultation`, `/workation` | [Value-added services](./services/overview.md) |
