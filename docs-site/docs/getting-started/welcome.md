@@ -13,4 +13,4 @@ WONO helps digital nomads and remote workers compare destinations, find places t
 
 The examples in this guide use Bali. Listings and available services vary by destination.
 
-If you run a coworking space, hostel, cafe or other business, see [Become a Host](../become-a-host.md).
+If you run a coworking space, hostel, cafe or other business, see [Become a Host](../become-a-host/index.md).
