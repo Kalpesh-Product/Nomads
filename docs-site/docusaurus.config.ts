@@ -1,5 +1,23 @@
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import type {PluginOptions} from '@docusaurus/plugin-content-docs';
+
+
+// Docs that stay online but are left out of the sidebar navigation.
+const HIDDEN_DOC_IDS = new Set(['destinations/browse-listings']);
+
+type SidebarItems = Awaited<
+  ReturnType<PluginOptions['sidebarItemsGenerator']>
+>;
+
+const withoutHiddenDocs = (items: SidebarItems): SidebarItems =>
+  items
+    .filter((item) => !(item.type === 'doc' && HIDDEN_DOC_IDS.has(item.id)))
+    .map((item) =>
+      item.type === 'category'
+        ? {...item, items: withoutHiddenDocs(item.items)}
+        : item,
+    );
 
 const config: Config = {
   title: 'WONO Nomads',
@@ -16,7 +34,14 @@ const config: Config = {
     [
       'classic',
       {
-        docs: {routeBasePath: '/', sidebarPath: './sidebars.ts'},
+        docs: {
+          routeBasePath: '/',
+          sidebarPath: './sidebars.ts',
+          async sidebarItemsGenerator(args) {
+            const items = await args.defaultSidebarItemsGenerator(args);
+            return withoutHiddenDocs(items);
+          },
+        },
         blog: false,
         theme: {customCss: './src/css/custom.css'},
       } satisfies Preset.Options,

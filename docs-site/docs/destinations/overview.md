@@ -8,7 +8,6 @@ Open a destination to discover its workspaces, stays, cafes, events, places, blo
 ## In this section
 
 - [Destination hub](./destination-hub.md)
-- [Browse listings](./browse-listings.md)
 - [Listing details](./listing-details.md)
 - [Listing photos](./listing-photos.md)
 - [Places](./places.md)
