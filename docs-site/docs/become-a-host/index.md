@@ -11,9 +11,9 @@ If you operate a coworking space, hostel, cafe or other business, choose **Becom
 2. Browse [Themes](./themes.md) to preview a website design or [Modules](./modules.md) to see the available tools, and read [Leads](./leads.md) for the marketing tools that bring enquiries in.
 3. Choose **Get Started**, complete the business profile and follow the verification instructions sent to your email.
 
-![Host landing page with pricing and plan cards](/img/guide/host-pricing.jpg)
+![Host landing page with pricing and plan cards](/img/guide/host-pricing.webp)
 
-![Host sign-up form for business details](/img/guide/host-sign-up.jpg)
+![Host sign-up form for business details](/img/guide/host-sign-up.webp)
 
 ## In this section
 
