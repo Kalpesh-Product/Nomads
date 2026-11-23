@@ -193,12 +193,68 @@ export const hostModuleCategories = [
         verticals: ["Meeting Rooms"],
         summary:
           "Reserve meeting rooms, manage bookings for members, external visitors and tenant companies.",
-        bullets: [
-          "Personal, internal, external and tenant-company reservations",
-          "Live availability check by room, date and time",
-          "View, reschedule or cancel eligible bookings; export booking data",
-        ],
         image: meetingRoomBooking,
+        // Mirrors the live master-panel catalog exactly (same ids/labels) —
+        // split by booking type rather than a plain dashboard+list pair.
+        children: [
+          {
+            id: "meeting-room-booking-dashboard",
+            label: "Meeting Room Booking Dashboard",
+            icon: HiOutlineViewGrid,
+            summary:
+              "Reserve meeting rooms, manage bookings for members, external visitors and tenant companies.",
+            bullets: [
+              "Personal, internal, external and tenant-company reservations",
+              "Live availability check by room, date and time",
+              "View, reschedule or cancel eligible bookings; export booking data",
+            ],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "meeting-room-booking-meeting-room-booking",
+            label: "My Bookings",
+            icon: HiOutlineViewGrid,
+            summary: "Create and manage room bookings",
+            bullets: [
+              "Check live availability by room, date and time",
+              "Create, reschedule or cancel your own reservations",
+            ],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "meeting-room-booking-all-bookings",
+            label: "Internal Booking",
+            icon: HiOutlineViewGrid,
+            summary: "Review complete booking activity",
+            bullets: [
+              "Review bookings made by members across the workspace",
+              "Filter by room, date or status",
+            ],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "meeting-room-booking-resource-pricing",
+            label: "External Booking",
+            icon: HiOutlineViewGrid,
+            summary: "Rooms, availability, packages, and rates",
+            bullets: [
+              "Book meeting rooms for external visitors",
+              "Review room packages and pricing before confirming",
+            ],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "meeting-room-booking-meeting-room-architecture",
+            label: "Tenant Booking",
+            icon: HiOutlineViewGrid,
+            summary: "Meeting-room resource and space structure",
+            bullets: [
+              "Book meeting rooms on behalf of a tenant company",
+              "Review tenant-company booking history",
+            ],
+            image: meetingRoomBooking,
+          },
+        ],
       },
       {
         id: "calendar",
@@ -235,12 +291,61 @@ export const hostModuleCategories = [
         verticals: ["Café"],
         summary:
           "Receive and manage café orders from the workspace, with clear preparation and fulfilment tracking.",
-        bullets: [
-          "Review new, preparing, ready and completed orders",
-          "Track ordered items, quantities and customer details",
-          "Keep the café service queue current throughout the day",
-        ],
         image: financeManagement,
+        children: [
+          {
+            id: "cafe-orders-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "An overview of café order volume, status breakdown and service activity.",
+            bullets: ["Review order counts, status breakdown and recent activity at a glance"],
+            image: financeManagement,
+          },
+          {
+            id: "cafe-orders-live",
+            label: "Live Tables",
+            icon: HiOutlineClipboardList,
+            summary: "Take table orders and track service status.",
+            bullets: [
+              "Open a table and take new orders",
+              "Track live order status: placed, preparing, ready",
+            ],
+            image: financeManagement,
+          },
+          {
+            id: "cafe-orders-reservations",
+            label: "Reservations",
+            icon: HiOutlineClipboardList,
+            summary: "Review arrivals and seat reserved guests.",
+            bullets: [
+              "Review upcoming table reservations",
+              "Seat guests as they arrive",
+            ],
+            image: financeManagement,
+          },
+          {
+            id: "cafe-orders-insights",
+            label: "Insights",
+            icon: HiOutlineChartBar,
+            summary: "Monitor sales, demand, and popular items.",
+            bullets: [
+              "Review order and revenue trends",
+              "See order status distribution and popular items",
+            ],
+            image: financeManagement,
+          },
+          {
+            id: "cafe-orders-history",
+            label: "Order History",
+            icon: HiOutlineClipboardList,
+            summary: "Review settled and cancelled café orders.",
+            bullets: [
+              "Review completed and cancelled orders",
+              "Search by order, table or date",
+            ],
+            image: financeManagement,
+          },
+        ],
       },
       {
         id: "hostel-booking",
@@ -250,12 +355,58 @@ export const hostModuleCategories = [
         verticals: ["Hostel"],
         summary:
           "Book hostel beds and rooms using the availability and pricing configured for the workspace.",
-        bullets: [
-          "Check room and bed availability for selected dates",
-          "Create and review guest reservations",
-          "Use the hostel inventory configured by the management team",
-        ],
         image: meetingRoomBooking,
+        children: [
+          {
+            id: "hostel-booking-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "An overview of hostel bed and dorm booking activity and occupancy.",
+            bullets: ["Review occupancy, upcoming check-ins and recent booking activity at a glance"],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "hostel-booking-availability",
+            label: "Availability",
+            icon: HiOutlineOfficeBuilding,
+            summary: "Find available dorm beds and rooms and create bookings.",
+            bullets: [
+              "Check live bed and room availability by date",
+              "Create a new guest reservation",
+            ],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "hostel-booking-reservations",
+            label: "Reservations",
+            icon: HiOutlineOfficeBuilding,
+            summary: "Review upcoming hostel booking reservations.",
+            bullets: ["Review upcoming arrivals and reservation details"],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "hostel-booking-guests",
+            label: "Current Guests",
+            icon: HiOutlineOfficeBuilding,
+            summary: "Manage check-ins, extensions, and check-outs.",
+            bullets: [
+              "Review currently checked-in guests",
+              "Process stay extensions and check-outs",
+            ],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "hostel-booking-history",
+            label: "Booking History",
+            icon: HiOutlineOfficeBuilding,
+            summary: "Review completed and cancelled hostel stays.",
+            bullets: [
+              "Review past bookings with their final status",
+              "Search by guest or date",
+            ],
+            image: meetingRoomBooking,
+          },
+        ],
       },
       {
         id: "room-booking",
@@ -265,12 +416,58 @@ export const hostModuleCategories = [
         verticals: ["Co-living"],
         summary:
           "Reserve co-living rooms and accommodation using live availability, dates and configured rates.",
-        bullets: [
-          "Search available rooms by stay dates",
-          "Create and manage accommodation reservations",
-          "Use room types and rates maintained in Resource & Pricing",
-        ],
         image: meetingRoomBooking,
+        children: [
+          {
+            id: "room-booking-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "An overview of co-living room booking activity and occupancy.",
+            bullets: ["Review occupancy, upcoming check-ins and recent booking activity at a glance"],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "room-booking-availability",
+            label: "Availability",
+            icon: MdMeetingRoom,
+            summary: "Find available co-living rooms and create bookings.",
+            bullets: [
+              "Check live room availability by date",
+              "Create a new resident reservation",
+            ],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "room-booking-reservations",
+            label: "Reservations",
+            icon: MdMeetingRoom,
+            summary: "Review upcoming co-living room reservations.",
+            bullets: ["Review upcoming arrivals and reservation details"],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "room-booking-residents",
+            label: "Current Residents",
+            icon: MdMeetingRoom,
+            summary: "Manage check-ins, extensions, and check-outs.",
+            bullets: [
+              "Review currently checked-in residents",
+              "Process stay extensions and check-outs",
+            ],
+            image: meetingRoomBooking,
+          },
+          {
+            id: "room-booking-history",
+            label: "Booking History",
+            icon: MdMeetingRoom,
+            summary: "Review completed and cancelled co-living stays.",
+            bullets: [
+              "Review past bookings with their final status",
+              "Search by resident or date",
+            ],
+            image: meetingRoomBooking,
+          },
+        ],
       },
       {
         id: "attendance",
@@ -279,12 +476,47 @@ export const hostModuleCategories = [
         plan: "custom",
         summary:
           "Record daily attendance, track working hours and breaks, and manage correction requests.",
-        bullets: [
-          "My Attendance: clock in/out with selfie + location verification",
-          "Team Attendance where role access permits",
-          "Corrections: request or review attendance corrections",
-        ],
         image: attendance,
+        children: [
+          {
+            id: "attendance-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "An overview of attendance across the company.",
+            bullets: ["Review attendance status and correction request counts at a glance"],
+            image: attendance,
+          },
+          {
+            id: "attendance-my-attendance",
+            label: "My Attendance",
+            icon: MdOutlineFingerprint,
+            summary: "Clock in/out with selfie and location verification.",
+            bullets: [
+              "Clock in and out with selfie and location verification",
+              "Review your own attendance history",
+            ],
+            image: attendance,
+          },
+          {
+            id: "attendance-team-attendance",
+            label: "Team Attendance",
+            icon: MdOutlineFingerprint,
+            summary: "Review attendance for the team you manage.",
+            bullets: ["Review attendance for your team where role access permits"],
+            image: attendance,
+          },
+          {
+            id: "attendance-corrections",
+            label: "Corrections",
+            icon: MdOutlineFingerprint,
+            summary: "Request or review attendance corrections.",
+            bullets: [
+              "Request a correction to a recorded attendance entry",
+              "Review and action correction requests where permitted",
+            ],
+            image: attendance,
+          },
+        ],
       },
       {
         id: "tasks",
@@ -306,12 +538,52 @@ export const hostModuleCategories = [
         plan: "custom",
         summary:
           "Apply for leave, track personal requests, and handle approvals based on role.",
-        bullets: [
-          "My Leaves: review balances, submit leave, track personal requests",
-          "Full Day, Half Day or Partial leave with calculated deduction preview",
-          "Company Leaves for org-wide visibility; Leave Requests queue for approvers",
-        ],
         image: leaveRequests,
+        children: [
+          {
+            id: "leave-requests-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "An overview of leave activity and pending approvals.",
+            bullets: ["Review leave balances and pending approvals at a glance"],
+            image: leaveRequests,
+          },
+          {
+            id: "leave-requests-my-leaves",
+            label: "My Leaves",
+            icon: HiOutlineLogout,
+            summary: "Review balances, submit leave, track personal requests.",
+            bullets: [
+              "Review leave balances, submit leave, track personal requests",
+              "Full Day, Half Day or Partial leave with calculated deduction preview",
+            ],
+            image: leaveRequests,
+          },
+          {
+            id: "leave-requests-approval-queue",
+            label: "Approval Queue",
+            icon: HiOutlineLogout,
+            summary: "Leave requests awaiting your approval.",
+            bullets: ["Review and approve or reject pending leave requests routed to you"],
+            image: leaveRequests,
+          },
+          {
+            id: "leave-requests-assigned-department-leaves",
+            label: "Assigned Department Leaves",
+            icon: HiOutlineLogout,
+            summary: "Leave activity for departments assigned to you.",
+            bullets: ["Review leave activity for departments you manage"],
+            image: leaveRequests,
+          },
+          {
+            id: "leave-requests-company-leaves",
+            label: "Company Leaves",
+            icon: HiOutlineLogout,
+            summary: "Company-wide leave visibility.",
+            bullets: ["Review leave activity across the whole company"],
+            image: leaveRequests,
+          },
+        ],
       },
     ],
   },
@@ -339,12 +611,29 @@ export const hostModuleCategories = [
         icon: HiOutlineCollection,
         plan: "custom",
         summary: "Manage consumable and returnable stock across the organization.",
-        bullets: [
-          "Track stock by item, category and owning department",
-          "Increase for purchases, decrease for consumption, transfer between departments",
-          "Monthly stock balances, ledger activity, export",
-        ],
         image: inventory,
+        children: [
+          {
+            id: "inventory-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "An overview of stock levels and movement.",
+            bullets: ["Review stock levels and recent movement at a glance"],
+            image: inventory,
+          },
+          {
+            id: "inventory-manage",
+            label: "Manage Inventory",
+            icon: HiOutlineCollection,
+            summary: "Track stock by item, category and owning department.",
+            bullets: [
+              "Track stock by item, category and owning department",
+              "Increase for purchases, decrease for consumption, transfer between departments",
+              "Monthly stock balances, ledger activity, export",
+            ],
+            image: inventory,
+          },
+        ],
       },
       {
         id: "department-inventory",
@@ -366,12 +655,57 @@ export const hostModuleCategories = [
         plan: "custom",
         summary:
           "A centralized view of company budgets, spending, and financial activity across departments.",
-        bullets: [
-          "Executive Finance Hub: budget, year-to-date spend, finance requests",
-          "Approval Center: projected annual budget + extra budget requests",
-          "Master Overview compares approved budget, spend and balance by department",
-        ],
         image: financeManagement,
+        children: [
+          {
+            id: "finance-management-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A consolidated view of company budgets, spending, and financial activity.",
+            bullets: ["Review budget, year-to-date spend and finance requests at a glance"],
+            image: financeManagement,
+          },
+          {
+            id: "finance-management-overview",
+            label: "Overview",
+            icon: HiOutlineCash,
+            summary: "The executive finance hub for the workspace.",
+            bullets: ["Review budget, year-to-date spend and finance requests in one place"],
+            image: financeManagement,
+          },
+          {
+            id: "finance-management-approvals",
+            label: "Approvals",
+            icon: HiOutlineCash,
+            summary: "Finance requests awaiting approval.",
+            bullets: ["Review and approve or reject pending finance requests"],
+            image: financeManagement,
+          },
+          {
+            id: "finance-management-projected",
+            label: "Projected Annual Budget",
+            icon: HiOutlineCash,
+            summary: "Department annual plans and monthly projections.",
+            bullets: ["Review department annual plans and monthly projections"],
+            image: financeManagement,
+          },
+          {
+            id: "finance-management-extra",
+            label: "Extra Budget Requests",
+            icon: HiOutlineCash,
+            summary: "Additional funding requests.",
+            bullets: ["Approve or return additional funding requests"],
+            image: financeManagement,
+          },
+          {
+            id: "finance-management-history",
+            label: "History",
+            icon: HiOutlineCash,
+            summary: "Finance activity history.",
+            bullets: ["Review historical finance activity and resolved requests"],
+            image: financeManagement,
+          },
+        ],
       },
       {
         id: "team-management",
@@ -380,12 +714,44 @@ export const hostModuleCategories = [
         plan: "custom",
         summary:
           "A central place to review team members, manage access, and view department SOPs/policies.",
-        bullets: [
-          "Team roster and employee status in Access Control",
-          "Search or filter team members by status",
-          "View department SOPs and policies available to the manager",
-        ],
         image: teamManagement,
+        children: [
+          {
+            id: "team-management-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A central place to review team members, access and department SOPs/policies.",
+            bullets: ["Review team roster and access status at a glance"],
+            image: teamManagement,
+          },
+          {
+            id: "team-management-access-control",
+            label: "Team Access Control",
+            icon: HiOutlineUserGroup,
+            summary:
+              "Choose a department, review its team, and control employee module access.",
+            bullets: ["Choose a department, review its team, and control employee module access"],
+            image: teamManagement,
+          },
+          {
+            id: "team-management-sops",
+            label: "Department SOPs",
+            icon: HiOutlineUserGroup,
+            summary:
+              "Publish operating procedures and control their visibility by department.",
+            bullets: ["Publish operating procedures and control their visibility by department"],
+            image: teamManagement,
+          },
+          {
+            id: "team-management-policies",
+            label: "Department Policies",
+            icon: HiOutlineUserGroup,
+            summary:
+              "Maintain policy documents and assign them to departments and employees.",
+            bullets: ["Maintain policy documents and assign them to the right departments and employees"],
+            image: teamManagement,
+          },
+        ],
       },
       {
         id: "reports",
@@ -394,12 +760,29 @@ export const hostModuleCategories = [
         plan: "custom",
         summary:
           "A central archive for viewing, filtering, previewing and downloading structured reports.",
-        bullets: [
-          "Filter by category, department, month or reporting window",
-          "Preview or download available reports",
-          "Export in PDF or Excel",
-        ],
         image: reports,
+        children: [
+          {
+            id: "reports-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "A central overview of available structured reports.",
+            bullets: ["Review report categories and recent exports at a glance"],
+            image: reports,
+          },
+          {
+            id: "reports-manage",
+            label: "Reports",
+            icon: HiOutlineDocumentText,
+            summary: "View, filter, preview and download structured reports.",
+            bullets: [
+              "Filter by category, department, month or reporting window",
+              "Preview or download available reports",
+              "Export in PDF or Excel",
+            ],
+            image: reports,
+          },
+        ],
       },
     ],
   },
@@ -685,11 +1068,53 @@ export const hostModuleCategories = [
         plan: "professional",
         summary:
           "The Founder manages business units linked to the account and configures settings per location.",
-        bullets: [
-          "View linked business units; create another unit and switch the active one",
-          "Configure location, attendance, working hours and other workspace options",
-        ],
         image: unitSettings,
+        children: [
+          {
+            id: "unit-settings-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "An overview of linked business units and their configuration.",
+            bullets: ["Review linked units and configuration status at a glance"],
+            image: unitSettings,
+          },
+          {
+            id: "unit-settings-list",
+            label: "Linked Units",
+            icon: HiOutlineAdjustments,
+            summary:
+              "View linked business units; create another unit and switch the active one.",
+            bullets: [
+              "Review every linked business unit",
+              "Create a new unit or switch the active one",
+            ],
+            image: unitSettings,
+          },
+          {
+            id: "unit-settings-business-hours",
+            label: "Business Hours",
+            icon: HiOutlineAdjustments,
+            summary: "Configure working hours per location.",
+            bullets: ["Configure business hours for the active unit"],
+            image: unitSettings,
+          },
+          {
+            id: "unit-settings-fiscal-year",
+            label: "Fiscal Year",
+            icon: HiOutlineAdjustments,
+            summary: "Configure the unit's fiscal year.",
+            bullets: ["Configure the fiscal year start and reporting periods"],
+            image: unitSettings,
+          },
+          {
+            id: "unit-settings-billing",
+            label: "Billing",
+            icon: HiOutlineAdjustments,
+            summary: "Review unit-level billing settings.",
+            bullets: ["Review and configure unit-level billing settings"],
+            image: unitSettings,
+          },
+        ],
       },
       {
         id: "unit-management",
@@ -700,11 +1125,61 @@ export const hostModuleCategories = [
         plan: "professional",
         summary:
           "The Founder reviews and compares operational activity across linked business units.",
-        bullets: [
-          "Compare employees, tickets, bookings and other data across units",
-          "Open detailed information for an individual unit, or switch into it",
-        ],
         image: unitManagement,
+        children: [
+          {
+            id: "unit-management-dashboard",
+            label: "Dashboard",
+            icon: HiOutlineViewGrid,
+            summary: "An overview of operational activity across linked business units.",
+            bullets: ["Compare units by employees, tickets and bookings at a glance"],
+            image: unitManagement,
+          },
+          {
+            id: "unit-management-list",
+            label: "Units Overview",
+            icon: HiOutlineOfficeBuilding,
+            summary:
+              "Compare employees, tickets, bookings and other data across units.",
+            bullets: [
+              "Compare employees, tickets, bookings and other data across units",
+              "Open detailed information for an individual unit, or switch into it",
+            ],
+            image: unitManagement,
+          },
+          {
+            id: "unit-management-employees",
+            label: "Employees",
+            icon: HiOutlineOfficeBuilding,
+            summary: "Employees across every linked unit.",
+            bullets: ["Review employees across every linked unit"],
+            image: unitManagement,
+          },
+          {
+            id: "unit-management-roles",
+            label: "Roles",
+            icon: HiOutlineOfficeBuilding,
+            summary: "Roles configured across units.",
+            bullets: ["Review and manage roles across linked units"],
+            image: unitManagement,
+          },
+          {
+            id: "unit-management-work-items",
+            label: "Work Items",
+            icon: HiOutlineOfficeBuilding,
+            summary: "Work items tracked across units.",
+            bullets: ["Review work items tracked across linked units"],
+            image: unitManagement,
+          },
+          {
+            id: "unit-management-departments",
+            label: "Departments",
+            icon: HiOutlineOfficeBuilding,
+            summary: "Departments across every linked unit.",
+            bullets: ["Review departments across every linked unit"],
+            image: unitManagement,
+          },
+        ],
       },
     ],
   },
@@ -1114,28 +1589,46 @@ export const hostModuleCategories = [
             image: techDepartment,
           },
           {
+            // Nested the same way as Key Apps > Website Builder — this is
+            // literally the same feature, just surfaced again under Tech's
+            // own department access.
             id: "tech-website-builder",
             label: "Website Builder",
             icon: HiOutlineGlobeAlt,
-            summary: "Edit Website, Website Leads, Website Review and Careers in one hub.",
-            bullets: ["Same Website Builder documented under Key Apps"],
+            summary:
+              "Edit Website, Website Leads and Website Review in one hub — the same feature shown under Key Apps.",
             image: createEditWebsite,
-          },
-          {
-            id: "tech-website-leads",
-            label: "Website Leads",
-            icon: HiOutlineMailOpen,
-            summary: "Track and manage enquiries received through the website.",
-            bullets: ["Lead summary, filters, search and management"],
-            image: websiteLeadsShot,
-          },
-          {
-            id: "tech-website-review",
-            label: "Website Review",
-            icon: HiOutlineStar,
-            summary: "Moderate visitor-submitted website reviews.",
-            bullets: ["Same Website Review documented under Key Apps > Website Builder"],
-            image: websiteReviewShot,
+            children: [
+              {
+                id: "tech-create-edit-website",
+                label: "Create / Edit Website",
+                icon: HiOutlinePencilAlt,
+                summary:
+                  "Choose a template, configure every page, preview, then publish using website credits.",
+                bullets: [
+                  "Configure Home, About, Services, Gallery, Partner, Careers and Contact content",
+                  "Preview the site before publishing; use the published URL after release",
+                  "Edit the website or change template later",
+                ],
+                image: createEditWebsite,
+              },
+              {
+                id: "tech-website-leads",
+                label: "Website Leads",
+                icon: HiOutlineMailOpen,
+                summary: "Track and manage enquiries received through the website.",
+                bullets: ["Lead summary, filters, search and management"],
+                image: websiteLeadsShot,
+              },
+              {
+                id: "tech-website-review",
+                label: "Website Review",
+                icon: HiOutlineStar,
+                summary: "Moderate visitor-submitted website reviews.",
+                bullets: ["Same Website Review documented under Key Apps > Website Builder"],
+                image: websiteReviewShot,
+              },
+            ],
           },
         ],
       },
@@ -1179,17 +1672,6 @@ export const hostModuleCategories = [
             image: companyProfileBasic,
           },
           {
-            id: "plan-and-billing",
-            label: "Plan and Billing",
-            icon: HiOutlineCash,
-            summary: "Current plan, included modules, and recorded plan payments.",
-            bullets: [
-              "Plan summary: status, start date, expiry date",
-              "Included Modules tab grouped by product area",
-            ],
-            image: planAndBillingBasic,
-          },
-          {
             id: "change-password",
             label: "Change Password",
             icon: HiOutlineLockClosed,
@@ -1222,6 +1704,21 @@ export const hostModuleCategories = [
             image: hrResignationManagement,
           },
         ],
+      },
+      {
+        // Standalone now — reachable straight from the sidebar, no longer a
+        // tab nested under Profile (matches HostPanel's own Sidebar.tsx
+        // BILLING_NAV_ITEM / route "/plan-billing").
+        id: "plan-and-billing",
+        label: "Plan and Billing",
+        icon: HiOutlineCash,
+        plan: "basic",
+        summary: "Current plan, included modules, and recorded plan payments — reachable directly from the sidebar.",
+        bullets: [
+          "Plan summary: status, start date, expiry date",
+          "Included Modules tab grouped by product area",
+        ],
+        image: planAndBillingBasic,
       },
     ],
   },
