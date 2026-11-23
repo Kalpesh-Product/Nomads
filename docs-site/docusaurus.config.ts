@@ -3,19 +3,23 @@ import type * as Preset from '@docusaurus/preset-classic';
 import type {PluginOptions} from '@docusaurus/plugin-content-docs';
 
 
-// Docs that stay online but are left out of the sidebar navigation.
+// Pages and categories excluded from sidebar navigation while their URLs stay available.
 const HIDDEN_DOC_IDS = new Set(['destinations/browse-listings']);
+const HIDDEN_CATEGORY_LABELS = new Set(['Help and policies']);
 
 type SidebarItems = Awaited<
   ReturnType<PluginOptions['sidebarItemsGenerator']>
 >;
 
-const withoutHiddenDocs = (items: SidebarItems): SidebarItems =>
+const withoutHiddenSidebarItems = (items: SidebarItems): SidebarItems =>
   items
-    .filter((item) => !(item.type === 'doc' && HIDDEN_DOC_IDS.has(item.id)))
+    .filter((item) =>
+      !(item.type === 'doc' && HIDDEN_DOC_IDS.has(item.id)) &&
+      !(item.type === 'category' && HIDDEN_CATEGORY_LABELS.has(item.label)),
+    )
     .map((item) =>
       item.type === 'category'
-        ? {...item, items: withoutHiddenDocs(item.items)}
+        ? {...item, items: withoutHiddenSidebarItems(item.items)}
         : item,
     );
 
@@ -72,7 +76,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           async sidebarItemsGenerator(args) {
             const items = await args.defaultSidebarItemsGenerator(args);
-            return withComingSoonEntries(withoutHiddenDocs(items));
+            return withComingSoonEntries(withoutHiddenSidebarItems(items));
           },
         },
         blog: false,
