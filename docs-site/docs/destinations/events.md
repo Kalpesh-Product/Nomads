@@ -10,3 +10,11 @@ Click the Events icon below the search bar to filter the listings to events. The
 Event pages show what an event is, where it takes place and its listed dates or season. The Bali Arts Festival example shows Denpasar and June-July. Read the description, save or share the event, and check the organiser's current schedule before planning your visit.
 
 ![Bali Arts Festival page with its image, location and season](/img/guide/bali-arts-festival.jpg)
+
+## Reviews
+
+Select Write a Review on the event page to share your own experience at the event. You need to be signed in first.
+
+![Write a review dialog on the Bali Arts Festival page with a star rating and comment box](/img/guide/event-write-review.webp)
+
+The dialog shows the event name and your name with your profile initials. Select the stars to rate the event from 1 to 5, write about your experience at the event in the text box, then select Submit Review. Your review then appears with the others on the event page.
