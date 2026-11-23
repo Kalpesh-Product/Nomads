@@ -771,6 +771,27 @@ const AiRestaurantProduct = () => {
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp  ",
   };
 
+  const mapTitleLabel =
+    companyDetails?.companyName || companyDetails?.address || "";
+
+  const mapAddressLabel = [
+    companyDetails?.address,
+    companyDetails?.city,
+    companyDetails?.state,
+    companyDetails?.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  const mapEmbedQuery =
+    [mapTitleLabel, mapAddressLabel].filter(Boolean).join(", ") ||
+    (companyDetails?.latitude && companyDetails?.longitude
+      ? `${companyDetails.latitude},${companyDetails.longitude}`
+      : "");
+  const mapEmbedUrl = mapEmbedQuery
+    ? `https://www.google.com/maps?q=${encodeURIComponent(mapEmbedQuery)}&output=embed`
+    : null;
+
   const shareUrl = (() => {
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
@@ -1620,11 +1641,23 @@ const AiRestaurantProduct = () => {
               <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
               </h1>
-              <Map
-                locations={mapsData}
-                disableNavigation
-                disableTwoFingerScroll
-              />
+              <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden">
+                {mapEmbedUrl ? (
+                  <iframe
+                    title={mapTitleLabel || "Map location"}
+                    src={mapEmbedUrl}
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : (
+                  <Map
+                    locations={mapsData}
+                    disableNavigation
+                    disableTwoFingerScroll
+                  />
+                )}
+              </div>
             </div>
 
             {/* Desktop Host Section */}
@@ -2524,11 +2557,23 @@ const AiRestaurantProduct = () => {
               <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
               </h1>
-              <Map
-                locations={mapsData}
-                disableNavigation
-                disableTwoFingerScroll
-              />
+              <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden">
+                {mapEmbedUrl ? (
+                  <iframe
+                    title={mapTitleLabel || "Map location"}
+                    src={mapEmbedUrl}
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : (
+                  <Map
+                    locations={mapsData}
+                    disableNavigation
+                    disableTwoFingerScroll
+                  />
+                )}
+              </div>
             </div>
 
             {/* Host Section - Responsive: Mobile/Tablet stacked, Desktop side-by-side */}

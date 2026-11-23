@@ -4,7 +4,6 @@ import {
   TextField,
   Button,
   Box,
-  InputAdornment,
   FormControl,
   FormControlLabel,
   Checkbox,
@@ -132,6 +131,13 @@ const checkedMenuItemSx = {
 
 const getFlagIconUrl = (isoCode) =>
   `https://flagcdn.com/24x18/${isoCode.toLowerCase()}.png`;
+
+// country-state-city's phonecode is inconsistent ("355", "+1-684", "+358-18"
+// ...) — normalize to a plain "+<callingCode>" for display and comparison.
+const getCallingCode = (phonecode) => {
+  const raw = String(phonecode || "").replace(/^\+/, "").split("-")[0];
+  return raw ? `+${raw}` : "";
+};
 
 const isValidSignupEmail = (value = "") => {
   const email = value.trim();
@@ -339,6 +345,17 @@ const AiHostSignup = () => {
     () => locationApi?.Country?.getAllCountries() || [],
     [locationApi],
   );
+  const phoneCodeOptions = useMemo(() => {
+    const seen = new Set();
+    const options = [];
+    countries.forEach((country) => {
+      const code = getCallingCode(country.phonecode);
+      if (!code || seen.has(code)) return;
+      seen.add(code);
+      options.push({ code, isoCode: country.isoCode, name: country.name });
+    });
+    return options.sort((a, b) => Number(a.code.slice(1)) - Number(b.code.slice(1)));
+  }, [countries]);
 
   useEffect(() => {
     let isMounted = true;
@@ -531,6 +548,7 @@ const AiHostSignup = () => {
 
   const selectedCountryName = watch("country");
   const selectedStateName = watch("state");
+  const contactCode = watch("contactCode");
   const selectedCountry = useMemo(
     () =>
       countries.find((country) => country.name === selectedCountryName) || null,
@@ -651,7 +669,7 @@ const AiHostSignup = () => {
 
   const handleCountryChange = (countryName, onChange) => {
     const country = countries.find((item) => item.name === countryName);
-    const phonePrefix = country?.phonecode ? `+${country.phonecode}` : "";
+    const phonePrefix = getCallingCode(country?.phonecode);
 
     onChange(countryName);
     setValue("contactCode", phonePrefix, {
@@ -669,10 +687,15 @@ const AiHostSignup = () => {
   const handleMobileChange = (event, onChange) => {
     const digits = event.target.value.replace(/\D/g, "");
 
-    if (selectedCountry?.isoCode === "IN" && digits.length > 10) return;
+    if (contactCode === "+91" && digits.length > 10) return;
     if (digits.length > 15) return;
 
     onChange(digits);
+  };
+
+  const handlePhoneCodeChange = (code, onChange) => {
+    onChange(code);
+    setValue("mobile", "", { shouldDirty: true, shouldTouch: true });
   };
 
   const emailCheckTimerRef = React.useRef(null);
@@ -1155,29 +1178,60 @@ const AiHostSignup = () => {
               <Controller
                 name="contactCode"
                 control={control}
-                render={({ field }) => (
+                rules={{ required: "Code is required" }}
+                render={({ field, fieldState }) => (
                   <TextField
                     {...field}
+                    select
                     label="Code"
                     fullWidth
                     variant="standard"
-                    sx={{ ...compactStepFieldSx, maxWidth: 80 }}
+                    sx={{ ...compactStepFieldSx, minWidth: 100, maxWidth: 140 }}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
                     InputLabelProps={{ sx: floatingLabelSx }}
-                    InputProps={{
-                      startAdornment: selectedCountry?.isoCode ? (
-                        <InputAdornment position="start">
+                    SelectProps={{
+                      renderValue: (value) => {
+                        const option = phoneCodeOptions.find(
+                          (item) => item.code === value,
+                        );
+                        if (!option) return value;
+
+                        return (
                           <Box
-                            component="img"
-                            src={getFlagIconUrl(selectedCountry.isoCode)}
-                            alt={`${selectedCountry.name} flag`}
-                            sx={{ width: 20, height: 15, flexShrink: 0 }}
-                            loading="lazy"
-                          />
-                        </InputAdornment>
-                      ) : null,
-                      readOnly: true,
+                            sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                          >
+                            <img
+                              src={getFlagIconUrl(option.isoCode)}
+                              alt={`${option.name} flag`}
+                              width={18}
+                              height={13}
+                              loading="lazy"
+                            />
+                            <span>{option.code}</span>
+                          </Box>
+                        );
+                      },
                     }}
-                  />
+                    onChange={(event) =>
+                      handlePhoneCodeChange(event.target.value, field.onChange)
+                    }
+                  >
+                    {phoneCodeOptions.map((option) => (
+                      <MenuItem key={option.isoCode} value={option.code}>
+                        <Box
+                          component="img"
+                          src={getFlagIconUrl(option.isoCode)}
+                          alt={`${option.name} flag`}
+                          sx={{ width: 18, height: 13, mr: 1, flexShrink: 0 }}
+                          loading="lazy"
+                        />
+                        <span>
+                          {option.code} {option.name}
+                        </span>
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 )}
               />
               <Controller
@@ -1190,7 +1244,7 @@ const AiHostSignup = () => {
                     message: "Please enter a valid phone number",
                   },
                   validate: (value) =>
-                    selectedCountry?.isoCode !== "IN" ||
+                    contactCode !== "+91" ||
                     value.length <= 10 ||
                     "Indian phone numbers cannot exceed 10 digits",
                 }}
@@ -1207,7 +1261,7 @@ const AiHostSignup = () => {
                     InputLabelProps={{ sx: floatingLabelSx }}
                     inputProps={{
                       inputMode: "numeric",
-                      maxLength: selectedCountry?.isoCode === "IN" ? 10 : 15,
+                      maxLength: contactCode === "+91" ? 10 : 15,
                     }}
                     onChange={(event) =>
                       handleMobileChange(event, field.onChange)

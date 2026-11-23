@@ -8,6 +8,8 @@ import {
   startForgotPasswordWithOtp,
   verifyForgotPasswordOtp,
   resetPasswordWithOtpSession,
+  sendSignupOtp,
+  verifySignupOtp,
 } from "../controllers/authControllers/authControllers.js";
 import { refreshTokenController } from "../controllers/authControllers/refreshTokenController.js";
 
@@ -22,5 +24,7 @@ router.patch("/reset-password/:token", resetPassword);
 router.post("/forgot-password/start", startForgotPasswordWithOtp);
 router.post("/forgot-password/verify-otp", verifyForgotPasswordOtp);
 router.post("/forgot-password/reset", resetPasswordWithOtpSession);
+router.post("/signup/send-otp", sendSignupOtp);
+router.post("/signup/verify-otp", verifySignupOtp);
 
 export default router;
