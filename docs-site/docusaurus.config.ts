@@ -19,6 +19,36 @@ const withoutHiddenDocs = (items: SidebarItems): SidebarItems =>
         : item,
     );
 
+// Non-clickable sidebar entry shown after News; the badge style matches the
+// "Coming soon" pill in the Nomads web app sidebar.
+const restaurantsComingSoonItem = {
+  type: 'html' as const,
+  className: 'sidebar-coming-soon-item',
+  value:
+    '<div class="sidebar-coming-soon"><span>Restaurants</span><span class="sidebar-coming-soon-badge">Coming soon</span></div>',
+};
+
+const withRestaurantsComingSoon = (items: SidebarItems): SidebarItems =>
+  items.map((item) => {
+    if (item.type !== 'category') return item;
+
+    const children = withRestaurantsComingSoon(item.items);
+    const newsIndex = children.findIndex(
+      (child) => child.type === 'doc' && child.id === 'destinations/news',
+    );
+
+    if (newsIndex === -1) return {...item, items: children};
+
+    return {
+      ...item,
+      items: [
+        ...children.slice(0, newsIndex + 1),
+        restaurantsComingSoonItem,
+        ...children.slice(newsIndex + 1),
+      ],
+    };
+  });
+
 const config: Config = {
   title: 'WONO Nomads',
   tagline: 'User guide for the WONO Nomad platform',
@@ -39,7 +69,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           async sidebarItemsGenerator(args) {
             const items = await args.defaultSidebarItemsGenerator(args);
-            return withoutHiddenDocs(items);
+            return withRestaurantsComingSoon(withoutHiddenDocs(items));
           },
         },
         blog: false,
