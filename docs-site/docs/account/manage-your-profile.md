@@ -9,13 +9,13 @@ Your account has four tabs: Profile, Change Password, Favorites and Reviews. Sig
 
 Personal information with an Edit button. Fields: Full Name, Email, Current Country Of Residence, Mobile (with country code), Salary and Designation. After Edit the fields become editable and the button becomes Submit.
 
-![Profile tab showing personal information fields](/img/guide/profile-tab.jpg)
+![Profile tab showing personal information fields](/img/guide/profile-tab.webp)
 
 ## Change Password tab
 
 Current Password, New Password and Confirm Password, with a list of password requirements below the fields. Submitting changes the password and signs the user out so they log in again.
 
-![Change Password tab with three password fields](/img/guide/change-password-tab.jpg)
+![Change Password tab with three password fields](/img/guide/change-password-tab.webp)
 
 ## Favorites tab
 

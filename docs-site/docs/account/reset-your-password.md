@@ -10,6 +10,8 @@ Follow these steps to reset your password:
 3. After the code is verified, choose and confirm a new password.
 4. If you received a password-reset link by email, open it and follow the instructions to set a new password.
 
-![Forgot Password form asking for the account email](/img/guide/forgot-password-form.jpg)
+![Forgot Password form asking for the account email](/img/guide/forgot-password-form.webp)
 
-![Reset Password form with password requirements](/img/guide/reset-password-form.jpg)
+![Verify OTP form asking for the one-time code](/img/guide/verify-otp-form.webp)
+
+![Reset Password form with password requirements](/img/guide/reset-password-form.webp)
