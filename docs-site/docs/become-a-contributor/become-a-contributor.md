@@ -1,6 +1,7 @@
 ---
 title: "Become a contributor"
-sidebar_position: 2
+sidebar_position: 1
+slug: /contributing/become-a-contributor
 ---
 
 Anyone can ask to help grow WONO. The form asks what they want to contribute.

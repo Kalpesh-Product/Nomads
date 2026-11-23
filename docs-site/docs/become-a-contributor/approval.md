@@ -1,6 +1,7 @@
 ---
 title: "Approval"
-sidebar_position: 3
+sidebar_position: 2
+slug: /contributing/approval
 ---
 
 The WONO team reviews your request and approves the contribution types you can create. Submitting the form does not give immediate access to the contributor tools.
