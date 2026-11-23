@@ -1,5 +1,6 @@
 import { Router } from "express";
 import upload from "../config/multerConfig.js";
+import { validateContributionImageSizes } from "../middlewares/validateContributionImageSizes.js";
 import {
   addPlace,
   bulkInsertPlaces,
@@ -11,6 +12,7 @@ import {
   getPlaceContributions,
   updatePlaceContributionStatus,
   updateMyPlace,
+  deleteMyPlace,
   updatePlace,
   updatePlaceStatus,
 } from "../controllers/placeController.js";
@@ -24,8 +26,9 @@ const router = Router();
 router.get("/", getPlaces);
 router.get("/destination/:destination", getPlacesByDestination);
 router.get("/my", verifyJwt, requireContributorRole("isPlaceWriter"), getMyPlaces);
-router.post("/my", verifyJwt, requireContributorRole("isPlaceWriter"), upload.any(), createMyPlace);
-router.patch("/my/:id", verifyJwt, requireContributorRole("isPlaceWriter"), upload.any(), updateMyPlace);
+router.post("/my", verifyJwt, requireContributorRole("isPlaceWriter"), upload.any(), validateContributionImageSizes, createMyPlace);
+router.patch("/my/:id", verifyJwt, requireContributorRole("isPlaceWriter"), upload.any(), validateContributionImageSizes, updateMyPlace);
+router.delete("/my/:id", verifyJwt, requireContributorRole("isPlaceWriter"), deleteMyPlace);
 router.get("/contributions", verifyAdminApiKey, getPlaceContributions);
 router.patch("/contributions/:id/status", verifyAdminApiKey, updatePlaceContributionStatus);
 router.get("/:placeId", getPlaceById);

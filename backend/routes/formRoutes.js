@@ -1,9 +1,15 @@
 import { Router } from "express";
-import { addB2CformSubmission } from "../controllers/form-controllers/b2cFormControllers.js";
+import {
+  addB2CformSubmission,
+  checkB2cUserEmail,
+  getConnectWithUsSubmissions,
+  getContentRemovalSubmissions,
+} from "../controllers/form-controllers/b2cFormControllers.js";
 import {
   addB2BFormSubmission,
   checkHostUserEmail,
   getHostUsers,
+  getJobApplicationSubmissions,
   getPublicPlanPricing,
   registerFormSubmission,
   resendHostEmailVerificationLink,
@@ -11,6 +17,11 @@ import {
   updateHostUserStatusAndComment,
   verifyHostEmailOtp,
 } from "../controllers/form-controllers/b2bFormControllers.js";
+import {
+  updateConnectWithUsStatus,
+  updateContentRemovalStatus,
+  updateJobApplicationStatus,
+} from "../controllers/form-controllers/leadStatusControllers.js";
 import upload, { uploadImages } from "../config/multerConfig.js";
 import { authenticateContributorSubmission } from "../middlewares/contributorAccess.js";
 import { getVerifyBusinessClick } from "../controllers/verifyBusinessClickController.js";
@@ -37,7 +48,15 @@ router.post(
   registerFormSubmission,
 );
 router.get("/host-users", getHostUsers);
+router.get("/connect-with-us", getConnectWithUsSubmissions);
+router.get("/job-applications", getJobApplicationSubmissions);
+router.get("/content-removal", getContentRemovalSubmissions);
+// TODO(next): add verifyAdminApiKey to these PATCH routes (see leadStatusControllers.js).
+router.patch("/connect-with-us/:id/status", updateConnectWithUsStatus);
+router.patch("/job-applications/:id/status", updateJobApplicationStatus);
+router.patch("/content-removal/:id/status", updateContentRemovalStatus);
 router.get("/check-host-user-email", checkHostUserEmail);
+router.get("/check-b2c-user-email", checkB2cUserEmail);
 router.get("/plan-pricing", getPublicPlanPricing);
 // Pre-fills the host signup for a visitor who clicked "Verify Business" on a listing.
 router.get("/verify-click/:id", getVerifyBusinessClick);

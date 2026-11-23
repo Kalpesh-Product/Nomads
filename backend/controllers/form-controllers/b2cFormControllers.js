@@ -11,6 +11,8 @@ import Consultation from "../../models/Consultation.js";
 import Workation from "../../models/Workation.js";
 import BecomeContributor from "../../models/BecomeContributor.js";
 import ContentRemoval from "../../models/ContentRemoval.js";
+import ConnectWithUs from "../../models/ConnectWithUs.js";
+import JobApplication from "../../models/JobApplication.js";
 import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 import { uploadFileToS3 } from "../../config/s3Config.js";
@@ -22,6 +24,10 @@ import {
   formatLongDate,
   renderNotificationEmail,
 } from "../../utils/emailTemplates.js";
+import {
+  verifySignupSession,
+  validateStrongPassword,
+} from "../authControllers/authControllers.js";
 
 const AI_CONTRIBUTOR_MESSAGE_CHARACTER_LIMIT = 1000;
 const AI_FAST_RESPONSE_SHEETS = new Set([
@@ -494,6 +500,33 @@ function toISODateOnly(v) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+export const checkB2cUserEmail = async (req, res, next) => {
+  try {
+    const { email } = req.query;
+
+    if (!email || typeof email !== "string") {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const exists = await NomadUser.exists({ email: normalizedEmail });
+
+    return res.status(200).json({
+      exists: Boolean(exists),
+      message: exists
+        ? "This email is already registered. Please use a different email."
+        : "Email is available",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const addB2CformSubmission = async (req, res, next) => {
   let responseSent = false;
 
@@ -529,6 +562,22 @@ export const addB2CformSubmission = async (req, res, next) => {
         req.file,
       );
       const resumeLink = data.url;
+
+      // Sidecar MongoDB write: Sheets + email stay authoritative for this
+      // flow, so a DB failure must never block the applicant's submission.
+      try {
+        await JobApplication.create({
+          ...payload,
+          submissionDate,
+          submissionTime,
+          resumeLink,
+        });
+      } catch (error) {
+        console.error(
+          "Failed to persist job application to MongoDB:",
+          error.message,
+        );
+      }
 
       // Post to Google Apps Script
       const apsBody = {
@@ -1054,6 +1103,20 @@ export const addB2CformSubmission = async (req, res, next) => {
 
     // Build payload
     const payload = config.map(validatedData);
+
+    if (sheetName === "Connect_with_us") {
+      // Sidecar MongoDB write: keep it non-fatal so the existing Apps Script
+      // sync and notification emails are unaffected by a DB outage.
+      try {
+        await ConnectWithUs.create(payload);
+      } catch (error) {
+        console.error(
+          "Failed to persist Connect With Us lead to MongoDB:",
+          error.message,
+        );
+      }
+    }
+
     if (sheetName === "AI_Become_Contributor") {
       payload.nomadUser = req.userData?._id || null;
       await BecomeContributor.create(payload);
@@ -1180,8 +1243,30 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
 
     if (sheetName === "Sign_up") {
+      const normalizedSignupEmail = req.body.email?.trim().toLowerCase();
+
+      const { signupSessionToken } = req.body;
+      if (!signupSessionToken) {
+        return res.status(400).json({
+          message: "Please verify your email with the OTP before signing up.",
+        });
+      }
+      let decodedSignupSession;
+      try {
+        decodedSignupSession = verifySignupSession(signupSessionToken);
+      } catch {
+        return res.status(400).json({
+          message: "Email verification expired. Please verify your email again.",
+        });
+      }
+      if (decodedSignupSession.email !== normalizedSignupEmail) {
+        return res.status(400).json({
+          message: "Verified email does not match the signup email.",
+        });
+      }
+
       const existingUser = await NomadUser.findOne({
-        email: req.body.email?.trim().toLowerCase(),
+        email: normalizedSignupEmail,
       });
 
       if (existingUser) {
@@ -1194,10 +1279,9 @@ export const addB2CformSubmission = async (req, res, next) => {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
-      if (password.length < 6) {
-        return res
-          .status(409)
-          .json({ message: "Password must be 6 characters long" });
+      const passwordStrengthMessage = validateStrongPassword(password);
+      if (passwordStrengthMessage) {
+        return res.status(409).json({ message: passwordStrengthMessage });
       }
 
       if (confirmPassword !== password) {
@@ -1326,5 +1410,29 @@ export const addB2CformSubmission = async (req, res, next) => {
     }
     if (responseSent) return;
     next(err);
+  }
+};
+
+export const getConnectWithUsSubmissions = async (req, res, next) => {
+  try {
+    const submissions = await ConnectWithUs.find()
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({ data: submissions });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getContentRemovalSubmissions = async (req, res, next) => {
+  try {
+    const submissions = await ContentRemoval.find()
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({ data: submissions });
+  } catch (error) {
+    return next(error);
   }
 };

@@ -27,6 +27,26 @@ export const VERTICAL_TEMPLATE_CATALOG = [
     heroImageMobile: "/hosts/themes/wayfarer-hero-mobile.jpg",
   },
   {
+    id: "orchard",
+    name: "Orchard Living",
+    tag: "hostel",
+    description:
+      "Residential-editorial hostel style — oversized Outfit type, warm off-white canvas, roomy amenity galleries, floor-plan cards and a calm tour request. Inspired by Orchard Living, works for any service.",
+    swatch: { bg: "#fafaf9", fg: "#353b41", accent: "#9aa88f", font: "'Outfit', ui-sans-serif, sans-serif" },
+    heroImage: "/hosts/themes/orchard-hero.jpg",
+    heroImageMobile: "/hosts/themes/orchard-hero-mobile.jpg",
+  },
+  {
+    id: "destinflow",
+    name: "DestinFlow",
+    tag: "hostel",
+    description:
+      "Editorial hostel style — a centered photographic hero, square dark buttons, pale-blue facilities and a dark gallery strip. Inspired by DestinFlow, works for any service.",
+    swatch: { bg: "#ffffff", fg: "#666b73", accent: "#3ba7da", font: "'Cormorant Garamond', Georgia, serif" },
+    heroImage: "/hosts/themes/destinflow-hero.jpg",
+    heroImageMobile: "/hosts/themes/destinflow-hero-mobile.jpg",
+  },
+  {
     id: "haven",
     name: "Haven",
     tag: "co-living",
@@ -65,6 +85,16 @@ export const VERTICAL_TEMPLATE_CATALOG = [
     swatch: { bg: "#f5f6f8", fg: "#14161a", accent: "#3b6cf0", font: "'Sora', sans-serif" },
     heroImage: "/hosts/themes/huddle-hero.jpg",
     heroImageMobile: "/hosts/themes/huddle-hero-mobile.jpg",
+  },
+  {
+    id: "wavex",
+    name: "WaveX Rooms",
+    tag: "meeting-rooms",
+    description:
+      "Warm editorial meeting-room design — coral accents, natural-light photography, community storytelling and a friendly booking flow. Made for meeting rooms, works for any service.",
+    swatch: { bg: "#ffffff", fg: "#2b2b2f", accent: "#ed4e36", font: "'Inter', sans-serif" },
+    heroImage: "/hosts/themes/wavex-hero.jpg",
+    heroImageMobile: "/hosts/themes/wavex-hero-mobile.jpg",
   },
   {
     id: "travigo",

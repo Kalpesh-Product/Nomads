@@ -1,3 +1,11 @@
+import {
+  applyContributionStatusFilter,
+  serializeContribution,
+  stripLifecycleFields,
+  resubmissionFields,
+  createDeleteContribution,
+  createModerateContribution,
+} from "../utils/contributionLifecycle.js";
 import { Readable } from "stream";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
@@ -131,6 +139,7 @@ export const getEvents = async (req, res, next) => {
     const { destination, keyword, category, month } = req.query;
     const query = {
       isDraft: { $ne: true },
+      deletedAt: null,
       isActive: { $ne: false },
       $or: [{ status: "approved" }, { status: { $exists: false } }],
     };
@@ -170,6 +179,7 @@ export const getEventsByDestination = async (req, res, next) => {
         $options: "i",
       },
       isDraft: { $ne: true },
+      deletedAt: null,
       isActive: { $ne: false },
       $or: [{ status: "approved" }, { status: { $exists: false } }],
     }).sort({ eventName: 1 });
@@ -277,7 +287,7 @@ export const addEvent = async (req, res, next) => {
 export const getMyEvents = async (req, res, next) => {
   try {
     const user = req.userData._id;
-    const events = await Event.find({ contributor: user }).sort({
+    const events = await Event.find({ contributor: user, deletedAt: null }).sort({
       updatedAt: -1,
       createdAt: -1,
     });
@@ -303,6 +313,7 @@ export const createMyEvent = async (req, res, next) => {
     const isDraft =
       String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
     const payload = buildEventPayload(uploadPayload || {});
+    stripLifecycleFields(payload);
     const missingFields = validateRequiredEventFields(payload);
 
     if (missingFields.length > 0) {
@@ -344,6 +355,7 @@ export const updateMyEvent = async (req, res, next) => {
     const isDraft =
       String(uploadPayload?.isDraft) === "true" || uploadPayload?.isDraft === true;
     const payload = buildEventPayload(uploadPayload || {});
+    stripLifecycleFields(payload);
     const missingFields = validateRequiredEventFields(payload);
 
     if (missingFields.length > 0) {
@@ -357,9 +369,11 @@ export const updateMyEvent = async (req, res, next) => {
       {
         _id: id,
         contributor: user,
+        deletedAt: null,
       },
       {
         ...payload,
+        ...resubmissionFields(isDraft),
         contributor: user,
         status: "pending",
         isDraft,
@@ -391,9 +405,7 @@ export const getEventContributions = async (req, res, next) => {
       isDraft: { $ne: true },
     };
 
-    if (status && status !== "all") {
-      query.status = status;
-    }
+    applyContributionStatusFilter(query, status);
 
     if (search) {
       const pattern = { $regex: escapeRegex(search), $options: "i" };
@@ -414,48 +426,16 @@ export const getEventContributions = async (req, res, next) => {
 
     return res.status(200).json({
       count: events.length,
-      data: events,
+      data: events.map(serializeContribution),
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const updateEventContributionStatus = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-    const normalizedStatus = String(status || "").toLowerCase();
+export const updateEventContributionStatus = createModerateContribution(Event, "Event", "event");
 
-    if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
-      return res.status(400).json({ message: "Invalid event status" });
-    }
-
-    const event = await Event.findOneAndUpdate(
-      {
-        _id: id,
-        contributor: { $exists: true, $ne: null },
-        isDraft: { $ne: true },
-      },
-      {
-        status: normalizedStatus,
-        isActive: normalizedStatus === "approved",
-      },
-      { new: true },
-    ).populate("contributor", "firstName lastName fullName name email");
-
-    if (!event) {
-      return res.status(404).json({ message: "Event contribution not found" });
-    }
-
-    return res.status(200).json({
-      message: `Event ${normalizedStatus} successfully`,
-      event,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+export const deleteMyEvent = createDeleteContribution(Event, "Event");
 
 export const getEventById = async (req, res, next) => {
   try {
@@ -465,7 +445,7 @@ export const getEventById = async (req, res, next) => {
       return res.status(400).json({ message: "Valid event identifier is required" });
     }
 
-    const event = await Event.findById(eventId);
+    const event = await Event.findOne({ _id: eventId, deletedAt: null });
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -509,7 +489,7 @@ export const updateEvent = async (req, res, next) => {
       });
     }
 
-    const event = await Event.findByIdAndUpdate(eventId, payload, {
+    const event = await Event.findOneAndUpdate({ _id: eventId, deletedAt: null }, payload, {
       new: true,
       runValidators: true,
     });
@@ -542,8 +522,8 @@ export const updateEventStatus = async (req, res, next) => {
       });
     }
 
-    const event = await Event.findByIdAndUpdate(
-      eventId,
+    const event = await Event.findOneAndUpdate(
+      { _id: eventId, deletedAt: null },
       { isActive },
       { new: true, runValidators: true },
     );

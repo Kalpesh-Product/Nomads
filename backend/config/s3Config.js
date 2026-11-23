@@ -2,6 +2,7 @@ import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  paginateListObjectsV2,
 } from "@aws-sdk/client-s3";
 import { config } from "dotenv";
 
@@ -23,7 +24,7 @@ const s3Client = new S3Client({
   },
 });
 
-export async function uploadFileToS3(route, file) {
+export async function uploadFileToS3(route, file, { createOnly = false } = {}) {
   try {
     const uploadParams = {
       Bucket: process.env.PROJECT_S3_BUCKET_NAME,
@@ -31,6 +32,7 @@ export async function uploadFileToS3(route, file) {
       Body: file.buffer,
       ContentType: file.mimetype,
       ACL: "public-read",
+      ...(createOnly && { IfNoneMatch: "*" }),
     };
 
     const command = new PutObjectCommand(uploadParams);
@@ -42,7 +44,7 @@ export async function uploadFileToS3(route, file) {
       url: fileUrl,
     };
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error, { cause: error });
   }
 }
 
@@ -62,12 +64,23 @@ export async function deleteFileFromS3ByUrl(fileUrl) {
   return { success: true, message: "File deleted successfully" };
 }
 
-export async function deleteFileFromS3ByKey(key) {
+export async function listS3FolderObjects(prefix) {
+  const objects = [];
+  const pages = paginateListObjectsV2(
+    { client: s3Client },
+    { Bucket: process.env.PROJECT_S3_BUCKET_NAME, Prefix: prefix, Delimiter: "/" },
+  );
+  for await (const page of pages) objects.push(...(page.Contents || []));
+  return objects;
+}
+
+export async function deleteFileFromS3ByKey(key, etag) {
   try {
     if (!key) return { success: false, message: "Key is required" };
     const deleteParams = {
       Bucket: process.env.PROJECT_S3_BUCKET_NAME,
       Key: key,
+      ...(etag && { IfMatch: etag }),
     };
 
     const command = new DeleteObjectCommand(deleteParams);

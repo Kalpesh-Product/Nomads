@@ -150,6 +150,28 @@ export const fixedAmenitiesMap = {
     "Water Purifier",
     "Custom Solutions",
   ],
+  restaurants: [
+    "Air Conditioning",
+    "Admin Support",
+    "Ambiance",
+    "Cafeteria",
+    "CCTV Secure",
+    "Community",
+    "Custom Solutions",
+    "Housekeeping",
+    "IT Support",
+    "Laundry Facilities",
+    "Maintenance",
+    "Parking",
+    "Power Backup",
+    "Printing Services",
+    "Private Storage",
+    "Purified Water",
+    "Reception Support",
+    "Swimming Pool",
+    "Tea & Coffee",
+    "Wi-Fi",
+  ],
 };
 
 export default fixedAmenitiesMap;

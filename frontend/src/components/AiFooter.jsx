@@ -5,6 +5,7 @@ import { FaTwitter, FaLinkedinIn } from "react-icons/fa";
 import { FaGlobe, FaRupeeSign, FaFacebookF, FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { AiOutlineClose } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 const languages = [
   { code: "en-US", name: "English (US)" },
@@ -25,40 +26,41 @@ const currencies = [
   { code: "SGD", name: "Singapore Dollar", symbol: "$" },
 ];
 
+export const AiBetaBanner = ({ className = "" }) => (
+  <div className={`sticky bottom-0 z-10 bg-white/95 py-6 text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80 ${className}`}>
+    <div className="flex flex-col items-center gap-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+      <span className="text-center sm:col-start-2">
+        WONO is currently in beta. We're continuously improving the platform
+        based on your feedback. Building the future of global nomad living,
+        one update at a time. See Cookie Preferences.
+      </span>
+      <span className="text-center sm:col-start-3 sm:justify-self-end sm:pr-8">
+        Version 2.7.3
+      </span>
+    </div>
+  </div>
+);
+
 const AiFooter = () => {
   const [showLangModal, setShowLangModal] = useState(false);
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const [selectedLang, setSelectedLang] = useState(languages[0]);
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
+  const navigate = useNavigate();
 
   const goToHostsPrivacy = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/privacy";
-    } else {
-      window.location.href = "https://wono.co/privacy";
-    }
+    navigate("/privacy");
   };
   const goToHostsTC = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/terms-and-conditions";
-    } else {
-      window.location.href = "https://wono.co/terms-and-conditions";
-    }
+    navigate("/terms-and-conditions")
   };
   const goToHostsContentCopyright = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/content-and-copyright";
-    } else {
-      window.location.href = "https://wono.co/content-and-copyright";
-    }
+    navigate("/content-and-copyright");
   };
-  const goToHostsContentUseRemoval = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/content-use-removal";
-    } else {
-      window.location.href = "https://wono.co/content-use-removal";
-    }
-  };
+
+const goToHostsContentUseRemoval = () => {
+  navigate("/content-use-removal");
+};
 
   const footerSections = [
     {
@@ -89,18 +91,7 @@ const AiFooter = () => {
 
   return (
     <>
-      <div className="sticky bottom-0 z-10 bg-white/95 py-6 text-nano text-gray-600 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-        <div className="flex flex-col items-center gap-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-          <span className="text-center sm:col-start-2">
-            WONO is currently in beta. We're continuously improving the platform
-            based on your feedback. Building the future of global nomad living,
-            one update at a time. See Cookie Preferences.
-          </span>
-          <span className="text-center sm:col-start-3 sm:justify-self-end sm:pr-8">
-            Version 2.7.3
-          </span>
-        </div>
-      </div>
+      <AiBetaBanner />
       <footer className="w-full bg-gray-100 text-black flex flex-col justify-center items-center shadow-lg">
         <div className="w-full flex flex-wrap justify-center lg:justify-between items-center pt-12 pb-8 px-4 md:px-20">
           {/* Left Section */}

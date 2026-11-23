@@ -23,6 +23,7 @@ export const allowedOrigins = [
 const regexAllowedOrigins = [
   /\.wono\.co$/, // allow any subdomain of wono.co
   /\.localhost:5173$/, // allow any subdomain of localhost:5173 (for Vite dev tenant sites)
+  /^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/, // Cloudflare quick tunnels (dev sharing)
 ];
 
 export const corsConfig = {

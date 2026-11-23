@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import "driver.js/dist/driver.css";
 import { useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import axios from "../utils/axios";
+import ContentShareButton from "../components/ContentShareButton";
 import humanDate from "../utils/humanDate";
+import ContentFavoriteButton from "../components/ContentFavoriteButton";
+import ArticleComments from "../components/ArticleComments";
 import { createDriverGuide } from "../utils/driverGuide";
 
 const AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX =
@@ -63,9 +68,28 @@ const AiBlogDetails = () => {
   //   },
   // ];
   const location = useLocation();
+  const contentType = location.pathname.includes("/news/") ? "news" : "blog";
+  const searchParams = new URLSearchParams(location.search);
+  const sharedContentId = searchParams.get("id");
+  const sharedDestination = searchParams.get("destination");
+  const { data: sharedContent, isPending: isSharedContentPending } = useQuery({
+    queryKey: ["sharedContent", contentType, sharedContentId, sharedDestination],
+    queryFn: async () => {
+      const resource = contentType === "news" ? "news" : "blogs";
+      const { data } = await axios.get(`/${resource}/get-${resource}`, {
+        params: sharedDestination ? { destination: sharedDestination } : {},
+      });
+      return data.find((article) => article._id === sharedContentId) || null;
+    },
+    enabled: !!sharedContentId && !location.state?.content && !searchParams.has("previewKey"),
+    refetchOnWindowFocus: false,
+  });
   const content = normalizeArticleContent(
-    location.state?.content || getStoredPreviewContent(location.search) || {},
+    location.state?.content || getStoredPreviewContent(location.search) || sharedContent || {},
   );
+  const shareUrl = new URL(location.pathname, window.location.origin);
+  if (content._id) shareUrl.searchParams.set("id", content._id);
+  if (content.destination) shareUrl.searchParams.set("destination", content.destination);
   console.log("content : ", content);
   const newsContent = content?.sections || [];
   let sectionImageIndex = 0;
@@ -79,7 +103,6 @@ const AiBlogDetails = () => {
 
     return { ...item, imageSide };
   });
-  const contentType = location.pathname.includes("/news/") ? "news" : "blog";
   const contentDetailGuideSeenKey = `${AI_CONTENT_DETAIL_GUIDE_SEEN_KEY_PREFIX}-${contentType}`;
   const hasAutoStartedContentDetailGuideRef = useRef(false);
 
@@ -228,6 +251,14 @@ const AiBlogDetails = () => {
     };
   }, [content, contentDetailGuideSeenKey, startContentDetailGuide]);
 
+  if (sharedContentId && !location.state?.content && !searchParams.has("previewKey") && !sharedContent) {
+    return (
+      <p role="status" className="mx-auto max-w-[80rem] p-4 text-gray-600">
+        {isSharedContentPending ? "Loading article..." : "This article is unavailable."}
+      </p>
+    );
+  }
+
   return (
     <div className="min-w-[70%] max-w-[80rem] lg:max-w-[80rem] mx-0 md:mx-auto p-4 lg:p-0">
       {/* <button
@@ -240,11 +271,19 @@ const AiBlogDetails = () => {
       </button> */}
       <div className="flex flex-col gap-8">
         <section className="clear-both flow-root">
-          <h1 className="mb-8 text-title leading-normal font-bold">
-            {content?.mainTitle ||
-              content?.title ||
-              "Lorem ipsum dolor sit amet consectetur adipisicing elit."}
-          </h1>
+          <div className="mb-8 flex items-start justify-between gap-4">
+            <h1 className="min-w-0 text-title leading-normal font-bold">
+              {content?.mainTitle ||
+                content?.title ||
+                "Lorem ipsum dolor sit amet consectetur adipisicing elit."}
+            </h1>
+            {content._id && !searchParams.has("previewKey") && (
+              <div className="flex shrink-0 items-center gap-2">
+                <ContentShareButton title={content.mainTitle} url={shareUrl.toString()} kind={contentType} />
+                <ContentFavoriteButton item={content} kind={contentType} variant="detail" />
+              </div>
+            )}
+          </div>
           {renderFloatingImage(
             content?.mainImage ||
               content?.image ||
@@ -288,6 +327,9 @@ const AiBlogDetails = () => {
         </footer>
       </div>
       <hr className="mt-5 mb-0 lg:mt-10 lg:mb-0" />
+      {content._id && !searchParams.has("previewKey") && (
+        <ArticleComments key={`${contentType}-${content._id}`} articleId={content._id} kind={contentType} title={content.mainTitle} />
+      )}
 
       {activeImage && (
         <div

@@ -26,6 +26,7 @@ import { createDriverGuide } from "../utils/driverGuide";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession";
 import { companyLocationsQueryOptions } from "../utils/classicSearchLocations";
+import { createClassicSearchOrigin } from "../utils/aiSearchOriginNavigation.js";
 
 const searchBarBadgeClassName =
   "inline-flex min-h-[40px] min-w-[5rem] items-center rounded-full border border-black/30 px-4 py-2 text-xs font-medium text-black/85";
@@ -323,11 +324,15 @@ const AiManualSearch = () => {
     });
   };
 
-  const navigateToSearchResults = ({ continent, country, location }) => {
+  const navigateToSearchResults = ({
+    continent,
+    country,
+    selectedLocation,
+  }) => {
     const formValues = {
       continent,
       country,
-      location,
+      location: selectedLocation,
       category: "",
       count: "",
     };
@@ -335,8 +340,8 @@ const AiManualSearch = () => {
     dispatch(setFormValues(formValues));
 
     const selectedLocationTitle =
-      locationOptions.find((option) => option.value === location)?.label ||
-      location;
+      locationOptions.find((option) => option.value === selectedLocation)
+        ?.label || selectedLocation;
     const badges = [
       "Classic Search",
       continentOptions.find((option) => option.value === continent)?.label,
@@ -347,20 +352,26 @@ const AiManualSearch = () => {
     persistSelectedDestination({
       continent,
       country,
-      city: location,
+      city: selectedLocation,
       title: selectedLocationTitle,
     });
 
     navigate(
-      `/verticals?country=${encodeURIComponent(country)}&location=${encodeURIComponent(location)}`,
+      `/verticals?country=${encodeURIComponent(country)}&location=${encodeURIComponent(selectedLocation)}`,
       {
         state: {
           searchContext: "classic",
+          searchOrigin: createClassicSearchOrigin({
+            location,
+            continent,
+            country,
+            selectedLocation,
+          }),
           selectedStateLabel: selectedLocationTitle,
           breadcrumbFilters: {
             continent,
             country,
-            location,
+            location: selectedLocation,
           },
           searchBarBadges: badges,
         },
@@ -374,7 +385,7 @@ const AiManualSearch = () => {
     navigateToSearchResults({
       continent: selectedContinent,
       country: selectedCountry,
-      location: selectedLocation,
+      selectedLocation,
     });
   };
 
@@ -688,7 +699,7 @@ const AiManualSearch = () => {
                     navigateToSearchResults({
                       continent: selectedContinent,
                       country: selectedCountry,
-                      location: value,
+                      selectedLocation: value,
                     });
                   }}
                   disabled={!selectedCountry}

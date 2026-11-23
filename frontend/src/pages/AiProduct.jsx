@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "driver.js/dist/driver.css";
 import {
   NavLink,
@@ -24,6 +30,7 @@ import MuiModal from "../components/Modal";
 import Map from "../components/Map";
 import LeafWrapper from "../components/LeafWrapper";
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
+import DetailIconButton from "../components/DetailIconButton";
 import { FiShare2 } from "react-icons/fi";
 import { ArrowLeft, Globe } from "lucide-react";
 import {
@@ -51,6 +58,7 @@ import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import VerifyBusinessButton from "../components/verification/VerifyBusinessButton";
 import { setFormValues } from "../features/locationSlice.js";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
+import { buildEntryPageReturnTarget } from "../utils/aiSearchOriginNavigation.js";
 import {
   buildCanonicalListingUrl,
   buildListingShareUrl,
@@ -72,6 +80,12 @@ const AiProduct = () => {
   const { company } = useParams();
   const [searchParams] = useSearchParams();
   const locationState = location.state || {};
+  // The country/continent crumbs must return to whichever WoNo Intelligence
+  // page started this journey, not a hardcoded goal results page.
+  const entryPageReturnTarget = useMemo(
+    () => buildEntryPageReturnTarget(locationState),
+    [locationState],
+  );
   const {
     companyId: stateCompanyId,
     businessId: stateBusinessId,
@@ -343,14 +357,20 @@ const AiProduct = () => {
   ]);
 
   useEffect(() => {
+    const entryPagePath = {
+      pathname: entryPageReturnTarget.pathname,
+      search: entryPageReturnTarget.search,
+    };
     const trail = [
       {
         label: breadcrumbState.continent,
-        path: "/search/worldranking/results",
+        path: entryPagePath,
+        state: entryPageReturnTarget.state,
       },
       {
         label: breadcrumbState.country,
-        path: `/search/worldranking/results`,
+        path: entryPagePath,
+        state: entryPageReturnTarget.state,
       },
       {
         label: breadcrumbState.stateLabel,
@@ -391,6 +411,7 @@ const AiProduct = () => {
     breadcrumbState.stateLabel,
     companyDetails?.companyName,
     companyName,
+    entryPageReturnTarget,
     location.pathname,
     location.search,
     location.state,
@@ -420,16 +441,31 @@ const AiProduct = () => {
     const normalizedCategory = normalizeValue(breadcrumbState.companyType);
 
     const isCompanyTypeClick = breadcrumbKey === "companyType";
+    const isEntryPageClick =
+      breadcrumbKey === "continent" || breadcrumbKey === "country";
 
     dispatch(
       setFormValues({
         continent: normalizedContinent || "",
         country: normalizedCountry || "",
-        location: normalizedLocation || "",
+        location: isEntryPageClick ? "" : normalizedLocation || "",
         category: isCompanyTypeClick ? normalizedCategory || "" : "",
         count: "",
       }),
     );
+
+    if (isEntryPageClick) {
+      navigate(
+        {
+          pathname: entryPageReturnTarget.pathname,
+          search: entryPageReturnTarget.search,
+        },
+        {
+          state: entryPageReturnTarget.state,
+        },
+      );
+      return;
+    }
 
     if (isCompanyTypeClick) {
       navigate(
@@ -741,6 +777,27 @@ const AiProduct = () => {
       companyDetails?.images?.[0]?.url ||
       "https://biznest.co.in/assets/img/projects/subscription/Managed%20Workspace.webp  ",
   };
+
+  const mapTitleLabel =
+    companyDetails?.companyName || companyDetails?.address || "";
+
+  const mapAddressLabel = [
+    companyDetails?.address,
+    companyDetails?.city,
+    companyDetails?.state,
+    companyDetails?.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  const mapEmbedQuery =
+    [mapTitleLabel, mapAddressLabel].filter(Boolean).join(", ") ||
+    (companyDetails?.latitude && companyDetails?.longitude
+      ? `${companyDetails.latitude},${companyDetails.longitude}`
+      : "");
+  const mapEmbedUrl = mapEmbedQuery
+    ? `https://www.google.com/maps?q=${encodeURIComponent(mapEmbedQuery)}&output=embed`
+    : null;
 
   const canonicalListingUrl = buildCanonicalListingUrl({
     currentUrl: typeof window !== "undefined" ? window.location.href : "",
@@ -1276,14 +1333,12 @@ const AiProduct = () => {
                   </h1>
                   <div className="items-center flex gap-2">
                     <div>
-                      <button
-                        type="button"
+                      <DetailIconButton
+                        aria-label="Share this listing"
                         onClick={() => setShareMenuOpen(true)}
-                        className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-3 py-1 mr-2 text-small text-gray-600 transition hover:border-gray-400 hover:text-gray-900"
                       >
-                        <FiShare2 className="text-gray-600" size={14} />
-                        Share
-                      </button>
+                        <FiShare2 size={22} aria-hidden="true" />
+                      </DetailIconButton>
                     </div>
 
                     {companyDetails?.websiteTemplateLink && (
@@ -1299,7 +1354,9 @@ const AiProduct = () => {
                       </div>
                     )}
 
-                    <div
+                    <DetailIconButton
+                      aria-label={heartClicked ? "Remove from favorites" : "Add to favorites"}
+                      aria-pressed={!!heartClicked}
                       onClick={() => {
                         if (!userId) {
                           navigate("/login");
@@ -1309,14 +1366,13 @@ const AiProduct = () => {
                         setHeartClicked(newLiked);
                         toggleLike(newLiked);
                       }}
-                      className="cursor-pointer relative"
                     >
                       {heartClicked ? (
                         <IoIosHeart className="text-[#ff5757]" size={22} />
                       ) : (
                         <IoIosHeartEmpty size={22} />
                       )}
-                    </div>
+                    </DetailIconButton>
                   </div>
                 </div>
 
@@ -1508,6 +1564,9 @@ const AiProduct = () => {
                         }}
                         helperText={errors?.mobileNumber?.message}
                         error={!!errors.mobileNumber}
+                        FormHelperTextProps={{
+                          sx: { fontSize: "0.65rem", whiteSpace: "nowrap" },
+                        }}
                         disabled={!!auth?.user}
                       />
                     )}
@@ -1771,26 +1830,26 @@ const AiProduct = () => {
               data-tour="product-map-section"
               className="w-full h-[500px] flex flex-col gap-8 rounded-xl overflow-hidden"
             >
-              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm md:text-base">
-                {" "}
-                <h1 className="text-title font-medium text-gray-700 uppercase">
-                  Where you'll be
-                </h1>{" "}
-                <a
-                  data-tour="product-get-direction"
-                  href={companyDetails?.googleMap}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-medium text-blue-600 underline"
-                >
-                  Get Direction
-                </a>
+              <h1 className="text-title font-medium text-gray-700 uppercase">
+                Where you'll be
+              </h1>
+              <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden">
+                {mapEmbedUrl ? (
+                  <iframe
+                    title={mapTitleLabel || "Map location"}
+                    src={mapEmbedUrl}
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : (
+                  <Map
+                    locations={mapsData}
+                    disableNavigation
+                    disableTwoFingerScroll
+                  />
+                )}
               </div>
-              <Map
-                locations={mapsData}
-                disableNavigation
-                disableTwoFingerScroll
-              />
             </div>
 
             {/* Desktop Host Section */}
@@ -1899,6 +1958,9 @@ const AiProduct = () => {
                               }}
                               helperText={salesErrors?.mobileNumber?.message}
                               error={!!salesErrors?.mobileNumber}
+                              FormHelperTextProps={{
+                                sx: { fontSize: "0.65rem", whiteSpace: "nowrap" },
+                              }}
                             />
                           )}
                         />
@@ -2270,12 +2332,12 @@ const AiProduct = () => {
                   </h1>
 
                   <div className="flex items-center justify-center sm:justify-start gap-3 md:gap-4">
-                    <button
-                      type="button"
+                    <DetailIconButton
+                      aria-label="Share this listing"
                       onClick={() => setShareMenuOpen(true)}
                     >
-                      <FiShare2 className="text-gray-600" size={17} />
-                    </button>
+                      <FiShare2 size={22} aria-hidden="true" />
+                    </DetailIconButton>
 
                     {companyDetails?.websiteTemplateLink && (
                       <a
@@ -2291,7 +2353,9 @@ const AiProduct = () => {
                       </a>
                     )}
 
-                    <div
+                    <DetailIconButton
+                      aria-label={heartClicked ? "Remove from favorites" : "Add to favorites"}
+                      aria-pressed={!!heartClicked}
                       onClick={() => {
                         if (!userId) {
                           navigate("/login");
@@ -2301,14 +2365,13 @@ const AiProduct = () => {
                         setHeartClicked(newLiked);
                         toggleLike(newLiked);
                       }}
-                      className="cursor-pointer relative"
                     >
                       {heartClicked ? (
                         <IoIosHeart className="text-[#ff5757]" size={22} />
                       ) : (
                         <IoIosHeartEmpty size={22} />
                       )}
-                    </div>
+                    </DetailIconButton>
                   </div>
                 </div>
 
@@ -2737,11 +2800,23 @@ const AiProduct = () => {
               <h1 className="text-title font-medium text-gray-700 uppercase">
                 Where you'll be
               </h1>
-              <Map
-                locations={mapsData}
-                disableNavigation
-                disableTwoFingerScroll
-              />
+              <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden">
+                {mapEmbedUrl ? (
+                  <iframe
+                    title={mapTitleLabel || "Map location"}
+                    src={mapEmbedUrl}
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : (
+                  <Map
+                    locations={mapsData}
+                    disableNavigation
+                    disableTwoFingerScroll
+                  />
+                )}
+              </div>
             </div>
 
             {/* Host Section - Responsive: Mobile/Tablet stacked, Desktop side-by-side */}
@@ -2854,6 +2929,9 @@ const AiProduct = () => {
                               }}
                               helperText={salesErrors?.mobileNumber?.message}
                               error={!!salesErrors?.mobileNumber}
+                              FormHelperTextProps={{
+                                sx: { fontSize: "0.65rem", whiteSpace: "nowrap" },
+                              }}
                             />
                           )}
                         />

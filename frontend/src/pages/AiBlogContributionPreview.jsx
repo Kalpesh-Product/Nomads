@@ -1,4 +1,6 @@
+import ArticleComments from "../components/ArticleComments";
 import CharacterLimitedField from "../components/CharacterLimitedField";
+import PlaceLocation, { PlaceAddress } from "../components/PlaceLocation";
 import CategorySelect from "../components/CategorySelect";
 import eventCategories from "../constants/eventCategories";
 import placeCategories from "../constants/placeCategories";
@@ -31,6 +33,7 @@ const contributionPreviewConfig = {
     errorMessage: "Could not update this blog. Please check the details and try again.",
     submitButtonLabel: "Publish Blog",
     previewType: "article",
+    commentKind: "blog",
   },
   news: {
     label: "News",
@@ -43,6 +46,7 @@ const contributionPreviewConfig = {
     errorMessage: "Could not update this news item. Please check the details and try again.",
     submitButtonLabel: "Publish News",
     previewType: "article",
+    commentKind: "news",
   },
   event: {
     label: "Event",
@@ -104,7 +108,7 @@ const buildFormState = (item = {}) => ({
   placeName: item.placeName || item.title || "",
   address: item.address || item.location || "",
   googleMapsLink: item.googleMapsLink || "",
-  rating: item.rating || "",
+  rating: String(item.rating ?? ""),
   latitude: item.latitude ?? "",
   longitude: item.longitude ?? "",
   placeType: item.placeType || item.type || "",
@@ -226,6 +230,7 @@ const EditableImage = ({ src, file, alt }) => {
 };
 
 const canEditContribution = (item = {}, config = {}) => {
+  if (item.deletedAt || item.status === "deleted") return false;
   if (item.isDraft && ["Blog", "News", "Event", "Place"].includes(config.label)) {
     return true;
   }
@@ -234,7 +239,7 @@ const canEditContribution = (item = {}, config = {}) => {
   return !item.isDraft && ["approved", "rejected"].includes(status);
 };
 
-const PreviewHeader = ({ config, item, onEdit }) => {
+const PreviewHeader = ({ config, item, onEdit, onDelete, isDeleting }) => {
   const canEdit = canEditContribution(item, config);
   const status = String(item.status || "pending").toLowerCase();
   const isPending = status === "pending" && !item.isDraft;
@@ -255,14 +260,28 @@ const PreviewHeader = ({ config, item, onEdit }) => {
       {!isPending && <div className="flex items-center justify-between gap-4">
         {previewDetails}
         {canEdit ? (
-          <button
-            type="button"
-            onClick={onEdit}
-            className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500"
-          >
-            <HiOutlinePencil size={16} />
-            Edit
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {onDelete ? (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <HiOutlineTrash size={16} />
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={onEdit}
+              disabled={isDeleting}
+              className="inline-flex items-center gap-2 rounded-full bg-primary-blue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <HiOutlinePencil size={16} />
+              Edit
+            </button>
+          </div>
         ) : null}
       </div>}
 
@@ -287,9 +306,12 @@ const PreviewHeader = ({ config, item, onEdit }) => {
   );
 };
 
-const ArticlePreview = ({ item, config, onEdit }) => {
+const ArticlePreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   let sectionImageIndex = 0;
   const title = item.mainTitle || `Untitled ${config.label}`;
+  const articleId = item._id || item.id;
+  const showComments = config.commentKind && articleId && !item.isDraft &&
+    !item.deletedAt && String(item.status).toLowerCase() === "approved";
   const sections = (item.sections || []).map((section) => {
     if (!section.image) return { ...section, imageSide: null };
     const imageSide = sectionImageIndex % 2 === 0 ? "left" : "right";
@@ -299,7 +321,7 @@ const ArticlePreview = ({ item, config, onEdit }) => {
 
   return (
     <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
-      <PreviewHeader config={config} item={item} onEdit={onEdit} />
+      <PreviewHeader config={config} item={item} onEdit={onEdit} onDelete={onDelete} isDeleting={isDeleting} />
 
       <div className="flex flex-col gap-8">
         <section className="clear-both flow-root">
@@ -350,12 +372,21 @@ const ArticlePreview = ({ item, config, onEdit }) => {
             {getSourceName(item.source) || "Source"}
           </p>
         </footer>
+        {showComments ? (
+          <ArticleComments
+            key={`${config.commentKind}-${articleId}`}
+            articleId={articleId}
+            kind={config.commentKind}
+            repliesOnly
+            hideWhenEmpty
+          />
+        ) : null}
       </div>
     </div>
   );
 };
 
-const DestinationPreview = ({ item, config, onEdit }) => {
+const DestinationPreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   const isEvent = config.formType === "event";
   const title = isEvent
     ? item.eventName || item.title || "Untitled Event"
@@ -364,14 +395,15 @@ const DestinationPreview = ({ item, config, onEdit }) => {
   const image = item.mainImage || item.image;
   const primaryMeta = isEvent ? item.category : item.category || item.placeType;
   const centerMeta = isEvent ? item.month : item.rating || item.month;
-  const rightMeta = isEvent ? item.venue : item.address || item.venue;
+  const rightMeta = item.venue;
 
   return (
     <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
-      <PreviewHeader config={config} item={item} onEdit={onEdit} />
+      <PreviewHeader config={config} item={item} onEdit={onEdit} onDelete={onDelete} isDeleting={isDeleting} />
 
       <section className="mt-4">
         <h2 className="text-title font-bold leading-normal">{title}</h2>
+        {!isEvent && <PlaceAddress address={item.address || item.location} />}
         {isEvent && item.month ? (
           <p className="mt-2 flex items-center gap-2 text-base font-medium text-black">
             <CalendarDays size={17} />
@@ -399,16 +431,7 @@ const DestinationPreview = ({ item, config, onEdit }) => {
           </p>
         ) : null}
 
-        {!isEvent && item.googleMapsLink ? (
-          <a
-            href={item.googleMapsLink}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-6 inline-flex text-sm font-semibold text-primary-blue"
-          >
-            Open place link
-          </a>
-        ) : null}
+        {!isEvent && <PlaceLocation item={item} />}
 
         {isEvent && item.link ? (
           <a
@@ -425,7 +448,7 @@ const DestinationPreview = ({ item, config, onEdit }) => {
   );
 };
 
-const EditActions = ({ config, isSaving, onCancel, onSubmit }) => (
+const EditActions = ({ config, isSaving, onCancel, onSubmit, deleteAction }) => (
   <div className="contribution-edit-actions sticky top-0 z-30 -mx-4 mb-6 flex flex-col gap-3 border-b border-black/10 bg-[#fffef2]/95 px-4 pb-5 pt-2 backdrop-blur sm:flex-row sm:items-center sm:justify-between md:-mx-8 md:px-8 lg:-mx-8">
     <div>
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-blue">
@@ -436,6 +459,7 @@ const EditActions = ({ config, isSaving, onCancel, onSubmit }) => (
       </h1>
     </div>
     <div className="flex flex-wrap items-center gap-3">
+      {deleteAction}
       <button
         type="button"
         onClick={onCancel}
@@ -468,7 +492,7 @@ const editTitleClassName =
   "w-full rounded-lg border border-transparent bg-white/70 px-3 py-2 text-title font-bold leading-normal outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100";
 const editTextAreaClassName =
   "w-full resize-y rounded-lg border border-transparent bg-white/70 px-3 py-2 leading-relaxed outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100";
-const ArticleEditField = ({ maxLength, ...props }) => (
+const ArticleEditField = ({ maxLength, slotProps, ...props }) => (
   <CharacterLimitedField
     as={TextField}
     fullWidth
@@ -476,7 +500,7 @@ const ArticleEditField = ({ maxLength, ...props }) => (
     size="small"
     {...props}
     maxLength={maxLength}
-    slotProps={{ htmlInput: { maxLength } }}
+    slotProps={{ ...slotProps, htmlInput: { ...slotProps?.htmlInput, maxLength } }}
   />
 );
 
@@ -585,7 +609,7 @@ const PlaceFields = ({ formValues, updateFormField }) => (
   </>
 );
 
-const ContributionEditForm = ({ item, config, onCancel }) => {
+const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = false }) => {
   const isRepublish =
     !item.isDraft &&
     ["approved", "rejected"].includes(String(item.status || "").toLowerCase());
@@ -884,12 +908,23 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
     updateContributionMutation.mutate({ payload });
   };
 
-  const isSaving = updateContributionMutation.isPending;
+  const isSaving = updateContributionMutation.isPending || isDeleting;
 
   if (showSections) {
     return (
       <ArticleInlineEdit
         config={editConfig}
+        deleteAction={onDelete ? (
+          <button
+            type="button"
+            onClick={onDelete}
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-5 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <HiOutlineTrash size={16} />
+            {isDeleting ? "Deleting..." : "Delete"}
+          </button>
+        ) : null}
         formValues={formValues}
         updateFormField={updateFormField}
         updateSection={updateSection}
@@ -924,6 +959,7 @@ const ContributionEditForm = ({ item, config, onCancel }) => {
 
 const ArticleInlineEdit = ({
   config,
+  deleteAction,
   formValues,
   updateFormField,
   updateSection,
@@ -949,6 +985,7 @@ const ArticleInlineEdit = ({
   return (
     <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
       <EditActions
+        deleteAction={deleteAction}
         config={config}
         isSaving={isSaving}
         onCancel={onCancel}
@@ -1126,7 +1163,6 @@ const DestinationInlineEdit = ({
   const isEvent = config.formType === "event";
   const titleField = isEvent ? "eventName" : "placeName";
   const titlePlaceholder = isEvent ? "Event name" : "Place name";
-  const centerMeta = isEvent ? formValues.month : formValues.rating || formValues.month;
 
   return (
     <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
@@ -1188,7 +1224,12 @@ const DestinationInlineEdit = ({
             </>
           ) : (
             <>
-              <p className="md:text-center">{centerMeta || ""}</p>
+              <ArticleEditField
+                label="Destination"
+                maxLength={contributionFieldLimits.mainTitle}
+                value={formValues.destination}
+                onChange={(event) => updateFormField("destination", event.target.value)}
+              />
               <ArticleEditField
                 label="Address"
                 maxLength={contributionFieldLimits.address}
@@ -1198,6 +1239,32 @@ const DestinationInlineEdit = ({
             </>
           )}
         </div>
+
+        {!isEvent && (
+          <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              ["Google Maps Link", "googleMapsLink"],
+              ["Venue (optional)", "venue"],
+              ["Latitude", "latitude"],
+              ["Longitude", "longitude"],
+              ["Rating", "rating"],
+              ["Type", "placeType"],
+              ["Month", "month"],
+            ].map(([label, field]) => (
+              <ArticleEditField
+                key={field}
+                label={label}
+                maxLength={metadataFieldLimits[field]}
+                value={formValues[field]}
+                onChange={(event) => updateFormField(field, event.target.value)}
+                slotProps={{ htmlInput: {
+                  maxLength: metadataFieldLimits[field],
+                  inputMode: ["latitude", "longitude"].includes(field) ? "decimal" : "text",
+                } }}
+              />
+            ))}
+          </div>
+        )}
 
         <hr className="my-6" />
 
@@ -1222,6 +1289,8 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(() =>
     Boolean(location.state?.startEditing),
   );
@@ -1267,6 +1336,99 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
     }
   }, [canEdit, isEditing]);
 
+  const handleDelete = async () => {
+    if (isDeleting || !item || !canEdit) return;
+    const contentName = config.label === "News" ? "news item" : config.label.toLowerCase();
+    setIsDeleting(true);
+    const dialogOptions = {
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#dc2626",
+      focusCancel: true,
+      heightAuto: false,
+      customClass: {
+        container: "swal2-container--republish",
+        popup: "swal2-popup--rounded swal2-popup--republish swal2-popup--delete",
+        title: "swal2-title--serif",
+        htmlContainer: "swal2-republish-message",
+        confirmButton: "swal2-button--pill swal2-button--republish",
+        cancelButton: "swal2-button--pill swal2-button--republish",
+      },
+    };
+
+    try {
+      const confirmation = await Swal.fire({
+        ...dialogOptions,
+        icon: "warning",
+        title: `Delete this ${contentName}?`,
+        html: `
+          <p>This ${contentName} will be removed from your contributions and will no longer be visible to readers. You cannot undo this action.</p>
+          <label class="blog-delete-reason-label" for="blog-delete-reason">Reason for deleting</label>
+          <textarea id="blog-delete-reason" class="blog-delete-reason" rows="3" maxlength="500" required aria-required="true" placeholder="Please tell us why you want to delete this ${contentName}"></textarea>
+          <label class="blog-delete-agreement" for="blog-delete-agreement">
+            <input id="blog-delete-agreement" type="checkbox" />
+            <span>I understand and agree to delete this ${contentName}</span>
+          </label>
+        `,
+        didOpen: () => {
+          const popup = Swal.getPopup();
+          const reasonInput = popup.querySelector("#blog-delete-reason");
+          const checkbox = popup.querySelector("#blog-delete-agreement");
+          const syncButton = () => {
+            Swal.getConfirmButton().disabled = !checkbox.checked || !reasonInput.value.trim();
+            Swal.resetValidationMessage();
+          };
+          reasonInput.addEventListener("input", syncButton);
+          checkbox.addEventListener("change", syncButton);
+          syncButton();
+        },
+        confirmButtonText: `Delete ${config.label}`,
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => !Swal.isLoading(),
+        allowEscapeKey: () => !Swal.isLoading(),
+        preConfirm: async () => {
+          const popup = Swal.getPopup();
+          const value = popup.querySelector("#blog-delete-reason").value.trim();
+          const agreed = popup.querySelector("#blog-delete-agreement").checked;
+          if (!value || value.length > 500 || !agreed) {
+            Swal.showValidationMessage("Please enter a reason (up to 500 characters) and agree to delete.");
+            return false;
+          }
+          try {
+            await axiosPrivate.delete(`${config.myEndpoint}/${itemId}`, {
+              data: { deletionReason: value.trim(), agreedToDelete: true },
+            });
+            return true;
+          } catch (error) {
+            Swal.showValidationMessage(
+              error?.response?.data?.message || `Could not delete this ${contentName}. Please try again.`,
+            );
+            return false;
+          }
+        },
+      });
+      if (!confirmation.isConfirmed) return;
+
+      queryClient.setQueriesData({ queryKey: [config.queryKey] }, (current) =>
+        Array.isArray(current)
+          ? current.filter((entry) => (entry._id || entry.id) !== itemId)
+          : current,
+      );
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [config.queryKey] }),
+        queryClient.invalidateQueries({ predicate: ({ queryKey }) => {
+          const key = String(queryKey[0] || "");
+          const contentKey = type === "places" ? "place" : type;
+          return key.toLowerCase().includes(contentKey) || key === "sharedContent" || key.startsWith("favorite");
+        } }),
+      ]);
+      navigate(config.dashboardPath, { replace: true });
+      showSuccessAlert(`${config.label} deleted successfully.`, { title: `${config.label} Deleted` });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (!auth?.user) {
     return null;
   }
@@ -1302,14 +1464,16 @@ const AiBlogContributionPreview = ({ type = "blog" }) => {
         item={item}
         config={config}
         onCancel={() => setIsEditing(false)}
+        onDelete={type === "blog" && item.isDraft ? handleDelete : undefined}
+        isDeleting={isDeleting}
       />
     );
   }
 
   return config.previewType === "destination" ? (
-    <DestinationPreview item={item} config={config} onEdit={() => setIsEditing(true)} />
+    <DestinationPreview item={item} config={config} onEdit={() => setIsEditing(true)} onDelete={handleDelete} isDeleting={isDeleting} />
   ) : (
-    <ArticlePreview item={item} config={config} onEdit={() => setIsEditing(true)} />
+    <ArticlePreview item={item} config={config} onEdit={() => setIsEditing(true)} onDelete={handleDelete} isDeleting={isDeleting} />
   );
 };
 
