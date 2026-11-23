@@ -11,7 +11,7 @@ These are paths on the Nomad website. A segment in angle brackets stands for a v
 | Ranking and discovery | `/world-rankings`, `/search`, `/savings`, `/career-search`, `/compatible` | [Destination discovery](./discovery/overview.md) |
 | Ranked results | `/search/results`, `/search/<goal>/results`, `/savings/results`, `/career-search/results`, `/compatible/results` | [Search results](./discovery/search-results.md) |
 | Classic Search | `/manual-search` | [Classic Search](./discovery/classic-search.md) |
-| Destination hub and listings | `/verticals`, `/listings`, `/listings-list` | [Destination hub](./destinations/destination-hub.md) |
+| Destinations Listings | `/verticals`, `/listings`, `/listings-list` | [Destinations Listings](./destinations/destination-hub.md) |
 | Listing and photos | `/listings/<company>`, `/listings/<company>/images` | [Listing details](./destinations/listing-details.md) |
 | Places and events | `/places/<id>`, `/events/<id>` | [Places](./destinations/places.md), [Events](./destinations/events.md) |
 | Articles | `/blog`, `/blog/blog-details`, `/news`, `/news/news-details` | [Blogs](./destinations/blogs.md), [News](./destinations/news.md) |
