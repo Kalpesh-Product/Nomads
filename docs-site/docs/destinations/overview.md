@@ -7,11 +7,9 @@ Open a destination to discover its workspaces, stays, cafes, events, places, blo
 
 ## In this section
 
-- [Destination hub](./destination-hub.md)
-- [Browse listings](./browse-listings.md)
+- [Destinations Listings](./destination-hub.md)
 - [Listing details](./listing-details.md)
 - [Listing photos](./listing-photos.md)
-- [Cafes and restaurants](./cafes-and-restaurants.md)
 - [Places](./places.md)
 - [Events](./events.md)
 - [Blogs](./blogs.md)

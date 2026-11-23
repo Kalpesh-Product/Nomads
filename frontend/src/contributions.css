@@ -20,7 +20,12 @@
   }
 
   .contributions-layout .contributions-breadcrumb {
-    padding-inline: 1.25rem;
+    padding-inline: 0.75rem;
+  }
+
+  /* The listings layout has no second inset inside its back/breadcrumb bar. */
+  .contributions-layout .contributions-breadcrumb > div {
+    padding-inline: 0;
   }
 
   .contributions-layout nav[aria-label="Breadcrumb"] {
@@ -85,6 +90,17 @@
 }
 
 @media (max-width: 639px) {
+  /* Match the listings-list page inset: layout px-1 + page px-2 = 12px. */
+  .contributions-layout main,
+  .contributions-layout .contribution-content {
+    padding-inline: 0.5rem;
+  }
+
+  .contributions-layout .contribution-edit-actions {
+    margin-inline: -0.5rem;
+    padding-inline: 0.5rem;
+  }
+
   .contributions-layout .contribution-top-row {
     grid-template-columns: 1.5rem 3rem minmax(0, 1fr);
     gap: 0.5rem;

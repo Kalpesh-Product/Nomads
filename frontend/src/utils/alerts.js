@@ -14,7 +14,7 @@ export const showSuccessAlert = (message, options = {}) =>
     title: options.title || "Success",
     text: message,
     showConfirmButton: false,
-    timer: 2500,
+    timer: options.timer || 2500,
     timerProgressBar: true,
     customClass: {
       popup: "swal2-popup--rounded",

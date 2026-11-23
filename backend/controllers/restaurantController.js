@@ -554,7 +554,8 @@ export const uploadRestaurantLogo = async (req, res, next) => {
 export const getRestaurants = async (req, res, next) => {
   try {
     const { destination, category, month } = req.query;
-    const query = {};
+    // Public listings must only surface restaurants explicitly marked active.
+    const query = { isActive: true };
 
     if (destination) {
       query.destination = {
@@ -588,6 +589,7 @@ export const getRestaurantsByDestination = async (req, res, next) => {
     }
 
     const restaurants = await Restaurant.find({
+      isActive: true,
       destination: {
         $regex: `^${buildExactDestinationPattern(destination)}$`,
         $options: "i",

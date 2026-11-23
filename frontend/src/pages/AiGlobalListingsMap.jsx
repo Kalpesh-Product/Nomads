@@ -542,6 +542,13 @@ const AiGlobalListingsMap = () => {
     enabled: !!destinationAvailability,
     refetchOnWindowFocus: false,
   });
+  const activeDestinationRestaurants = useMemo(
+    () =>
+      destinationRestaurantsData.filter(
+        (restaurant) => restaurant.isActive === true,
+      ),
+    [destinationRestaurantsData],
+  );
   const { data: destinationNewsData = [] } = useQuery({
     queryKey: ["ai-news-availability", destinationAvailability],
     queryFn: async () => {
@@ -590,7 +597,7 @@ const AiGlobalListingsMap = () => {
         }
 
         if (option.value === RESTAURANTS_CATEGORY) {
-          return destinationRestaurantsData.length > 0;
+          return activeDestinationRestaurants.length > 0;
         }
 
         if (option.value === NEWS_CATEGORY) {
@@ -665,7 +672,7 @@ const AiGlobalListingsMap = () => {
     destinationBlogsData.length,
     destinationEventsData.length,
     destinationNewsData.length,
-    destinationRestaurantsData.length,
+    activeDestinationRestaurants.length,
     destinationPlacesData.length,
     isLisitingLoading,
     listingsData,

@@ -256,7 +256,7 @@ All routes are mounted under `/api` in `backend/server.js`.
 
 **Authentication** — `POST /api/auth/login` returns an access token (kept by the client) and sets a refresh cookie; `GET /api/auth/refresh` rotates it. CORS is credentialed and cookie parsing is enabled globally, so the frontend origin must be listed in `backend/config/corsConfig.js`. Frontend helpers live in `frontend/src/hooks/` and `frontend/src/context/AuthContext.jsx`.
 
-**Contributors** — submitting the contributor form creates a lead; it does not grant roles. Accounts start with all four contributor flags `false`, and the Master Panel approves or revokes each role through its authenticated proxy. Full detail, including the activation email, is in [`docs/contributor-approval.md`](docs/contributor-approval.md); the user-facing version is in [`docs-site/docs/contributing/`](docs-site/docs/contributing).
+**Contributors** — submitting the contributor form creates a lead; it does not grant roles. Accounts start with all four contributor flags `false`, and the Master Panel approves or revokes each role through its authenticated proxy. Full detail, including the activation email, is in [`docs/contributor-approval.md`](docs/contributor-approval.md); the user-facing version is in [`docs-site/docs/become-a-contributor/`](docs-site/docs/become-a-contributor) and [`docs-site/docs/contributing/`](docs-site/docs/contributing).
 
 **Listings and hosts** — listing content, verification state and plan/pricing live in the Master Panel. Nomads reads live Professional and Basic pricing through `/api/forms/plan-pricing` (which proxies the Master Panel) and checks listing status with `backend/utils/nomadListingStatus.js` rather than duplicating host state.
 

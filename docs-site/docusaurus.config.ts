@@ -1,5 +1,60 @@
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import type {PluginOptions} from '@docusaurus/plugin-content-docs';
+
+
+// Pages and categories excluded from sidebar navigation while their URLs stay available.
+const HIDDEN_DOC_IDS = new Set(['destinations/browse-listings']);
+const HIDDEN_CATEGORY_LABELS = new Set(['Help and policies']);
+
+type SidebarItems = Awaited<
+  ReturnType<PluginOptions['sidebarItemsGenerator']>
+>;
+
+const withoutHiddenSidebarItems = (items: SidebarItems): SidebarItems =>
+  items
+    .filter((item) =>
+      !(item.type === 'doc' && HIDDEN_DOC_IDS.has(item.id)) &&
+      !(item.type === 'category' && HIDDEN_CATEGORY_LABELS.has(item.label)),
+    )
+    .map((item) =>
+      item.type === 'category'
+        ? {...item, items: withoutHiddenSidebarItems(item.items)}
+        : item,
+    );
+
+// Non-clickable sidebar entries that are announced but not available yet; the
+// badge style matches the "Coming soon" pill in the Nomads web app sidebar.
+const createComingSoonSidebarItem = (label: string) => ({
+  type: 'html' as const,
+  className: 'sidebar-coming-soon-item',
+  value: `<div class="sidebar-coming-soon"><span>${label}</span><span class="sidebar-coming-soon-badge">Coming soon</span></div>`,
+});
+
+const COMING_SOON_AFTER_DOC_ID: Record<string, string> = {
+  'destinations/news': 'Restaurants',
+  'services/workation': 'Apply for Jobs',
+};
+
+const withComingSoonEntries = (items: SidebarItems): SidebarItems =>
+  items.map((item) => {
+    if (item.type !== 'category') return item;
+
+    const children = withComingSoonEntries(item.items);
+    const withEntries: SidebarItems = [];
+
+    for (const child of children) {
+      withEntries.push(child);
+
+      if (child.type === 'doc' && COMING_SOON_AFTER_DOC_ID[child.id]) {
+        withEntries.push(
+          createComingSoonSidebarItem(COMING_SOON_AFTER_DOC_ID[child.id]),
+        );
+      }
+    }
+
+    return {...item, items: withEntries};
+  });
 
 const config: Config = {
   title: 'WONO Nomads',
@@ -16,7 +71,14 @@ const config: Config = {
     [
       'classic',
       {
-        docs: {routeBasePath: '/', sidebarPath: './sidebars.ts'},
+        docs: {
+          routeBasePath: '/',
+          sidebarPath: './sidebars.ts',
+          async sidebarItemsGenerator(args) {
+            const items = await args.defaultSidebarItemsGenerator(args);
+            return withComingSoonEntries(withoutHiddenSidebarItems(items));
+          },
+        },
         blog: false,
         theme: {customCss: './src/css/custom.css'},
       } satisfies Preset.Options,

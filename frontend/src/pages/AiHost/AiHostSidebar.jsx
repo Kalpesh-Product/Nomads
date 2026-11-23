@@ -17,6 +17,7 @@ import {
   HiOutlineUserCircle,
   HiOutlineKey,
   HiOutlineLogout,
+  HiOutlineLogin,
 } from "react-icons/hi";
 import { LuCircleDollarSign, LuMapPinned } from "react-icons/lu";
 import { FaGlobeAmericas } from "react-icons/fa";
@@ -556,36 +557,66 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
       ) : (
         !isMobileOverlay && (
           <>
-            {/* <div className="border-t border-black/10 mt-4 mx-4"></div>
-                    <SidebarSection
-                        items={becomeNomadItem}
-                        collapsed={isCollapsed}
-                        onItemClick={handleBecomeNomadClick}
-                        compact={true}
-                    /> */}
-            {/* <div className="border-t border-black/10 mt-4 mx-4"></div> */}
-            <div className="px-4 pt-3">
-              <div className="border-t border-black/10"></div>
-            </div>
-            {/* {!isCollapsed && (
-                        <div className="mt-auto px-4 pb-4 pt-10">
-                            <div className="rounded-[28px] p-4 shadow-sm">
-                                <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
-                                    {loggedOutPrompt.description}
-                                </p>
-                                <p className="text-nano font-semibold leading-5 text-black/55">
-                                    Powered by your preferences.
-                                </p>
-                                <button
-                                    type="button"
-                                    onClick={handleLogInClick}
-                                    className="mt-6 w-full rounded-full border border-black/10 bg-primary-blue px-3 py-2 text-base font-semibold text-white"
-                                >
-                                    {loggedOutPrompt.actionLabel}
-                                </button>
-                            </div>
-                        </div>
-                    )} */}
+            <div className="mx-4 mt-3 border-t border-black/10"></div>
+            <SidebarSection
+              items={becomeNomadItem}
+              collapsed={isCollapsed}
+              onItemClick={handleBecomeNomadClick}
+              compact={true}
+              onTooltipChange={setTooltip}
+            />
+            <div className="mx-4 border-t border-black/10"></div>
+            {!isCollapsed ? (
+              <div className="mt-auto px-4 pb-4 pt-10">
+                <div className="rounded-[28px] p-4">
+                  <p className="mt-2 text-nano leading-[0.9rem] text-black/55">
+                    {hostLoginPrompt.description}
+                  </p>
+                  <p className="text-nano font-semibold leading-5 text-black/55">
+                    Built for your host workflow.
+                  </p>
+
+                  <div className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={handleHostLoginClick}
+                      className="mt-6 w-[70%] rounded-full border border-black/30 bg-[#efefef] px-0 py-2 text-nano text-black/80 hover:bg-[#e0e0e0]"
+                    >
+                      {hostLoginPrompt.actionLabel}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-auto flex justify-center px-2 pb-4">
+                <button
+                  type="button"
+                  onClick={handleHostLoginClick}
+                  onMouseEnter={(event) => {
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    setTooltip({
+                      label: hostLoginPrompt.actionLabel,
+                      top: rect.top + rect.height / 2,
+                      left: rect.right + 14,
+                    });
+                  }}
+                  onMouseLeave={() => setTooltip(null)}
+                  onFocus={(event) => {
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    setTooltip({
+                      label: hostLoginPrompt.actionLabel,
+                      top: rect.top + rect.height / 2,
+                      left: rect.right + 14,
+                    });
+                  }}
+                  onBlur={() => setTooltip(null)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-black/20 bg-white text-black/80 transition-all hover:bg-[#e0e0e0]"
+                  aria-label={hostLoginPrompt.actionLabel}
+                >
+                  <HiOutlineLogin size={20} />
+                </button>
+              </div>
+            )}
           </>
         )
       )}
