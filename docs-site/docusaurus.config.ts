@@ -3,23 +3,19 @@ import type * as Preset from '@docusaurus/preset-classic';
 import type {PluginOptions} from '@docusaurus/plugin-content-docs';
 
 
-// Pages and categories excluded from sidebar navigation while their URLs stay available.
-const HIDDEN_DOC_IDS = new Set(['destinations/browse-listings']);
+// Categories excluded from sidebar navigation while their URLs stay available.
 const HIDDEN_CATEGORY_LABELS = new Set(['Help and policies']);
 
 type SidebarItems = Awaited<
   ReturnType<PluginOptions['sidebarItemsGenerator']>
 >;
 
-const withoutHiddenSidebarItems = (items: SidebarItems): SidebarItems =>
+const withoutHiddenCategories = (items: SidebarItems): SidebarItems =>
   items
-    .filter((item) =>
-      !(item.type === 'doc' && HIDDEN_DOC_IDS.has(item.id)) &&
-      !(item.type === 'category' && HIDDEN_CATEGORY_LABELS.has(item.label)),
-    )
+    .filter((item) => !(item.type === 'category' && HIDDEN_CATEGORY_LABELS.has(item.label)))
     .map((item) =>
       item.type === 'category'
-        ? {...item, items: withoutHiddenSidebarItems(item.items)}
+        ? {...item, items: withoutHiddenCategories(item.items)}
         : item,
     );
 
@@ -76,7 +72,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           async sidebarItemsGenerator(args) {
             const items = await args.defaultSidebarItemsGenerator(args);
-            return withComingSoonEntries(withoutHiddenSidebarItems(items));
+            return withComingSoonEntries(withoutHiddenCategories(items));
           },
         },
         blog: false,
