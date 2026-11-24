@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "../motion";
-import { addDaysISO, addMinutesToTime, addMonthsISO, getLeadFormDefinition, nightsBetween, parsePriceNumber, todayISO, } from "../leadForms";
+import { addDaysISO, addMonthsISO, getLeadFormDefinition, monthsBetween, nightsBetween, parsePriceNumber, todayISO, } from "../leadForms";
 import { currencyPrefix, priceWithUnit } from "../templateKit";
 import { resolveServiceKind } from "../verticalProfiles";
 import { Icon } from "./TplUI";
@@ -19,6 +19,11 @@ export const estimateTotal = (item, start, end, people) => {
     return { nights, beds: perBed ? beds : 0, text: `${currencyPrefix(item.price)}${total.toLocaleString()}` };
 };
 const nextDayISO = (value) => addDaysISO(value, 1);
+/** "09:05" -> 545, for meeting-room duration maths. */
+const minutesOfTime = (hhmm) => {
+    const [h, m] = String(hhmm || "").split(":").map(Number);
+    return Number.isFinite(h) && Number.isFinite(m) ? (h * 60) + m : NaN;
+};
 /** Cover-charge policy mirrored from HostPanel CafeSettings onto the published template. */
 const coverPolicyOf = (draft) => {
     const policy = draft?.reservation?.reservationPolicy;
@@ -41,8 +46,40 @@ export const estimateBooking = (kind, item, form, extras, draft) => {
         return { detail: `${passes} day pass${passes > 1 ? "es" : ""}`, text: money(unit * passes) };
     }
     if (kind === "meeting") {
-        const hours = Number(extras?.duration) / 60;
-        return hours > 0 ? { detail: `${hours} hr${hours !== 1 ? "s" : ""}`, text: money(unit * hours) } : null;
+        // The form collects an explicit end time now — derive the duration from it.
+        const start = minutesOfTime(extras?.time);
+        const end = minutesOfTime(extras?.endTime);
+        if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
+            return null;
+        const minutes = end - start;
+        const hours = minutes / 60;
+        const wholeHours = Math.floor(hours);
+        const detail = Number.isInteger(hours)
+            ? `${hours} hr${hours !== 1 ? "s" : ""}`
+            : `${wholeHours ? `${wholeHours} hr ` : ""}${minutes % 60} min`;
+        return { detail, text: money(unit * hours) };
+    }
+    if (kind === "coLiving") {
+        // Monthly rooms are priced per month, not per night — a stay is months × rent.
+        // Short-stay co-living falls back to the nightly maths.
+        const stayType = item.raw?.stayType;
+        const priceUnit = String(item.priceUnit || item.raw?.priceUnit || "");
+        const monthly = stayType === "monthly" || (stayType !== "short_stay" && /month/i.test(priceUnit));
+        if (monthly) {
+            const choice = String(extras?.stayDuration || "");
+            const picked = parseInt(choice, 10);
+            const months = choice === "Custom" || !Number.isFinite(picked)
+                ? monthsBetween(form?.startDate, form?.endDate)
+                : picked;
+            if (!months)
+                return null;
+            return {
+                detail: `${months} month${months === 1 ? "" : "s"} rent · excl. deposit & utilities`,
+                text: money(unit * months),
+            };
+        }
+        const stay = estimateTotal(item, form?.startDate, form?.endDate, form?.people);
+        return stay ? { detail: `${stay.nights} night${stay.nights > 1 ? "s" : ""}${stay.beds ? ` · ${stay.beds} bed${stay.beds > 1 ? "s" : ""}` : ""}`, text: stay.text } : null;
     }
     if (kind === "menu") {
         const policy = coverPolicyOf(draft);
@@ -98,7 +135,9 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
         roomKind: item?.raw?.roomKind,
         minCheckoutDate: nextDayISO(t.leadForm?.startDate),
         stayDurationChoice: t.leadExtras?.stayDuration,
-    }), [kind, draft?.reservation, draft?.openingHours, t.leadForm?.startDate, mode, canVisit, spaces, item?.raw?.stayType, item?.raw?.roomKind, t.leadExtras?.stayDuration]);
+        // End-time options are derived from the picked start slot.
+        time: t.leadExtras?.time,
+    }), [kind, draft?.reservation, draft?.openingHours, t.leadForm?.startDate, mode, canVisit, spaces, item?.raw?.stayType, item?.raw?.roomKind, t.leadExtras?.stayDuration, t.leadExtras?.time]);
     const setField = (field, value) => {
         if (field.target === "form") {
             t.setLeadForm((prev) => ({ ...prev, [field.key]: value }));
@@ -106,6 +145,9 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
                 // A new date invalidates the chosen time slot (hours differ by weekday).
                 if (kind === "menu")
                     t.setLeadExtras((prev) => ({ ...prev, time: "" }));
+                // Meeting hours differ by weekday, so both slots must be repicked.
+                if (kind === "meeting")
+                    t.setLeadExtras((prev) => ({ ...prev, time: "", endTime: "" }));
                 // A hostel stay is at least one night; keep Check-out ahead of Check-in.
                 if (kind === "hostel" && value) {
                     const minCheckout = nextDayISO(value);
@@ -122,11 +164,9 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
         }
         else {
             t.setLeadExtras((prev) => ({ ...prev, [field.key]: value }));
-            if (field.key === "duration" || field.key === "time") {
-                const endTime = addMinutesToTime(field.key === "time" ? value : t.leadExtras?.time, field.key === "duration" ? value : t.leadExtras?.duration);
-                if (endTime)
-                    t.setLeadExtras((prev) => ({ ...prev, endTime }));
-            }
+            // A later start can invalidate an already-picked end slot.
+            if (field.key === "time" && t.leadExtras?.endTime && t.leadExtras.endTime <= value)
+                t.setLeadExtras((prev) => ({ ...prev, endTime: "" }));
             if (field.key === "stayDuration") {
                 if (value === "Custom")
                     t.setLeadForm((prev) => ({ ...prev, endDate: "" }));
@@ -138,7 +178,8 @@ export const LeadFormPanel = ({ service, item, compact, defaultMode = "enquiry" 
             }
         }
     };
-    const estimate = estimateBooking(kind, item, t.leadForm, t.leadExtras, draft);
+    // The visit tab collects a date/time, not a stay — a rent estimate there would be wrong.
+    const estimate = canVisit && mode === "visit" ? null : estimateBooking(kind, item, t.leadForm, t.leadExtras, draft);
     const coverPolicy = coverPolicyOf(draft);
     if (t.leadSubmitted) {
         return (<div className="tp-soft p-8 text-center" role="status">

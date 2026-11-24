@@ -46,6 +46,32 @@ export const generateTimeSlots = (openingHours, date, intervalMinutes = 30) => {
         slots.push(fmt(t % (24 * 60)));
     return slots;
 };
+/**
+ * Bookable end times for a date, including the closing time itself. Start times
+ * stop one step before closing, so ends need their own generator.
+ */
+const generateEndTimeSlots = (openingHours, date, intervalMinutes = 30) => {
+    const rows = Array.isArray(openingHours) ? openingHours : [];
+    if (!rows.length)
+        return null;
+    if (!date)
+        return null;
+    const day = DAY_KEYS[new Date(`${date}T12:00:00`).getDay()];
+    const row = rows.find((r) => r.day === day);
+    if (!row || row.closed)
+        return [];
+    const open = toMinutes(row.open);
+    let close = toMinutes(row.close);
+    if (!Number.isFinite(open) || !Number.isFinite(close))
+        return null;
+    if (close <= open)
+        close += 24 * 60; // closes after midnight
+    const step = Math.max(5, intervalMinutes);
+    const slots = [];
+    for (let t = open + step; t <= close; t += step)
+        slots.push(fmt(t % (24 * 60)));
+    return slots;
+};
 const contactFields = () => [
     { key: "fullName", label: "Full name", type: "text", required: true, target: "form", half: true },
     { key: "mobile", label: "Mobile number", type: "tel", required: true, target: "form", half: true },
@@ -83,7 +109,13 @@ export const DURATION_OPTIONS = [
     { value: "240", label: "4 hrs" },
     { value: "480", label: "8 hrs" },
 ];
-const businessHourSlots = () => Array.from({ length: 18 }, (_, i) => fmt((9 * 60) + (i * 30))); // 09:00 – 18:00
+/** Granularity of meeting-room start/end slots. 30 is the default; 5 gives ~108 options per dropdown. */
+const MEETING_SLOT_MINUTES = 5;
+const businessHourSlots = (intervalMinutes = 30) => {
+    const step = Math.max(5, intervalMinutes);
+    // 09:00 – 18:00, with the last start one step before closing.
+    return Array.from({ length: Math.floor((9 * 60) / step) }, (_, i) => fmt((9 * 60) + (i * step)));
+};
 export const getLeadFormDefinition = (kind, ctx = {}) => {
     const profile = getServiceProfile(kind);
     const base = {
@@ -268,9 +300,14 @@ export const getLeadFormDefinition = (kind, ctx = {}) => {
         };
     }
     if (kind === "meeting") {
-        const slots = generateTimeSlots(ctx.openingHours, ctx.date, 30);
+        const slots = generateTimeSlots(ctx.openingHours, ctx.date, MEETING_SLOT_MINUTES);
         const hasHours = (ctx.openingHours || []).length > 0;
-        const options = hasHours ? slots || [] : businessHourSlots();
+        const options = hasHours ? slots || [] : businessHourSlots(MEETING_SLOT_MINUTES);
+        // Ends run to the actual closing time, and can never precede the start.
+        const endBase = hasHours
+            ? generateEndTimeSlots(ctx.openingHours, ctx.date, MEETING_SLOT_MINUTES) || []
+            : [...businessHourSlots(MEETING_SLOT_MINUTES), "18:00"];
+        const endOptions = ctx.time ? endBase.filter((slot) => slot > ctx.time) : [];
         return {
             ...base,
             fields: [
@@ -288,14 +325,14 @@ export const getLeadFormDefinition = (kind, ctx = {}) => {
                     placeholder: hasHours && slots === null ? "Pick a date first" : options.length ? "Select a time" : "Closed on this day",
                 },
                 {
-                    key: "duration",
-                    label: "Duration",
+                    key: "endTime",
+                    label: "End time",
                     type: "select",
                     required: true,
                     target: "extra",
                     half: true,
-                    options: DURATION_OPTIONS,
-                    placeholder: "Select duration",
+                    options: endOptions.map((slot) => ({ value: slot, label: formatTime12h(slot) })),
+                    placeholder: !ctx.time ? "Pick a start time first" : endOptions.length ? "Select end time" : "No later slots",
                 },
                 { key: "notes", label: "Requirements (e.g., projector, whiteboard)", type: "textarea", target: "extra" },
             ],
@@ -318,6 +355,19 @@ export const nightsBetween = (start, end) => {
     const ms = new Date(`${end}T12:00:00`).getTime() - new Date(`${start}T12:00:00`).getTime();
     const nights = Math.round(ms / 86400000);
     return nights > 0 ? nights : 0;
+};
+/** Months between two YYYY-MM-DD dates, to one decimal (0 when missing / reversed). */
+export const monthsBetween = (start, end) => {
+    if (!start || !end)
+        return 0;
+    const from = new Date(`${start}T12:00:00`);
+    const to = new Date(`${end}T12:00:00`);
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || to <= from)
+        return 0;
+    const months = (to.getFullYear() - from.getFullYear()) * 12
+        + (to.getMonth() - from.getMonth())
+        + (to.getDate() - from.getDate()) / 30;
+    return Math.max(0, Math.round(months * 10) / 10);
 };
 /** First run of digits (with decimals) in a price string, e.g. "₹1,200 / night" -> 1200. */
 export const parsePriceNumber = (price) => {
