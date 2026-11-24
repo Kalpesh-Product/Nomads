@@ -1760,15 +1760,8 @@ const hostModuleIconMap = {
   HiOutlineWrenchScrewdriver,
 };
 
-const findLocalModule = (category, moduleId, parentId = null) => {
-  if (!category) return null;
-  if (parentId) {
-    return category.modules
-      .find((module) => module.id === parentId)
-      ?.children?.find((child) => child.id === moduleId);
-  }
-  return category.modules.find((module) => module.id === moduleId);
-};
+const findLocalModule = (category, moduleId) =>
+  category?.modules.find((module) => module.id === moduleId) || null;
 
 const hydrateModule = (remoteModule, localModule) => {
   const remoteImage =
@@ -1794,6 +1787,20 @@ const hydrateModule = (remoteModule, localModule) => {
   };
 };
 
+// Recursive so a grandchild (e.g. Tech Department > Website Builder >
+// Website Leads) also gets its image unpacked from `{url, key}` to a plain
+// string and its iconKey resolved — hydrateModule alone only shapes the one
+// module passed to it, not any nested children it's carrying.
+const hydrateModuleTree = (remoteModule, localModule) => ({
+  ...hydrateModule(remoteModule, localModule),
+  children: (remoteModule.children || []).map((remoteChild) =>
+    hydrateModuleTree(
+      remoteChild,
+      localModule?.children?.find((child) => child.id === remoteChild.id) || null,
+    ),
+  ),
+});
+
 // The API owns structure, visibility, order and copy. The checked-in catalog
 // only supplies local icon components and bundled screenshot fallbacks for
 // matching IDs. With a successful API response, removed/hidden modules do
@@ -1811,19 +1818,9 @@ export const hydrateHostModuleCatalog = (remoteCategories) => {
     return {
       ...localCategory,
       ...remoteCategory,
-      modules: (remoteCategory.modules || []).map((remoteModule) => {
-        const localModule = findLocalModule(localCategory, remoteModule.id);
-        const hydrated = hydrateModule(remoteModule, localModule);
-        return {
-          ...hydrated,
-          children: (remoteModule.children || []).map((remoteChild) =>
-            hydrateModule(
-              remoteChild,
-              findLocalModule(localCategory, remoteChild.id, remoteModule.id),
-            ),
-          ),
-        };
-      }),
+      modules: (remoteCategory.modules || []).map((remoteModule) =>
+        hydrateModuleTree(remoteModule, findLocalModule(localCategory, remoteModule.id)),
+      ),
     };
   });
 };
