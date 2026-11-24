@@ -8,7 +8,7 @@ WONO helps digital nomads and remote workers compare destinations, find places t
 
 1. [Choose a goal](./choose-a-goal.md) on the WONO home page.
 2. [Compare destinations](../discovery/search-results.md) or use [Classic Search](../discovery/classic-search.md) to go straight to a place you know.
-3. Open [Destinations Listings](../destinations/destination-hub.md) to find workspaces, stays, cafes, events and local guides.
+3. Open [Destination Listings - List View](../destinations/destination-hub.md) to find workspaces, stays, cafes, events and local guides.
 4. [Create an account](../account/sign-up.md) to save favorites and write reviews.
 
 The examples in this guide use Bali. Listings and available services vary by destination.
