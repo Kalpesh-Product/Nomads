@@ -21,6 +21,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Seo from "../components/Seo";
 import humanDate from "../utils/humanDate";
 import { rankContributionsByFavorites } from "../utils/contributionFavorites";
+import { contributionRefreshOptions } from "../constants/contributionRefresh";
 
 const contributionTypes = [
   {
@@ -206,6 +207,7 @@ const AiContributionsHubTwo = () => {
       },
       enabled: Boolean(userId) && Boolean(auth?.user?.[config.flag]),
       staleTime: 1000 * 60,
+      ...contributionRefreshOptions,
     })),
   });
 
@@ -387,7 +389,7 @@ const AiContributionsHubTwo = () => {
                             {liveCount}
                           </p>
                           <p className="text-[10px] font-medium text-black/45">
-                            live
+                            Live
                           </p>
                         </div>
                         <div className="rounded-lg bg-slate-50 px-2 py-2">
@@ -395,7 +397,7 @@ const AiContributionsHubTwo = () => {
                             {pendingCount}
                           </p>
                           <p className="text-[10px] font-medium text-black/45">
-                            pending
+                            Pending
                           </p>
                         </div>
                         <div className="rounded-lg bg-slate-50 px-2 py-2">
@@ -403,7 +405,7 @@ const AiContributionsHubTwo = () => {
                             {draftCount}
                           </p>
                           <p className="text-[10px] font-medium text-black/45">
-                            drafts
+                            Drafts
                           </p>
                         </div>
                       </div>
@@ -462,7 +464,7 @@ const AiContributionsHubTwo = () => {
                         <span>Rank</span>
                         <span>Image</span>
                         <span>Title</span>
-                        <span className="justify-self-center">Likes</span>
+                        <span className="justify-self-center">Favorites</span>
                         <span className="justify-self-center">Category</span>
                       </div>
                       <div className="hidden border-t border-black/10 md:block" />
