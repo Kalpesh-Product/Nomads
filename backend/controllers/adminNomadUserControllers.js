@@ -76,7 +76,6 @@ export const getPopularDestinationsForAdmin = async (req, res, next) => {
           _id: {
             country: "$country",
             state: "$state",
-            title: "$title",
             continent: "$continent",
           },
           clicks: { $sum: 1 },
@@ -92,7 +91,7 @@ export const getPopularDestinationsForAdmin = async (req, res, next) => {
           _id: 0,
           country: "$_id.country",
           state: "$_id.state",
-          title: "$_id.title",
+          title: "$_id.state",
           continent: "$_id.continent",
           clicks: 1,
           guestClicks: 1,
