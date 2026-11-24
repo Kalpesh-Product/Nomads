@@ -57,6 +57,8 @@ import adminNomadUserRoutes from "./routes/adminNomadUserRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import adminVerificationRoutes from "./routes/adminVerificationRoutes.js";
 import adminVerifyClickRoutes from "./routes/adminVerifyClickRoutes.js";
+import hostModuleCatalogRoutes from "./routes/hostModuleCatalogRoutes.js";
+import adminHostModuleCatalogRoutes from "./routes/adminHostModuleCatalogRoutes.js";
 import { verifyAdminApiKey } from "./middlewares/verifyAdminApiKey.js";
 
 const app = express();
@@ -106,6 +108,8 @@ app.use(
   verifyAdminApiKey,
   adminVerifyClickRoutes,
 );
+app.use("/api/host-modules", hostModuleCatalogRoutes);
+app.use("/api/admin/host-modules", verifyAdminApiKey, adminHostModuleCatalogRoutes);
 
 
 app.use("/api/news", newsRoutes);

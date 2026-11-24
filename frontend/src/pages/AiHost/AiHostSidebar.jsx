@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-  clearStoredLoginState,
   readStoredLoginState,
 } from "../../hooks/useNomadLoginState";
 import useAuth from "../../hooks/useAuth";
-import useLogout from "../../hooks/useLogout";
+import useHostModuleCatalog from "../../hooks/useHostModuleCatalog";
+import { findModuleByLabel, findModule } from "../../data/hostModulesCatalog";
 import logo from "../../assets/WONO_LOGO_Black_TP.svg";
 import {
   HiChevronDown,
@@ -50,210 +50,42 @@ import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 import { HiOutlineChip } from "react-icons/hi";
 import { HiOutlineDatabase } from "react-icons/hi";
 
-const gatedRecommendationLabels = new Set([
-  "Work From Anywhere",
-  "Increase Your Savings",
-  "Advance Your Career",
-  "Find Your Community",
-]);
-
-const goalSlugByLabel = {
-  "World Ranking": "worldranking",
-  "Work From Anywhere": "workfromanywhere",
-  "Increase Your Savings": "increaseyoursavings",
-  "Advance Your Career": "advanceyourcareer",
-  "Find Your Community": "findyourcommunity",
-};
-
-const getSearchPathForGoal = (goalLabel) => {
-  const goalSlug = goalSlugByLabel[goalLabel];
-  return goalSlug ? `/search/${goalSlug}/results` : "/search/results";
-};
-
 const hostSignupEntryPath = "/signup?step=1";
 
-const recommendationItems = [
-  {
-    label: "Build & Manage Website",
-    icon: CgWebsite,
-    // path: "/website-builder",
-  },
-  {
-    label: "Nomad Listings",
-    icon: TbWorldWww,
-    // path: "/modules",
-  },
-  {
-    label: "Sales Management",
-    icon: MdOutlineHandshake,
-    // path: "/modules",
-  },
-  {
-    label: "Finance Management",
-    icon: MdAccountBalance,
-    // path: "/themes",
-  },
-  {
-    label: "Administration Management",
-    icon: HiOutlineBriefcase,
-    // path: "/leads",
-  },
-  {
-    label: "HR Management",
-    icon: BsPeopleFill,
-    // path: "/career",
-  },
-  {
-    label: "IT Infrastructure",
-    icon: FaDesktop,
-    // path: "/calendar",
-  },
-  {
-    label: "Maintenance Management",
-    icon: TiSpanner,
-    // suffixText: "...More",
-  },
-];
+// Plan badge shown next to every nav item that maps to a real catalog
+// module, site-wide, so browsing the sidebar itself shows which tier
+// unlocks what — same lookup handleSidebarItemClick uses to deep-link.
+const planForLabel = (label, categories) => {
+  const target = findModuleByLabel(label, categories);
+  if (!target) return null;
+  const found = findModule(target.categoryId, target.moduleId, categories);
+  return found?.module?.plan || found?.parent?.plan || null;
+};
 
-const valueAdditionItems = [
-  {
-    label: "Visitor Management",
-    icon: BsPersonVcard,
-    // path: "/assets",
-  },
-  {
-    label: "Assets Management",
-    icon: HiOutlineArchive,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Inventory Management",
-    icon: HiOutlineLibrary,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Finance Management",
-    icon: HiOutlineCash,
-    // path: "/assets",
-  },
-  {
-    label: "Reports Management",
-    icon: HiOutlineDocumentReport,
-  },
-];
+const SIDEBAR_PLAN_RANK = { basic: 0, professional: 1, custom: 2 };
 
-const commonFeatures = [
-  {
-    label: "Dashboard",
-    icon: HiOutlineViewGrid,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Customer Support",
-    icon: MdOutlineSupportAgent,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Tasks",
-    icon: HiOutlineClipboardList,
-    // path: "/assets",
-  },
-  {
-    label: "Ticketing System",
-    icon: MdOutlineSupportAgent,
-    // path: "/inventory",
-  },
-  {
-    label: "Meeting Room Booking System",
-    icon: MdMeetingRoom,
-    // path: "/finance-management",
-  },
-  {
-    label: "Attendance",
-    icon: MdOutlineFingerprint,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Leave Requests",
-    icon: HiOutlineLogout,
-  },
-  {
-    label: "Calendar",
-    icon: TbCalendarUser,
-    // path: "/finance-management",
-  },
-];
-
-const coreModules = [
-  {
-    label: "Organization Management",
-    icon: HiOutlineLibrary,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Module Management",
-    icon: HiOutlineTemplate,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Access Grants",
-    icon: HiOutlineKey,
-    // path: "/assets",
-  },
-  {
-    label: "Unit Setting",
-    icon: HiOutlineCash,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Unit Management",
-    icon: HiOutlineTemplate,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Analytics",
-    icon: HiOutlineChartBar,
-    // path: "/assets",
-  },
-];
-
-const departmentAccess = [
-  {
-    label: "Hr Department",
-    icon: HiOutlineUsers,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Administration Department",
-    icon: HiOutlineBriefcase,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Sales Department",
-    icon: HiOutlineTrendingUp,
-    // path: "/assets",
-  },
-  {
-    label: "Finance Department",
-    icon: HiOutlineCurrencyDollar,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Maintainence Department",
-    icon: HiOutlineWrenchScrewdriver,
-    // path: "/extra-common-modules",
-  },
-  {
-    label: "Tech Department",
-    icon: HiOutlineChip,
-    // path: "/assets",
-  },
-  {
-    label: "IT Department",
-    icon: HiOutlineDatabase,
-    // path: "/assets",
-  },
-];
+const categoryToSidebarItems = (categories, categoryId) => {
+  const category = categories.find((item) => item.id === categoryId);
+  return (category?.modules || []).map((module) => ({
+    label: module.label,
+    icon: module.icon || HiOutlineViewGrid,
+    plan: module.plan,
+    planAccessMode: module.planAccessMode,
+    categoryId,
+    moduleId: module.id,
+    children: module.children?.length
+      ? module.children.map((child) => ({
+          label: child.label,
+          icon: child.icon || module.icon || HiOutlineViewGrid,
+          plan: child.plan || module.plan,
+          planAccessMode: child.planAccessMode || module.planAccessMode,
+          categoryId,
+          moduleId: child.id,
+          parentModuleId: module.id,
+        }))
+      : undefined,
+  }));
+};
 
 const becomeNomadItem = [{ label: "Become a Nomad", icon: HiOutlineViewGrid }];
 
@@ -263,26 +95,13 @@ const hostLoginPrompt = {
   actionLabel: "Login as Business",
 };
 
-const loggedOutPrompt = {
-  title: "Get responses tailored to you",
-  description:
-    "Login to explore your nomad lifestyle and discover where you should live, work, and save more.",
-  actionLabel: "Login",
-};
-
-const profileItems = [
-  { label: "Edit Profile", icon: HiOutlineUserCircle, tab: "profile" },
-  { label: "Change Password", icon: HiOutlineKey, tab: "password" },
-];
-
-const signOutItem = [{ label: "Sign Out", icon: HiOutlineLogout }];
-
 const collapsedSectionLabels = {
   Modules: "MOD",
   "Common Modules": "COM",
+  "Extra Common Modules": "EXT",
   "Core Modules": "COR",
   "Key Apps": "APP",
-  "Department Access": "DEP",
+  "Department Accesses": "DEP",
   Profile: "PRO",
 };
 
@@ -361,72 +180,69 @@ const SidebarSection = ({
           <div className=" space-y-1">
             {items.map((item) => {
               const Icon = item.icon;
-              const isActive = !!item.active;
+              const hasChildren = !!item.children?.length;
+              const isChildActive =
+                hasChildren && item.children.some((c) => c.active);
+              const isActive = !!item.active || isChildActive;
 
               return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => onItemClick?.(item)}
-                  onMouseEnter={(event) => {
-                    if (!collapsed) return;
+                <div key={item.label}>
+                  <button
+                    type="button"
+                    onClick={() => onItemClick?.(item)}
+                    onMouseEnter={(event) => {
+                      if (!collapsed) return;
 
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    onTooltipChange?.({
-                      label: item.label,
-                      top: rect.top + rect.height / 2,
-                      left: rect.right + 14,
-                    });
-                  }}
-                  onMouseLeave={() => onTooltipChange?.(null)}
-                  onFocus={(event) => {
-                    if (!collapsed) return;
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      onTooltipChange?.({
+                        label: item.label,
+                        top: rect.top + rect.height / 2,
+                        left: rect.right + 14,
+                      });
+                    }}
+                    onMouseLeave={() => onTooltipChange?.(null)}
+                    onFocus={(event) => {
+                      if (!collapsed) return;
 
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    onTooltipChange?.({
-                      label: item.label,
-                      top: rect.top + rect.height / 2,
-                      left: rect.right + 14,
-                    });
-                  }}
-                  onBlur={() => onTooltipChange?.(null)}
-                  className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
-                    isActive ? "bg-white text-black shadow-sm" : "text-black/80"
-                  }`}
-                  aria-label={collapsed ? item.label : undefined}
-                >
-                  <Icon
-                    size={18}
-                    className={`shrink-0 ${isActive ? "text-black" : "text-black/80"}`}
-                  />
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      onTooltipChange?.({
+                        label: item.label,
+                        top: rect.top + rect.height / 2,
+                        left: rect.right + 14,
+                      });
+                    }}
+                    onBlur={() => onTooltipChange?.(null)}
+                    className={`group relative flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left transition-all hover:bg-white ${
+                      isActive ? "text-black" : "text-black/80"
+                    }`}
+                    aria-label={collapsed ? item.label : undefined}
+                  >
+                    <Icon
+                      size={18}
+                      className={`shrink-0 ${isActive ? "text-primary-blue" : "text-black/80"}`}
+                    />
 
-                  {!collapsed && (
-                    <>
-                      <span
-                        className={`text-xs font-medium ${isActive ? "font-semibold" : ""}`}
-                      >
-                        {item.label}
-                      </span>
-                      {item.suffixText && (
-                        <span className="ml-auto text-[12px] font-medium tracking-wide text-black/55">
-                          <button
-                            onClick={() => navigate(hostSignupEntryPath)}
-                            className="hover:text-primary-blue"
-                          >
-                            {item.suffixText}
-                          </button>
+                    {!collapsed && (
+                      <>
+                        <span
+                          className={`min-w-0 flex-1 truncate whitespace-nowrap text-xs font-medium ${isActive ? "font-semibold text-black" : ""}`}
+                        >
+                          {item.label}
                         </span>
-                      )}
-                    </>
-                  )}
-                  {/* <span
-                    className={`absolute bottom-0 left-0 h-[0.5px] bg-black rounded-t transition-all duration-300 ease-out
-      ${isActive
-                        ? "w-full"
-                        : "w-0 group-hover:w-full"
-                      }`}
-                  /> */}
-                </button>
+                        {item.suffixText && (
+                          <span className="ml-auto text-[12px] font-medium tracking-wide text-black/55">
+                            <button
+                              onClick={() => navigate(hostSignupEntryPath)}
+                              className="hover:text-primary-blue"
+                            >
+                              {item.suffixText}
+                            </button>
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -437,105 +253,98 @@ const SidebarSection = ({
 };
 
 const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
+  const { categories } = useHostModuleCatalog({ liveRefresh: true });
+  const catalogSidebarSections = useMemo(
+    () =>
+      categories.map((category) => ({
+        id: category.id,
+        label: category.label,
+        items: categoryToSidebarItems(categories, category.id),
+      })),
+    [categories],
+  );
+  const modulesOverviewItems = useMemo(
+    () => [
+      ...categoryToSidebarItems(categories, "key-apps").slice(0, 2),
+      ...categoryToSidebarItems(categories, "department-accesses"),
+    ],
+    [categories],
+  );
   const [collapsed, setCollapsed] = useState(true);
-  // Sidebar width changes (duration-300 below) without ever firing a window
-  // resize — so react-fitty, which only recalculates on "resize"/
-  // "orientationchange" (see its source), keeps rendering text sized for the
-  // old, wider container and it overflows off-screen. Fire one once the
-  // width transition has settled.
+  // The sidebar transition changes available width without a window resize.
+  // Recalculate responsive text once that transition has settled.
   useEffect(() => {
     const timer = setTimeout(() => window.dispatchEvent(new Event("resize")), 320);
     return () => clearTimeout(timer);
   }, [collapsed]);
-  const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(true);
-  const [isValueAdditionsOpen, setIsValueAdditionsOpen] = useState(false);
-  const [isCommonFeaturesOpen, setIsCommonFeaturesOpen] = useState(false);
-  const [isCoreModulesOpen, setIsCoreModulesOpen] = useState(false);
-  const [isDepartmentAccessOpen, setIsDepartmentAccessOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
+  const [openCatalogSections, setOpenCatalogSections] = useState({});
   const [tooltip, setTooltip] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
+  const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
+  const requestedModulesPlan = new URLSearchParams(location.search).get("plan");
+  const selectedModulesPlan =
+    normalizedPath === "/modules" && requestedModulesPlan in SIDEBAR_PLAN_RANK
+      ? requestedModulesPlan
+      : null;
 
   const { auth } = useAuth();
-  const logout = useLogout();
   useEffect(() => {
-    const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
-    const isAiHomePage = normalizedPath === "/home";
-
-    const isValueAddedPage = valueAdditionItems.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
-    const isCommonFeaturePage = commonFeatures.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
-    const isCoreModulePage = coreModules.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
-    const isDepartmentAccessPage = departmentAccess.some((item) => {
-      if (!item.path) return false;
-      const normalizedItemPath = item.path.replace(/\/$/, "");
-      return (
-        normalizedPath === normalizedItemPath ||
-        normalizedPath.startsWith(`${normalizedItemPath}/`)
-      );
-    });
-
-    if (isAiHomePage) {
+    if (normalizedPath === "/home") {
       setIsRecommendationsOpen(false);
-      setIsValueAdditionsOpen(true);
       return;
     }
 
     setIsRecommendationsOpen(true);
-    if (isValueAddedPage) setIsValueAdditionsOpen(true);
-    if (isCommonFeaturePage) setIsCommonFeaturesOpen(true);
-    if (isCoreModulePage) setIsCoreModulesOpen(true);
-    if (isDepartmentAccessPage) setIsDepartmentAccessOpen(true);
-  }, [location.pathname]);
+    if (normalizedPath === "/modules") {
+      const categoryId = new URLSearchParams(location.search).get("category");
+      if (categoryId) {
+        setOpenCatalogSections((current) => ({
+          ...current,
+          [categoryId]: true,
+        }));
+      }
+    }
+  }, [location.search, normalizedPath]);
 
   const isLoggedIn = Boolean(auth?.user) || readStoredLoginState();
   console.log(isLoggedIn);
 
-  const handleSidebarItemClick = () => {};
+  // Mock wiring: every item under Modules / Common Modules / Core Modules /
+  // Key Apps routes into /modules and jumps straight to that item's
+  // section (and pre-selects it when its label matches a real module from
+  // hostModulesCatalog.js). Falls back to the section's default category,
+  // or the top of the page, when there's no exact match yet.
+  // /modules is plan-scoped — a deep link needs ?plan= too, or the target
+  // module may be filtered out of the selected plan's module index.
+  const handleSidebarItemClick = (item, defaultCategoryId) => {
+    if (item?.categoryId && item?.moduleId) {
+      const plan = item.plan || selectedModulesPlan || "basic";
+      navigate(
+        `/modules?plan=${plan}&category=${item.categoryId}&module=${item.moduleId}`,
+      );
+      if (isMobileOverlay) onClose?.();
+      return;
+    }
 
-  const handleProfileClick = (item) => {
-    if (!item.tab) return;
-
-    const params = new URLSearchParams(location.search);
-    params.set("tab", item.tab);
-
-    navigate({
-      pathname: "/profile",
-      search: params.toString() ? `?${params.toString()}` : "",
-    });
-  };
-
-  const handleLogInClick = () => {
-    navigate(`/ai-login${location.search}`, {
-      state: {
-        redirectTo: `${location.pathname}${location.search}`,
-      },
-    });
+    const match = findModuleByLabel(item?.label, categories);
+    if (match) {
+      const plan = planForLabel(item?.label, categories) || selectedModulesPlan || "basic";
+      navigate(`/modules?plan=${plan}&category=${match.categoryId}&module=${match.moduleId}`);
+      if (isMobileOverlay) onClose?.();
+      return;
+    }
+    if (defaultCategoryId) {
+      navigate(
+        selectedModulesPlan
+          ? `/modules?plan=${selectedModulesPlan}&category=${defaultCategoryId}`
+          : `/modules?category=${defaultCategoryId}`,
+      );
+      return;
+    }
+    navigate("/modules");
   };
 
   const handleBecomeNomadClick = () => {
@@ -550,116 +359,47 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
     window.location.href = "https://hostpanel.wono.co";
   };
 
-  const handleSignOutClick = async () => {
-    if (auth?.user) {
-      await logout();
-    }
-
-    const nextSearchParams = new URLSearchParams(location.search);
-    nextSearchParams.delete("login");
-    clearStoredLoginState();
-
-    if (isMobileOverlay) {
-      onClose?.();
-      navigate("/ai-login");
-      return;
-    }
-
-    navigate(
-      {
-        pathname: "/ai-login",
-        search: nextSearchParams.toString()
-          ? `?${nextSearchParams.toString()}`
-          : "",
-      },
-      {
-        state: {
-          redirectTo: `${location.pathname}${location.search}`,
-        },
-      },
-    );
-  };
-
   const isCollapsed = isMobileOverlay ? false : collapsed;
 
-  const normalizedPath = location.pathname.replace(/\/$/, "") || "/";
-  const redirectGoal = location.pathname
-    .replace(/\/$/, "")
-    .match(/^\/ai-login\/([^/]+)$/)?.[1];
+  // A module selected on /modules (?category=&module=) shows as the
+  // selected item here too, by matching its label against the real
+  // catalog — same mapping handleSidebarItemClick uses to get there.
+  const activeModuleParam =
+    normalizedPath === "/modules"
+      ? new URLSearchParams(location.search).get("module")
+      : null;
+  const isModuleActive = (item) => {
+    if (!activeModuleParam) return false;
+    if (item.moduleId) return item.moduleId === activeModuleParam;
+    const match = findModuleByLabel(item.label, categories);
+    return Boolean(match && match.moduleId === activeModuleParam);
+  };
 
-  // Active state logic for recommendations
-  const recommendationItemsWithActivePath = recommendationItems.map((item) => {
-    if (!item.path) return item;
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const goalSlug = goalSlugByLabel[item.label];
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`) ||
-      (normalizedPath.startsWith("/ai-login/") &&
-        Boolean(goalSlug) &&
-        goalSlug === redirectGoal);
-
-    return {
-      ...item,
-      active: isActivePath,
-    };
+  // Active state logic for recommendations. The sidebar is a fixed, custom
+  // menu — it does not filter items in or out as the /modules plan changes,
+  // so no plan is passed to filterSidebarItemsForPlan here.
+  const recommendationItemsWithActivePath = modulesOverviewItems.map((item) => {
+    const moduleActive = isModuleActive(item);
+    return { ...item, active: moduleActive };
   });
 
-  // Active state logic for value additions
-  const valueAdditionItemsWithActivePath = valueAdditionItems.map((item) => {
-    if (!item.path) return item;
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-    return {
-      ...item,
-      active: isActivePath,
-    };
-  });
-
-  const commonFeaturesWithActivePath = commonFeatures.map((item) => {
-    if (!item.path) return item;
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
+  const catalogSectionsWithActivePath = catalogSidebarSections.map((section) => {
+    const items = section.items.map((item) => {
+      const children = item.children?.map((child) => ({
+        ...child,
+        active: isModuleActive(child),
+      }));
+      return {
+        ...item,
+        children,
+        active:
+          isModuleActive(item) || Boolean(children?.some((child) => child.active)),
+      };
+    });
 
     return {
-      ...item,
-      active: isActivePath,
-    };
-  });
-
-  const coreModulesWithActivePath = coreModules.map((item) => {
-    if (!item.path) return item;
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-    return {
-      ...item,
-      active: isActivePath,
-    };
-  });
-
-  const departmentAccessWithActivePath = departmentAccess.map((item) => {
-    if (!item.path) return item;
-
-    const normalizedItemPath = item.path.replace(/\/$/, "");
-    const isActivePath =
-      normalizedPath === normalizedItemPath ||
-      normalizedPath.startsWith(`${normalizedItemPath}/`);
-
-    return {
-      ...item,
-      active: isActivePath,
+      ...section,
+      items,
     };
   });
 
@@ -720,50 +460,30 @@ const AiSidebar = ({ isMobileOverlay = false, onClose }) => {
         isExpandable
         isOpen={isRecommendationsOpen}
         onToggle={() => setIsRecommendationsOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
+        onItemClick={(item) => handleSidebarItemClick(item, "key-apps")}
         onTooltipChange={setTooltip}
       />
 
-      <SidebarSection
-        title="Common Modules"
-        items={commonFeaturesWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isCommonFeaturesOpen}
-        onToggle={() => setIsCommonFeaturesOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
-        onTooltipChange={setTooltip}
-      />
-      <SidebarSection
-        title="Core Modules"
-        items={coreModulesWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isCoreModulesOpen}
-        onToggle={() => setIsCoreModulesOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
-        onTooltipChange={setTooltip}
-      />
-      <SidebarSection
-        title="Key Apps"
-        items={valueAdditionItemsWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isValueAdditionsOpen}
-        onToggle={() => setIsValueAdditionsOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
-        onTooltipChange={setTooltip}
-      />
-      <SidebarSection
-        title="Department Access"
-        items={departmentAccessWithActivePath}
-        collapsed={isCollapsed}
-        isExpandable
-        isOpen={isDepartmentAccessOpen}
-        onToggle={() => setIsDepartmentAccessOpen((prev) => !prev)}
-        onItemClick={handleSidebarItemClick}
-        onTooltipChange={setTooltip}
-      />
+      {catalogSectionsWithActivePath.map((section) =>
+        section.items.length > 0 ? (
+          <SidebarSection
+            key={section.id}
+            title={section.label}
+            items={section.items}
+            collapsed={isCollapsed}
+            isExpandable
+            isOpen={Boolean(openCatalogSections[section.id])}
+            onToggle={() =>
+              setOpenCatalogSections((current) => ({
+                ...current,
+                [section.id]: !current[section.id],
+              }))
+            }
+            onItemClick={(item) => handleSidebarItemClick(item, section.id)}
+            onTooltipChange={setTooltip}
+          />
+        ) : null,
+      )}
 
       {isMobileOverlay && (
         <>

@@ -37,11 +37,12 @@ const uploadImages = multer({
     if (
       file.mimetype === "image/jpeg" ||
       file.mimetype === "image/png" ||
-      file.mimetype === "image/webp"
+      file.mimetype === "image/webp" ||
+      file.mimetype === "image/gif"
     ) {
       return cb(null, true);
     }
-    cb(new Error("Only .jpeg, .png, .webp files are allowed"), false);
+    cb(new Error("Only .jpeg, .png, .webp, .gif files are allowed"), false);
   },
 });
 
