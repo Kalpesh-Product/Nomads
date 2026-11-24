@@ -1828,12 +1828,15 @@ export const hydrateHostModuleCatalog = (remoteCategories) => {
   });
 };
 
-const findInModules = (modules, moduleId) => {
+// Recursive so a grandchild (e.g. Tech Department > Website Builder >
+// Website Leads) resolves too, not just a direct child — `parent` is always
+// the match's immediate parent, same as the one-level case.
+const findInModules = (modules, moduleId, parent = null) => {
   for (const module of modules) {
-    if (module.id === moduleId) return { module, parent: null };
-    if (module.children) {
-      const child = module.children.find((c) => c.id === moduleId);
-      if (child) return { module: child, parent: module };
+    if (module.id === moduleId) return { module, parent };
+    if (module.children?.length) {
+      const found = findInModules(module.children, moduleId, module);
+      if (found) return found;
     }
   }
   return null;

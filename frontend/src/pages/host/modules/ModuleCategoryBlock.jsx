@@ -8,25 +8,33 @@ export const planLabels = { basic: "Basic", professional: "Professional", custom
 const freeBadgeStyles = "bg-emerald-50 text-emerald-700 border border-emerald-200";
 const planOrder = { basic: 0, professional: 1, custom: 2 };
 
+// Recursively flattens a module tree down to its leaves — a department's
+// own sub-module (e.g. Leads Management, Website Builder) can itself nest a
+// Dashboard/pages, so one level of children isn't enough. Each leaf inherits
+// plan/planAccessMode from the nearest ancestor that sets one, and tags
+// `parentLabel`/`parentIcon` from its immediate (non-leaf) parent so the UI
+// can still group sub-pages under their module's heading.
+const flattenToLeaves = (modules, parentLabel = null, parentIcon = null) =>
+  modules.flatMap((module) =>
+    module.children?.length
+      ? flattenToLeaves(module.children, module.label, module.icon).map((child) => ({
+          ...child,
+          plan: child.plan || module.plan,
+          planAccessMode: child.planAccessMode || module.planAccessMode,
+        }))
+      : [{ ...module, parentLabel, parentIcon }],
+  );
+
 // Flattens a category's modules (including nested sub-pages like Website
 // Builder > Website Leads) into one ordered list, each tile inheriting its
 // parent's plan tier unless it sets its own, then sorts Basic → Professional
 // → Custom so "what's included in Basic, what's an upsell" reads top to
 // bottom. Every tile keeps its own id so the real site sidebar can deep-link
 // straight to it.
-const flattenModules = (modules, sortByPlan) => {
-  const flat = modules.flatMap((module) =>
-    module.children?.length
-      ? module.children.map((child) => ({
-          ...child,
-          parentLabel: module.label,
-          parentIcon: module.icon,
-          plan: child.plan || module.plan,
-        }))
-      : [module],
-  );
+export const flattenModules = (modules, sortByPlan) => {
+  const flat = flattenToLeaves(modules);
   return sortByPlan
-    ? flat.sort((a, b) => (planOrder[a.plan] ?? 99) - (planOrder[b.plan] ?? 99))
+    ? [...flat].sort((a, b) => (planOrder[a.plan] ?? 99) - (planOrder[b.plan] ?? 99))
     : flat;
 };
 

@@ -10,6 +10,7 @@ import useHostModuleCatalog from "../../hooks/useHostModuleCatalog";
 import { findModule } from "../../data/hostModulesCatalog";
 import {
   ModuleDetailTile,
+  flattenModules,
   planBadgeStyles,
   planLabels,
 } from "../host/modules/ModuleCategoryBlock";
@@ -179,16 +180,13 @@ export default function Modules() {
     : [{ label: "Modules", href: null }];
 
   const detailTiles = activeModule?.children?.length
-    ? activeModule.children.filter((child) =>
-        planIncludesModule(
-          {
-            ...child,
-            plan: child.plan || requiredPlan,
-            planAccessMode: child.planAccessMode || activeModule.planAccessMode,
-          },
-          activePlan,
-        ),
-      )
+    ? flattenModules(activeModule.children, false)
+        .map((tile) => ({
+          ...tile,
+          plan: tile.plan || requiredPlan,
+          planAccessMode: tile.planAccessMode || activeModule.planAccessMode,
+        }))
+        .filter((tile) => planIncludesModule(tile, activePlan))
     : activeModule
       ? [activeModule]
       : [];
@@ -461,21 +459,39 @@ export default function Modules() {
                 )}
               </div>
             )}
-            {detailTiles.map((tile, index) => (
-              <div
-                key={tile.id}
-                className={index > 0 ? "border-t border-gray-200 pt-8 lg:pt-10" : ""}
-              >
-                <ModuleDetailTile
-                  tile={{
-                    ...tile,
-                    plan: tile.plan || requiredPlan,
-                    verticals: activeModule.children?.length ? tile.verticals : undefined,
-                  }}
-                  planBadgeLabel={PLAN_ACCESS_LABELS[tile.plan || requiredPlan]}
-                />
-              </div>
-            ))}
+            {(() => {
+              let lastGroupLabel = null;
+              return detailTiles.map((tile, index) => {
+                const ParentIcon = tile.parentIcon;
+                const isNewGroup = Boolean(tile.parentLabel) && tile.parentLabel !== lastGroupLabel;
+                lastGroupLabel = tile.parentLabel || null;
+                return (
+                  <div
+                    key={tile.id}
+                    className={index > 0 ? "border-t border-gray-200 pt-8 lg:pt-10" : ""}
+                  >
+                    {isNewGroup && (
+                      <div className="mb-4 flex items-center gap-2">
+                        {ParentIcon && (
+                          <ParentIcon size={18} className="shrink-0 text-secondary-dark/70" />
+                        )}
+                        <h2 className="text-sm font-bold uppercase tracking-wide text-secondary-dark/80 md:text-base">
+                          {tile.parentLabel}
+                        </h2>
+                      </div>
+                    )}
+                    <ModuleDetailTile
+                      tile={{
+                        ...tile,
+                        plan: tile.plan || requiredPlan,
+                        verticals: activeModule.children?.length ? tile.verticals : undefined,
+                      }}
+                      planBadgeLabel={PLAN_ACCESS_LABELS[tile.plan || requiredPlan]}
+                    />
+                  </div>
+                );
+              });
+            })()}
           </section>
         ) : (
           <section className="mx-auto my-8 w-full max-w-2xl rounded-2xl border border-gray-200 bg-gray-50 px-5 py-10 text-center sm:px-8">
