@@ -236,6 +236,52 @@ export const getRecruitmentJobs = async (req, res, next) => {
   }
 };
 
+// Every price on a hosted site renders in the owning unit's own currency (the same value its
+// Unit Settings edits). Nomads' local WebsiteTemplate copy is never written by HostPanel, so the
+// value comes from Master Panel's editor endpoint, which resolves it from
+// Workspace.preferences.currency on each request. Cached briefly because this runs on every
+// site page load; a missing answer leaves prices symbol-less rather than guessing one.
+const TENANT_CURRENCY_TTL_MS = 5 * 60 * 1000;
+const tenantCurrencyCache = new Map();
+
+const normalizeCurrencyCode = (value) => {
+  const code = String(value || "").trim().toUpperCase();
+  return /^[A-Z]{3}$/.test(code) ? code : "";
+};
+
+const resolveTenantCurrency = async (tenant) => {
+  const key = String(tenant || "").trim().toLowerCase();
+  if (!key) return "";
+  const cached = tenantCurrencyCache.get(key);
+  if (cached && Date.now() - cached.at < TENANT_CURRENCY_TTL_MS) return cached.currency;
+
+  let currency = "";
+  try {
+    const upstream = await axios.get(
+      `${process.env.WONOMASTER_BE || "http://localhost:5007"}/api/editor/get-website/${encodeURIComponent(key)}`,
+      { timeout: 5000 },
+    );
+    const template = upstream.data?.template || upstream.data || {};
+    currency =
+      normalizeCurrencyCode(template?.currency) ||
+      normalizeCurrencyCode(template?.publishedData?.currency);
+  } catch (error) {
+    // Unknown/unpublished tenant, or Master Panel unreachable: no currency context.
+  }
+
+  tenantCurrencyCache.set(key, { currency, at: Date.now() });
+  return currency;
+};
+
+// The freshly resolved workspace currency outranks whatever code the payload
+// carried: an already-published site (or an older draft) may embed a default
+// from before the unit had a currency, and that must not survive here.
+const withWorkspaceCurrency = (payload, currency) => {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return payload;
+  const resolved = normalizeCurrencyCode(currency) || normalizeCurrencyCode(payload.currency);
+  return resolved ? { ...payload, currency: resolved } : payload;
+};
+
 export const getWebsiteByTenant = async (req, res, next) => {
   try {
     const tenant = normalizeTenant(req.params.tenant);
@@ -245,6 +291,7 @@ export const getWebsiteByTenant = async (req, res, next) => {
     }
 
     const searchKey = tenant.split("-")[0] || tenant;
+    const workspaceCurrency = await resolveTenantCurrency(tenant);
 
     const publishedTemplate =
       (await WebsiteTemplate.findOne({
@@ -270,8 +317,11 @@ export const getWebsiteByTenant = async (req, res, next) => {
       return res
         .status(200)
         .json(
-          normalizeTemplatePayload(
-            publishedTemplate.publishedData || publishedTemplate,
+          withWorkspaceCurrency(
+            normalizeTemplatePayload(
+              publishedTemplate.publishedData || publishedTemplate,
+            ),
+            workspaceCurrency,
           ),
         );
     }
@@ -295,8 +345,11 @@ export const getWebsiteByTenant = async (req, res, next) => {
       return res
         .status(200)
         .json(
-          normalizeTemplatePayload(
-            localTemplate.publishedData || localTemplate,
+          withWorkspaceCurrency(
+            normalizeTemplatePayload(
+              localTemplate.publishedData || localTemplate,
+            ),
+            workspaceCurrency,
           ),
         );
     }
@@ -323,8 +376,11 @@ export const getWebsiteByTenant = async (req, res, next) => {
       return res
         .status(upstream.status)
         .json(
-          normalizeTemplatePayload(
-            upstreamTemplate?.publishedData || upstreamTemplate,
+          withWorkspaceCurrency(
+            normalizeTemplatePayload(
+              upstreamTemplate?.publishedData || upstreamTemplate,
+            ),
+            workspaceCurrency,
           ),
         );
     }

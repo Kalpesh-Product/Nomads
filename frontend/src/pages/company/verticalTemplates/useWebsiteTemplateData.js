@@ -272,8 +272,9 @@ export const useWebsiteTemplateData = () => {
     const [draft, setDraft] = useState(site?.data ? normalizeSiteMedia(site.data) : null);
     const previewDraftRawRef = useRef(null);
 
-    // The published site's own currency (if it ever carries one) resolves every template's price
-    // display; anything without one yet falls back to USD rather than assuming India.
+    // The published site's own currency (resolved by the backend from the unit's Unit Settings)
+    // resolves every template's price display; with none the price renders as a bare number
+    // rather than guessing a symbol.
     setActiveTemplateCurrency(draft?.currency);
     const [heroIndex, setHeroIndex] = useState(0);
     const [testimonialIndex, setTestimonialIndex] = useState(0);

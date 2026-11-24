@@ -114,11 +114,12 @@ export const postWebsiteLead = (draft, fields) => api.post("/leads/create-lead",
 });
 // The currency every template's price display resolves to when a call site doesn't pass one
 // explicitly. Set once per render by useWebsiteTemplateData from the published site's own
-// currency; anything without one yet defaults to USD rather than assuming India.
-let activeTemplateCurrency = "USD";
+// currency (the backend resolves it from the unit's Unit Settings). Starts empty on purpose:
+// with no currency context a price renders as a bare number instead of guessing a symbol.
+let activeTemplateCurrency = "";
 export const setActiveTemplateCurrency = (currency) => {
-    const trimmed = String(currency || "").trim();
-    activeTemplateCurrency = trimmed ? normalizeWorkspaceCurrency(trimmed) : "USD";
+    const code = String(currency || "").trim().toUpperCase();
+    activeTemplateCurrency = /^[A-Z]{3}$/.test(code) ? normalizeWorkspaceCurrency(code) : "";
 };
 
 /** "500" + "per night" -> "₹500 / night" (symbol resolved from the active/given currency, any symbol already in `price` is replaced). */
@@ -127,7 +128,8 @@ export const priceWithUnit = (price, unit, currency) => {
         return "";
     const cleaned = String(unit || "").replace(/^per\s+/i, "").replace(/^\/\s*/, "").trim();
     const numeric = String(price).replace(/^[^\d]+/, "").trim();
-    const symbol = getWorkspaceCurrencySymbol(currency || activeTemplateCurrency);
+    const code = String(currency || activeTemplateCurrency || "").trim().toUpperCase();
+    const symbol = /^[A-Z]{3}$/.test(code) ? getWorkspaceCurrencySymbol(code) : "";
     const priced = numeric ? `${symbol}${numeric}` : String(price);
     return cleaned ? `${priced} / ${cleaned}` : priced;
 };

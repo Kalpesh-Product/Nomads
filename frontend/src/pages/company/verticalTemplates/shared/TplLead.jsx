@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "../motion";
 import { addDaysISO, addMonthsISO, getLeadFormDefinition, monthsBetween, nightsBetween, parsePriceNumber, todayISO, } from "../leadForms";
-import { currencyPrefix, priceWithUnit } from "../templateKit";
+import { priceWithUnit } from "../templateKit";
 import { resolveServiceKind } from "../verticalProfiles";
 import { Icon } from "./TplUI";
 import { useTpl } from "./TplContext";
@@ -16,7 +16,7 @@ export const estimateTotal = (item, start, end, people) => {
     const perBed = item.raw?.roomKind === "dorm" || (item.raw?.capacity && item.raw?.roomKind !== "private");
     const beds = perBed ? Math.max(1, Number(people) || 1) : 1;
     const total = unit * nights * beds;
-    return { nights, beds: perBed ? beds : 0, text: `${currencyPrefix(item.price)}${total.toLocaleString()}` };
+    return { nights, beds: perBed ? beds : 0, text: priceWithUnit(total.toLocaleString(), "") };
 };
 const nextDayISO = (value) => addDaysISO(value, 1);
 /** "09:05" -> 545, for meeting-room duration maths. */
