@@ -5,6 +5,7 @@ import {
   stateWiseWeightCalculation,
   getLabelForScore,
   ATTRIBUTE_QUICK_STATS_CONFIG,
+  STATEWISE_WEIGHT_FORMULAS,
 } from "../controllers/stateWiseWeightCalculation.js";
 import {
   normalizeCountryKey,
@@ -219,6 +220,37 @@ const buildSelectiveUpdateData = (row = {}) => {
     updateData: { ...updateData, ...weightUpdates },
     insertOnlyData: {},
   };
+};
+
+// Headers matching the "Export Weights (.csv)" button on master panel's
+// World Ranking Weights V2 page (24 ALGO2_BASE_METRICS labels, normalized).
+// Kept separate from CSV_TO_SCHEMA_MAP above (old script's headers) so
+// neither mapping breaks the other's caller.
+const WEIGHT_CSV_TO_SCHEMA_MAP = {
+  costofliving: "costOfLiving",
+  internet: "internet",
+  safety: "safety",
+  nomadcommunity: "nomadCommunity",
+  workinfrastructure: "workInfrastructure",
+  airqualityindex: "airQualityIndex",
+  startupecosystem: "startupEcosystem",
+  healthcarecostindex: "healthcareCostIndex",
+  purchasingpower: "purchasingPower",
+  inflationstability: "inflationStability",
+  meetupsevents: "meetupsEvents",
+  startupincubatorsaccelerators: "incubators",
+  climateenvironment: "climateEnvironment",
+  lowertaxes: "lowerTaxes",
+  naturenomadtravelling: "natureNomadTravelling",
+  yoga: "yoga",
+  venturecapitalpresence: "ventureCapitalPresence",
+  venturecapitalinvestments: "ventureCapitalInvestments",
+  visaopenness: "visaOpenness",
+  healthcarequality: "healthcareQuality",
+  flightconnectivity: "flightConnectivity",
+  remotejobs: "remoteJobs",
+  techtalentdensity: "techTalentDensity",
+  conferencesevents: "conferencesEvents",
 };
 
 // --- CONTROLLERS ---
@@ -626,6 +658,198 @@ export const updateStateWiseWeightV2 = async (req, res, next) => {
     });
   } catch (error) {
     return next(error);
+  }
+};
+
+// Strict weight-only update: matches by _id, upsert:false (unmatched _id is
+// just skipped, never inserted), writes only weight.<field> — never _id,
+// state, country, title, rank, or isActive. Pairs with the "Export Weights
+// (.csv)" button on master panel's World Ranking Weights V2 page.
+export const bulkUpdateStateWiseWeightV2Weights = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Please upload a CSV file using field state-wise-weight-file.",
+      });
+    }
+
+    const isDryRun =
+      String(req.query.dryRun || req.body.dryRun || "").toLowerCase() === "true";
+    const attribute = Object.prototype.hasOwnProperty.call(
+      STATEWISE_WEIGHT_FORMULAS,
+      req.query.attribute,
+    )
+      ? req.query.attribute
+      : "bestForNomads";
+
+    const rows = [];
+    const rowErrors = [];
+    let rowNumber = 1;
+
+    Readable.from(req.file.buffer.toString("utf-8"))
+      .pipe(csvParser())
+      .on("data", (rawRow) => {
+        rowNumber += 1;
+        const row = normalize(rawRow);
+        const id = String(row["id"] || "").trim();
+
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+          rowErrors.push({ rowNumber, reason: "Missing or invalid _id" });
+          return;
+        }
+
+        // Plain field names here (not "weight.<field>") — dry run needs to
+        // merge these into the existing weight object to recompute scores.
+        const weightUpdates = {};
+        for (const [csvKey, schemaKey] of Object.entries(WEIGHT_CSV_TO_SCHEMA_MAP)) {
+          if (!hasValue(row[csvKey])) continue;
+          const parsedValue = toNumberOrUndefined(row[csvKey]);
+          if (parsedValue !== undefined) {
+            weightUpdates[schemaKey] = parsedValue;
+          }
+        }
+
+        if (Object.keys(weightUpdates).length === 0) {
+          rowErrors.push({ rowNumber, id, reason: "No updatable weight values found" });
+          return;
+        }
+
+        rows.push({ rowNumber, id, weightUpdates });
+      })
+      .on("end", async () => {
+        try {
+          if (!rows.length) {
+            return res
+              .status(400)
+              .json({ message: "No valid rows were found in CSV.", rowErrors });
+          }
+
+          if (!isDryRun) {
+            const operations = rows.map(({ id, weightUpdates }) => ({
+              updateOne: {
+                filter: { _id: id },
+                update: {
+                  $set: Object.fromEntries(
+                    Object.entries(weightUpdates).map(([field, value]) => [
+                      `weight.${field}`,
+                      value,
+                    ]),
+                  ),
+                },
+                upsert: false,
+              },
+            }));
+
+            const result = await StateWiseWeightV2.bulkWrite(operations, {
+              ordered: false,
+            });
+
+            return res.status(200).json({
+              dryRun: false,
+              message: "Weight values updated from CSV.",
+              processedRows: rows.length,
+              matchedCount: result.matchedCount,
+              modifiedCount: result.modifiedCount,
+              notFoundCount: rows.length - result.matchedCount,
+              rowErrors,
+            });
+          }
+
+          // --- Dry run: diff only, nothing written to the DB ---
+          // Uses the same universe getAllStateWiseWeightV2 serves (no
+          // isActive/continent filter) so rank deltas match what staff
+          // already sees elsewhere; it's a global-rank approximation, not
+          // the exact filtered list any one visitor view would show.
+          const allDocs = await StateWiseWeightV2.find().lean();
+          const docById = new Map(allDocs.map((doc) => [String(doc._id), doc]));
+          const rowById = new Map(rows.map((row) => [row.id, row]));
+
+          const rankOf = (scored) =>
+            new Map(
+              scored
+                .slice()
+                .sort((a, b) => b.score - a.score)
+                .map((entry, index) => [entry.id, index + 1]),
+            );
+
+          const rankBeforeById = rankOf(
+            allDocs.map((doc) => ({
+              id: String(doc._id),
+              score: stateWiseWeightCalculation(doc.weight)[attribute] ?? 0,
+            })),
+          );
+
+          const rankAfterById = rankOf(
+            allDocs.map((doc) => {
+              const id = String(doc._id);
+              const override = rowById.get(id);
+              const weight = override
+                ? { ...doc.weight, ...override.weightUpdates }
+                : doc.weight;
+              return { id, score: stateWiseWeightCalculation(weight)[attribute] ?? 0 };
+            }),
+          );
+
+          const preview = [];
+          const notFound = [];
+          let unchangedCount = 0;
+
+          for (const row of rows) {
+            const doc = docById.get(row.id);
+            if (!doc) {
+              notFound.push({ rowNumber: row.rowNumber, id: row.id });
+              continue;
+            }
+
+            const changedFields = Object.entries(row.weightUpdates)
+              .map(([field, newValue]) => ({
+                field,
+                oldValue: Number(doc.weight?.[field]) || 0,
+                newValue,
+              }))
+              .filter((entry) => entry.oldValue !== entry.newValue);
+
+            if (!changedFields.length) {
+              unchangedCount += 1;
+              continue;
+            }
+
+            const scoreBefore = stateWiseWeightCalculation(doc.weight)[attribute] ?? null;
+            const afterWeight = { ...doc.weight, ...row.weightUpdates };
+            const scoreAfter = stateWiseWeightCalculation(afterWeight)[attribute] ?? null;
+
+            preview.push({
+              rowNumber: row.rowNumber,
+              id: row.id,
+              state: doc.state,
+              country: doc.country,
+              title: doc.title,
+              changedFields,
+              attribute,
+              scoreBefore,
+              scoreAfter,
+              rankBefore: rankBeforeById.get(row.id) ?? null,
+              rankAfter: rankAfterById.get(row.id) ?? null,
+            });
+          }
+
+          return res.status(200).json({
+            dryRun: true,
+            attribute,
+            processedRows: rows.length,
+            willUpdateCount: preview.length,
+            unchangedCount,
+            notFoundCount: notFound.length,
+            notFound,
+            rowErrors,
+            preview,
+          });
+        } catch (error) {
+          return next(error);
+        }
+      });
+  } catch (error) {
+    next(error);
   }
 };
 
