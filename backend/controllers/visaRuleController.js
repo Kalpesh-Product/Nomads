@@ -3,8 +3,8 @@ import csvParser from "csv-parser";
 import VisaRule from "../models/VisaRule.js";
 
 export const VISA_REQUIREMENT_LABELS = {
-  "traditional visa": "visa required",
-  "physical visa": "visa required",
+  "traditional visa": "physical visa",
+  "physical visa": "physical visa",
   "e visa": "e-visa",
   evisa: "e-visa",
   "e-visa": "e-visa",
@@ -81,7 +81,7 @@ const normalizeRow = (row = {}) =>
     ]),
   );
 
-const parseCsvBuffer = (buffer) =>
+export const parseCsvBuffer = (buffer) =>
   new Promise((resolve, reject) => {
     const rows = [];
 
@@ -108,7 +108,7 @@ const getPassportFromRow = (row = {}) => {
   return key ? row[key] : "";
 };
 
-const buildMatrixMap = (rows = [], valueMapper = (value) => value) => {
+export const buildMatrixMap = (rows = [], valueMapper = (value) => value) => {
   const matrix = new Map();
 
   rows.forEach((row) => {
@@ -138,7 +138,7 @@ const buildMatrixMap = (rows = [], valueMapper = (value) => value) => {
   return matrix;
 };
 
-const parseDurationValue = (value) => {
+export const parseDurationValue = (value) => {
   const trimmed = String(value ?? "").trim();
   if (!trimmed || trimmed === "-1") return null;
 

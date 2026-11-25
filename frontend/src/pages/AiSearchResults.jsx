@@ -54,7 +54,7 @@ const visaRequirementOptions = [
 
 const visaRequirementApiValueMap = {
   "Visa Free": "visa free",
-  "Physical Visa": "visa required",
+  "Physical Visa": "physical visa",
   "e-Visa": "e-visa",
   "Visa on Arrival": "visa on arrival",
   eTA: "eta",
