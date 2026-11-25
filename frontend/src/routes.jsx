@@ -100,7 +100,7 @@ const SiteIsDown = lazyPage(() => import("./pages/SiteIsDown"));
 const WebsiteUnderMaintenance = lazyPage(() =>
   import("./pages/WebsiteUnderMaintenance"),
 );
-
+const NotFound = lazyPage(() => import("./pages/NotFound"));
 const NomadAiLayout = lazyPage(() => import("./pages/NomadAiLayout"));
 const AiHome = lazyPage(() => import("./pages/AiHome"));
 const AiSearch = lazyPage(() => import("./pages/AiSearch"));
@@ -510,6 +510,7 @@ if (tenant === "main") {
               path: "website-under-maintenance",
               element: <WebsiteUnderMaintenance />,
             },
+            { path: "*", element: <NotFound /> },
           ],
         },
         {
@@ -890,8 +891,10 @@ if (tenant === "main") {
             { path: "content-use-removal", element: <ContentUseRemoval /> },
             { path: "privacy", element: <HostPrivacy /> },
             { path: "faq", element: <HostFAQ /> },
+            { path: "*", element: <NotFound /> },
           ],
         },
+        { path: "*", element: <NotFound /> },
       ],
     },
   ];
@@ -936,6 +939,7 @@ if (tenant === "main") {
         { path: "page/careers/:jobCode", element: <TemplateCareerPage /> },
         { path: "contact", element: <TemplateContactPage /> },
         { path: "page/contact", element: <TemplateContactPage /> },
+        { path: "*", element: <NotFound /> },
       ],
     },
   ];

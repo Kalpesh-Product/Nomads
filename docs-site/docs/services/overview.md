@@ -3,7 +3,7 @@ title: "Value-added services"
 sidebar_position: 1
 ---
 
-Open **Value-Added Services** in the sidebar to request help with a visa, relocation, company setup, consultation or a work trip. **Apply for Jobs** opens the careers page.
+Open **Value-Added Services** in the sidebar to request help with a visa, relocation, company setup, consultation or a work trip.
 
 ## Sending a support request
 
@@ -21,4 +21,3 @@ The available countries and locations appear in the form dropdowns.
 - [Company Setup](./company-setup.md)
 - [Consultation](./consultation.md)
 - [Workation](./workation.md)
-- [Apply for Jobs](./apply-for-jobs.md)

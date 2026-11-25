@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "driver.js/dist/driver.css";
 import {
   NavLink,
@@ -52,6 +58,7 @@ import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 import VerifyBusinessButton from "../components/verification/VerifyBusinessButton";
 import { setFormValues } from "../features/locationSlice.js";
 import { readSelectedDestination } from "../utils/selectedDestinationSession";
+import { buildEntryPageReturnTarget } from "../utils/aiSearchOriginNavigation.js";
 import {
   buildCanonicalListingUrl,
   buildListingShareUrl,
@@ -73,6 +80,12 @@ const AiProduct = () => {
   const { company } = useParams();
   const [searchParams] = useSearchParams();
   const locationState = location.state || {};
+  // The country/continent crumbs must return to whichever WoNo Intelligence
+  // page started this journey, not a hardcoded goal results page.
+  const entryPageReturnTarget = useMemo(
+    () => buildEntryPageReturnTarget(locationState),
+    [locationState],
+  );
   const {
     companyId: stateCompanyId,
     businessId: stateBusinessId,
@@ -344,14 +357,20 @@ const AiProduct = () => {
   ]);
 
   useEffect(() => {
+    const entryPagePath = {
+      pathname: entryPageReturnTarget.pathname,
+      search: entryPageReturnTarget.search,
+    };
     const trail = [
       {
         label: breadcrumbState.continent,
-        path: "/search/worldranking/results",
+        path: entryPagePath,
+        state: entryPageReturnTarget.state,
       },
       {
         label: breadcrumbState.country,
-        path: `/search/worldranking/results`,
+        path: entryPagePath,
+        state: entryPageReturnTarget.state,
       },
       {
         label: breadcrumbState.stateLabel,
@@ -392,6 +411,7 @@ const AiProduct = () => {
     breadcrumbState.stateLabel,
     companyDetails?.companyName,
     companyName,
+    entryPageReturnTarget,
     location.pathname,
     location.search,
     location.state,
@@ -421,16 +441,31 @@ const AiProduct = () => {
     const normalizedCategory = normalizeValue(breadcrumbState.companyType);
 
     const isCompanyTypeClick = breadcrumbKey === "companyType";
+    const isEntryPageClick =
+      breadcrumbKey === "continent" || breadcrumbKey === "country";
 
     dispatch(
       setFormValues({
         continent: normalizedContinent || "",
         country: normalizedCountry || "",
-        location: normalizedLocation || "",
+        location: isEntryPageClick ? "" : normalizedLocation || "",
         category: isCompanyTypeClick ? normalizedCategory || "" : "",
         count: "",
       }),
     );
+
+    if (isEntryPageClick) {
+      navigate(
+        {
+          pathname: entryPageReturnTarget.pathname,
+          search: entryPageReturnTarget.search,
+        },
+        {
+          state: entryPageReturnTarget.state,
+        },
+      );
+      return;
+    }
 
     if (isCompanyTypeClick) {
       navigate(

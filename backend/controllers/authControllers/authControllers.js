@@ -9,7 +9,7 @@ import { renderNotificationEmail } from "../../utils/emailTemplates.js";
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W]).+$/;
 
-const validateStrongPassword = (password) => {
+export const validateStrongPassword = (password) => {
   if (!password || password.length < 8) return "Must be at least 8 characters long.";
   if (password.length > 72) return "Password cannot exceed 72 characters.";
   if (!PASSWORD_REGEX.test(password)) {
@@ -34,6 +34,25 @@ const signPasswordResetSession = (email) => {
 const verifyPasswordResetSession = (token) => {
   const secret = getPasswordResetSessionSecret();
   if (!secret) throw new Error("Password reset secret not configured");
+  return jwt.verify(token, secret);
+};
+
+const getSignupSessionSecret = () =>
+  process.env.SIGNUP_OTP_SECRET || process.env.ACCESS_TOKEN_SECRET;
+
+const signSignupSession = (email) => {
+  const secret = getSignupSessionSecret();
+  if (!secret) throw new Error("Signup session secret not configured");
+  return jwt.sign(
+    { purpose: "signup_session", email: String(email || "").trim().toLowerCase() },
+    secret,
+    { expiresIn: "15m" },
+  );
+};
+
+export const verifySignupSession = (token) => {
+  const secret = getSignupSessionSecret();
+  if (!secret) throw new Error("Signup session secret not configured");
   return jwt.verify(token, secret);
 };
 
@@ -333,7 +352,7 @@ export const verifyForgotPasswordOtp = async (req, res, next) => {
     }
     if (String(otpRecord.code) !== String(otp)) {
       await Otp.updateOne({ _id: otpRecord._id }, { $inc: { attempts: 1 } });
-      return res.status(400).json({ message: "Invalid OTP." });
+      return res.status(400).json({ message: "Invalid OTP" });
     }
 
     const user = await NomadUser.findOne({ email: normalizedEmail }).lean().exec();
@@ -356,6 +375,92 @@ export const verifyForgotPasswordOtp = async (req, res, next) => {
     if (error?.name === "JsonWebTokenError") {
       return res.status(400).json({ message: "Invalid reset session." });
     }
+    next(error);
+  }
+};
+
+export const sendSignupOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    if (!normalizedEmail) return res.status(400).json({ message: "Email is required." });
+
+    const existingUser = await NomadUser.findOne({ email: normalizedEmail }).lean().exec();
+    if (existingUser) return res.status(400).json({ message: "Email already registered." });
+
+    const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
+    await Otp.updateMany(
+      { email: normalizedEmail, purpose: "registration", isUsed: false },
+      { $set: { isUsed: true } },
+    );
+    await Otp.create({
+      email: normalizedEmail,
+      code: otp,
+      purpose: "registration",
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+      payload: {},
+    });
+
+    await sendMail({
+      to: normalizedEmail,
+      subject: "Verify Your Email - WONO Signup",
+      html: renderNotificationEmail({
+        heroTitle: "Verify Your Email",
+        heroSubtitle: "Use the verification code below to continue signing up.",
+        greetingHtml: `
+          <p style="margin:0 0 4px;">Hello,</p>
+          <p class="email-text" style="margin:0;">Use the verification code below to verify your email and complete your WONO signup.</p>
+        `,
+        otpCode: { code: otp, expiryMinutes: 10 },
+        noteHtml:
+          "For your security, never share this verification code with anyone.<br/><br/><b>Didn't request this?</b> You can safely ignore this email.",
+      }),
+    });
+
+    return res.status(200).json({ message: "OTP sent successfully.", email: normalizedEmail });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifySignupOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    if (!normalizedEmail || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required." });
+    }
+
+    const otpRecord = await Otp.findOne({
+      email: normalizedEmail,
+      purpose: "registration",
+      isUsed: false,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (!otpRecord) return res.status(400).json({ message: "Please request OTP first." });
+    if (new Date(otpRecord.expiresAt).getTime() < Date.now()) {
+      await Otp.updateOne({ _id: otpRecord._id }, { $set: { isUsed: true } });
+      return res.status(400).json({ message: "OTP expired. Please request a new OTP." });
+    }
+    if (otpRecord.attempts >= 5) {
+      await Otp.updateOne({ _id: otpRecord._id }, { $set: { isUsed: true } });
+      return res.status(429).json({ message: "OTP attempts exceeded. Request a new OTP." });
+    }
+    if (String(otpRecord.code) !== String(otp)) {
+      await Otp.updateOne({ _id: otpRecord._id }, { $inc: { attempts: 1 } });
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    await Otp.updateOne({ _id: otpRecord._id }, { $set: { isUsed: true } });
+    const signupSessionToken = signSignupSession(normalizedEmail);
+    return res.status(200).json({
+      message: "OTP verified successfully.",
+      signupSessionToken,
+      email: normalizedEmail,
+    });
+  } catch (error) {
     next(error);
   }
 };

@@ -6,15 +6,20 @@ import CommonsTemplate from "./commons/CommonsTemplate";
 import HuddleTemplate from "./huddle/HuddleTemplate";
 import TravigoTemplate from "./travigo/TravigoTemplate";
 import LodgeTemplate from "./lodge/LodgeTemplate";
+import OrchardTemplate from "./orchard/OrchardTemplate";
+import DestinflowTemplate from "./destinflow/DestinflowTemplate";
 import CaliHostelTemplate from "./caliHostel/CaliHostelTemplate";
 import TastycTemplate from "./tastyc/TastycTemplate";
 import GrandBarTemplate from "./grandbar/GrandBarTemplate";
 import AromaticaTemplate from "./aromatica/AromaticaTemplate";
 import ItalianoTemplate from "./italiano/ItalianoTemplate";
 import RestobarTemplate from "./restobar/RestobarTemplate";
+import CabinTemplate from "./cabin/CabinTemplate";
 import TinyHomeTemplate from "./tinyhome/TinyHomeTemplate";
 import FlowspaceTemplate from "./flowspace/FlowspaceTemplate";
 import WorkscapeTemplate from "./workscape/WorkscapeTemplate";
+import WaveXTemplate from "./wavex/WaveXTemplate";
+import WorkhubTemplate from "./workhub/WorkhubTemplate";
 import BrixspaceTemplate from "./brixspace/BrixspaceTemplate";
 import WorpaceTemplate from "./worpace/WorpaceTemplate";
 import CoPlaceTemplate from "./coplace/CoPlaceTemplate";
@@ -35,15 +40,21 @@ export const VERTICAL_TEMPLATES = {
   huddle: HuddleTemplate,
   travigo: TravigoTemplate,
   lodge: LodgeTemplate,
+  orchard: OrchardTemplate,
+  destinflow: DestinflowTemplate,
   "cali-hostel": CaliHostelTemplate,
   tastyc: TastycTemplate,
   grandbar: GrandBarTemplate,
   aromatica: AromaticaTemplate,
   italiano: ItalianoTemplate,
   restobar: RestobarTemplate,
+  cabin: CabinTemplate,
+
   tinyhome: TinyHomeTemplate,
   flowspace: FlowspaceTemplate,
   workscape: WorkscapeTemplate,
+  wavex: WaveXTemplate,
+  workhub: WorkhubTemplate,
   brixspace: BrixspaceTemplate,
   worpace: WorpaceTemplate,
   coplace: CoPlaceTemplate,

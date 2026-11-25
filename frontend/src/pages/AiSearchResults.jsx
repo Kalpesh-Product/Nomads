@@ -18,6 +18,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { aiDestinationCards } from "../constants/aiDestinationCards";
 import { createDriverGuide } from "../utils/driverGuide";
 import { persistSelectedDestination } from "../utils/selectedDestinationSession";
+import { createGoalSearchOrigin } from "../utils/aiSearchOriginNavigation.js";
 
 import axios from "../utils/axios";
 import useAuth from "../hooks/useAuth";
@@ -1253,6 +1254,12 @@ const AiSearchResults = () => {
 
     navigate(`/verticals?${verticalsParams.toString()}`, {
       state: {
+        searchOrigin: createGoalSearchOrigin({
+          location,
+          goal: selectedGoal,
+          continent: selectedContinent,
+          goalOption: selectedGoalOption,
+        }),
         selectedStateLabel: destinationTitle,
         breadcrumbFilters: {
           continent,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AnimatePresence, Reveal, motion } from "../motion";
+import { AnimatePresence, Reveal, motion as Motion } from "../motion";
 import { Icon } from "./TplUI";
 import { useTpl } from "./TplContext";
 /* ───────────────────────── FAQ (also used on other pages) ───────────────────────── */
@@ -21,12 +21,12 @@ export const FaqSection = ({ faqs }) => {
                 <div className="tp-card overflow-hidden" style={{ borderRadius: 22 }}>
                   <button type="button" className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : index)}>
                     <span className="text-[16px] font-bold">{faq.question}</span>
-                    <motion.span animate={{ rotate: isOpen ? 45 : 0 }} style={{ color: "var(--t-accent-fg, var(--t-accent))" }}>{Icon.plus(20)}</motion.span>
+                    <Motion.span animate={{ rotate: isOpen ? 45 : 0 }} style={{ color: "var(--t-accent-fg, var(--t-accent))" }}>{Icon.plus(20)}</Motion.span>
                   </button>
                   <AnimatePresence initial={false}>
-                    {isOpen ? (<motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} style={{ overflow: "hidden" }}>
+                    {isOpen ? (<Motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} style={{ overflow: "hidden" }}>
                         <p className="tp-muted whitespace-pre-line px-6 pb-5 text-[15px] leading-relaxed">{faq.answer}</p>
-                      </motion.div>) : null}
+                      </Motion.div>) : null}
                   </AnimatePresence>
                 </div>
               </Reveal>);
@@ -53,26 +53,26 @@ export const Lightbox = () => {
         return () => window.removeEventListener("keydown", onKey);
     }, [open, t.galleryViewerIndex]);
     return (<AnimatePresence>
-      {open ? (<motion.div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(8,6,4,.92)" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Photo viewer" onClick={t.closeGalleryViewer}>
+      {open && t.galleryItems[t.galleryViewerIndex] ? (<Motion.div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(8,6,4,.92)" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Photo viewer" onClick={t.closeGalleryViewer}>
           <button type="button" aria-label="Previous photo" className="absolute left-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white md:left-8" onClick={(e) => { e.stopPropagation(); t.goToGalleryIndex(t.galleryViewerIndex - 1); }}>
             <span style={{ transform: "rotate(180deg)", display: "flex" }}>{Icon.arrow(20)}</span>
           </button>
-          <motion.img key={t.galleryViewerIndex} src={t.galleryItems[t.galleryViewerIndex]} alt="" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} className="max-h-[86vh] max-w-[88vw] rounded-2xl object-contain" onClick={(e) => e.stopPropagation()}/>
+          <Motion.img key={t.galleryViewerIndex} src={t.galleryItems[t.galleryViewerIndex]} alt="" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} className="max-h-[86vh] max-w-[88vw] rounded-2xl object-contain" onClick={(e) => e.stopPropagation()}/>
           <button type="button" aria-label="Next photo" className="absolute right-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white md:right-8" onClick={(e) => { e.stopPropagation(); t.goToGalleryIndex(t.galleryViewerIndex + 1); }}>
             {Icon.arrow(20)}
           </button>
           <button type="button" aria-label="Close" className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white" onClick={t.closeGalleryViewer}>
             {Icon.close(20)}
           </button>
-        </motion.div>) : null}
+        </Motion.div>) : null}
     </AnimatePresence>);
 };
 export const Toast = () => {
     const { t } = useTpl();
     return (<AnimatePresence>
-      {t.successPopup?.open ? (<motion.div className="fixed bottom-6 left-1/2 z-[80] -translate-x-1/2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} role="status">
+      {t.successPopup?.open ? (<Motion.div className="fixed bottom-6 left-1/2 z-[80] -translate-x-1/2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} role="status">
           <div className="tp-btn tp-btn-dark shadow-xl">{Icon.check(16)} {t.successPopup.message}</div>
-        </motion.div>) : null}
+        </Motion.div>) : null}
     </AnimatePresence>);
 };
 /** Simple lightbox for one item's own photos. */
@@ -92,16 +92,16 @@ export const PhotoViewer = ({ images, index, onClose, onChange, }) => {
         return () => window.removeEventListener("keydown", onKey);
     }, [index, images.length]);
     return (<AnimatePresence>
-      {index !== null && images[index] ? (<motion.div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(8,10,12,.94)" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Photo viewer" onClick={onClose}>
+      {index !== null && images[index] ? (<Motion.div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(8,10,12,.94)" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} role="dialog" aria-modal="true" aria-label="Photo viewer" onClick={onClose}>
           <button type="button" aria-label="Previous photo" className="absolute left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white md:left-8" onClick={(e) => { e.stopPropagation(); onChange((index - 1 + images.length) % images.length); }}>
             <span style={{ display: "flex", transform: "rotate(180deg)" }}>{Icon.arrow(20)}</span>
           </button>
-          <motion.img key={images[index]} src={images[index]} alt="" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="max-h-[86vh] max-w-[90vw] rounded-xl object-contain" onClick={(e) => e.stopPropagation()}/>
+          <Motion.img key={images[index]} src={images[index]} alt="" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="max-h-[86vh] max-w-[90vw] rounded-xl object-contain" onClick={(e) => e.stopPropagation()}/>
           <button type="button" aria-label="Next photo" className="absolute right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white md:right-8" onClick={(e) => { e.stopPropagation(); onChange((index + 1) % images.length); }}>
             {Icon.arrow(20)}
           </button>
           <button type="button" aria-label="Close" className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white" onClick={onClose}>{Icon.close(20)}</button>
           <span className="absolute bottom-5 rounded-full bg-white/10 px-3 py-1 text-[12px] font-semibold text-white">{index + 1} / {images.length}</span>
-        </motion.div>) : null}
+        </Motion.div>) : null}
     </AnimatePresence>);
 };

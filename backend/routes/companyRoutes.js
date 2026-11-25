@@ -30,6 +30,7 @@ import {
   editCompanyImagesBulk,
   getCompaniesDataNomads,
   getCompaniesDataMaster,
+  getDestinationListingCounts,
   applyToCompanyJob,
   getCompanyCountries,
   getCompanyOgData,
@@ -65,6 +66,7 @@ router.post("/verify-business-click", trackVerifyBusinessClick);
 router.get("/companies", getCompaniesData);
 router.get("/companiesn", getCompaniesDataNomads);
 router.get("/companiesma", getCompaniesDataMaster);
+router.get("/destination-listing-counts", getDestinationListingCounts);
 router.get("/company-countries", getCompanyCountries);
 router.get("/amenities", getAmenitiesMap);
 router.get("/field-options", getListingFieldOptions);

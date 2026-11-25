@@ -5,6 +5,7 @@ import { FaTwitter, FaLinkedinIn } from "react-icons/fa";
 import { FaGlobe, FaRupeeSign, FaFacebookF, FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { AiOutlineClose } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 const languages = [
   { code: "en-US", name: "English (US)" },
@@ -45,35 +46,21 @@ const AiFooter = () => {
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const [selectedLang, setSelectedLang] = useState(languages[0]);
   const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
+  const navigate = useNavigate();
 
   const goToHostsPrivacy = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/privacy";
-    } else {
-      window.location.href = "https://wono.co/privacy";
-    }
+    navigate("/privacy");
   };
   const goToHostsTC = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/terms-and-conditions";
-    } else {
-      window.location.href = "https://wono.co/terms-and-conditions";
-    }
+    navigate("/terms-and-conditions")
   };
   const goToHostsContentCopyright = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/content-and-copyright";
-    } else {
-      window.location.href = "https://wono.co/content-and-copyright";
-    }
+    navigate("/content-and-copyright");
   };
-  const goToHostsContentUseRemoval = () => {
-    if (window.location.hostname.includes("localhost")) {
-      window.location.href = "http://localhost:5173/content-use-removal";
-    } else {
-      window.location.href = "https://wono.co/content-use-removal";
-    }
-  };
+
+const goToHostsContentUseRemoval = () => {
+  navigate("/content-use-removal");
+};
 
   const footerSections = [
     {

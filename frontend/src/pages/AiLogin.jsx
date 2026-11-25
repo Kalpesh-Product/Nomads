@@ -12,6 +12,13 @@ import useAuth from "../hooks/useAuth";
 import axios from "../utils/axios";
 import { showErrorAlert, showSuccessAlert } from "../utils/alerts";
 
+// Matches AiHostSignup's label styling: black until focused/filled, then blue.
+const floatingLabelSx = {
+  color: "black",
+  "&.Mui-focused": { color: "#1976d2" },
+  "&.MuiInputLabel-shrink": { color: "#1976d2" },
+};
+
 const LOGIN_PROMPT =
   "Login to unlock all features and get the most out of your Nomad experience.";
 
@@ -285,8 +292,8 @@ export default function AiLogin() {
                   label="Email"
                   type="email"
                   fullWidth
-                  required
                   variant="standard"
+                  InputLabelProps={{ sx: floatingLabelSx }}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -303,8 +310,8 @@ export default function AiLogin() {
                   label="Password"
                   type={showPassword ? "text" : "password"}
                   fullWidth
-                  required
                   variant="standard"
+                  InputLabelProps={{ sx: floatingLabelSx }}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                   InputProps={{
