@@ -7,7 +7,7 @@ import GetStartedButton from "../../components/GetStartedButton";
 import FinanceImage from "../../assets/images-service/finance-final.png";
 import useIsMobile from "../../hooks/useIsMobile.js";
 import useHostModuleCatalog from "../../hooks/useHostModuleCatalog";
-import { findModule } from "../../data/hostModulesCatalog";
+import { findModule, planImageFor } from "../../data/hostModulesCatalog";
 import {
   ModuleDetailTile,
   flattenModules,
@@ -283,7 +283,7 @@ export default function Modules() {
               <hr className="border-t-4" />
             </section>
 
-            <section className="flex flex-col gap-4 px-3 py-0 sm:px-0 lg:py-4">
+            {/* <section className="flex flex-col gap-4 px-3 py-0 sm:px-0 lg:py-4">
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
                 <div className="flex flex-col gap-2">
                   <div className="relative my-3 flex w-full flex-col text-card-title font-medium md:text-3xl">
@@ -323,7 +323,7 @@ export default function Modules() {
                 )}
               </div>
               <hr className="mb-2 border-t-4 lg:mt-10" />
-            </section>
+            </section> */}
           </>
         )}
 
@@ -485,6 +485,7 @@ export default function Modules() {
                         ...tile,
                         plan: tile.plan || requiredPlan,
                         verticals: activeModule.children?.length ? tile.verticals : undefined,
+                        image: planImageFor(tile, activePlan),
                       }}
                       planBadgeLabel={PLAN_ACCESS_LABELS[tile.plan || requiredPlan]}
                     />
