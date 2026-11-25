@@ -574,6 +574,57 @@ export const getReviewsByCompany = async (req, res, next) => {
       query = { ...query, source };
     }
 
+    if (req.query.page !== undefined || req.query.limit !== undefined) {
+      const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+      const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 25, 1), 200);
+      const status = typeof req.query.status === "string" ? req.query.status.trim().toLowerCase() : "";
+      const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
+      const filters = [...(query.$and ?? [])];
+
+      if (source === "nomad") {
+        filters.push({
+          $or: [
+            { reviewSource: /nomad/i },
+            {
+              reviewSource: { $not: /^\s*website reviews\s*$/i },
+              source: { $not: /^\s*website(?: form| preview| reviews)?\s*$/i },
+            },
+          ],
+        });
+      }
+
+      if (status) {
+        filters.push(status === "pending"
+          ? { $or: [{ status: "pending" }, { status: { $in: [null, ""] } }] }
+          : { status });
+      }
+      if (search) {
+        const pattern = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+        filters.push({
+          $or: ["name", "reviewerName", "reviewSource", "companyType", "description", "review"]
+            .map((field) => ({ [field]: pattern })),
+        });
+      }
+
+      const filter = filters.length ? { ...query, $and: filters } : query;
+      const [reviews, total] = await Promise.all([
+        Review.find(filter)
+          .sort({ createdAt: -1, _id: -1 })
+          .skip((page - 1) * limit)
+          .limit(limit)
+          .populate("reviewer", "fullName email mobile")
+          .lean()
+          .exec(),
+        Review.countDocuments(filter).exec(),
+      ]);
+
+      return res.status(200).json({
+        count: reviews.length,
+        data: reviews,
+        pagination: { page, limit, total, hasNextPage: page * limit < total },
+      });
+    }
+
     // 2️⃣ Fetch reviews using ObjectId (fast)
     const reviews = await Review.find(query)
       .populate("reviewer", "fullName email mobile")

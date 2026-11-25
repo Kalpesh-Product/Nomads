@@ -939,6 +939,53 @@ export const getCompaniesData = async (req, res, next) => {
   }
 };
 
+export const getDestinationListingCounts = async (req, res, next) => {
+  try {
+    const counts = await Company.aggregate([
+      {
+        $match: {
+          isActive: true,
+          isDeleted: { $ne: true },
+          companyType: { $ne: "privatestay" },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            companyType: "$companyType",
+            country: "$country",
+            continent: "$continent",
+            state: "$state",
+            city: "$city",
+            addressCountry: "$address.country",
+            addressCity: "$address.city",
+          },
+          count: { $sum: 1 },
+          publicCount: { $sum: { $cond: [{ $eq: ["$isPublic", true] }, 1, 0] } },
+          firstId: { $min: "$_id" },
+        },
+      },
+      { $sort: { firstId: 1 } },
+      {
+        $project: {
+          _id: 0,
+          companyType: "$_id.companyType",
+          country: "$_id.country",
+          continent: "$_id.continent",
+          state: "$_id.state",
+          city: "$_id.city",
+          address: { country: "$_id.addressCountry", city: "$_id.addressCity" },
+          count: 1,
+          publicCount: 1,
+        },
+      },
+    ]);
+    return res.status(200).json({ data: counts });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getCompaniesDataMaster = async (req, res, next) => {
   try {
     const companies = await Company.find(
