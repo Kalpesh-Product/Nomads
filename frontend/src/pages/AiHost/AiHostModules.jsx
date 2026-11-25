@@ -7,7 +7,7 @@ import GetStartedButton from "../../components/GetStartedButton";
 import FinanceImage from "../../assets/images-service/finance-final.png";
 import useIsMobile from "../../hooks/useIsMobile.js";
 import useHostModuleCatalog from "../../hooks/useHostModuleCatalog";
-import { findModule } from "../../data/hostModulesCatalog";
+import { findModule, planImageFor } from "../../data/hostModulesCatalog";
 import {
   ModuleDetailTile,
   flattenModules,
@@ -485,6 +485,7 @@ export default function Modules() {
                         ...tile,
                         plan: tile.plan || requiredPlan,
                         verticals: activeModule.children?.length ? tile.verticals : undefined,
+                        image: planImageFor(tile, activePlan),
                       }}
                       planBadgeLabel={PLAN_ACCESS_LABELS[tile.plan || requiredPlan]}
                     />

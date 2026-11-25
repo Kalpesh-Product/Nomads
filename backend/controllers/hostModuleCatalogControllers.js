@@ -271,14 +271,22 @@ const findModuleAndTarget = (category, moduleId, childId) => {
   return target ? { module: target, target } : null;
 };
 
+const PLAN_IMAGE_SLOTS = ["basic", "professional", "custom"];
+
 // Admin: screenshot upload for one module/child. Uploads to S3 first, then
 // deletes the previous image (if any) so a failed upload never leaves the
-// module without a picture.
+// module without a picture. With a `:plan` route param (or `?plan=`), the
+// upload fills that plan's slot in `planImages` instead of the shared
+// `image` field — same module and write-up, a different screenshot per plan.
 export const uploadModuleScreenshot = async (req, res, next) => {
   try {
     const { categoryId, moduleId } = req.params;
     const childId = req.query.childId || req.body?.childId;
+    const plan = req.params.plan || req.query.plan || req.body?.plan;
 
+    if (plan && !PLAN_IMAGE_SLOTS.includes(plan)) {
+      return res.status(400).json({ message: "plan must be basic, professional or custom" });
+    }
     if (!req.file) {
       return res.status(400).json({ message: "image file is required" });
     }
@@ -293,12 +301,22 @@ export const uploadModuleScreenshot = async (req, res, next) => {
       return res.status(404).json({ message: "Module not found" });
     }
 
-    const previousKey = found.target.image?.key;
+    const previousKey = plan
+      ? found.target.planImages?.[plan]?.key
+      : found.target.image?.key;
     const extension = (req.file.mimetype.split("/")[1] || "png").toLowerCase();
-    const key = `host-modules/${categoryId}/${childId || moduleId}-${Date.now()}.${extension}`;
+    const slugId = childId || moduleId;
+    const key = plan
+      ? `host-modules/${categoryId}/${slugId}-${plan}-${Date.now()}.${extension}`
+      : `host-modules/${categoryId}/${slugId}-${Date.now()}.${extension}`;
     const { url } = await uploadFileToS3(key, req.file);
 
-    found.target.image = { url, key };
+    if (plan) {
+      if (!found.target.planImages) found.target.planImages = {};
+      found.target.planImages[plan] = { url, key };
+    } else {
+      found.target.image = { url, key };
+    }
     await category.save();
 
     if (previousKey) {

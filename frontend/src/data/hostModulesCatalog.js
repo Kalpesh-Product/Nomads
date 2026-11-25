@@ -1778,6 +1778,10 @@ const hydrateModule = (remoteModule, localModule) => {
     ...remoteModule,
     icon,
     image: remoteImage || localModule?.image || "",
+    // Optional per-plan screenshot overrides ({ basic, professional, custom },
+    // each `{url, key}` or absent) — same write-up across plans, a different
+    // picture of HostPanel per plan tier. See planImageFor() below.
+    planImages: remoteModule?.planImages || localModule?.planImages || {},
     verticals: Array.isArray(remoteModule?.verticals)
       ? remoteModule.verticals
       : localModule?.verticals || [],
@@ -1786,6 +1790,11 @@ const hydrateModule = (remoteModule, localModule) => {
       : localModule?.bullets || [],
   };
 };
+
+// Resolves which screenshot to show for a tile under a given plan tab —
+// the per-plan slot if that plan's image was uploaded, else the shared
+// fallback `image`.
+export const planImageFor = (tile, plan) => tile?.planImages?.[plan]?.url || tile?.image || "";
 
 // Recursive so a grandchild (e.g. Tech Department > Website Builder >
 // Website Leads) also gets its image unpacked from `{url, key}` to a plain
