@@ -190,7 +190,9 @@ export const importVisaRulesV2Csv = async (req, res, next) => {
       // below (requirement-row path sets both fields; duration-only path
       // never touches an existing row's requirement).
       // Only fetch the pairs the uploaded file actually mentions — a full
-      // unfiltered collection scan here hangs in production.
+      // unfiltered collection scan here hangs in production. Grouped by
+      // passport (same as the row importer) so a full matrix doesn't turn
+      // into one $or clause per pair.
       const neededPairs = new Map();
       requirementMap.forEach((entry) =>
         neededPairs.set(`${entry.passport}|${entry.destination}`, entry),
@@ -199,12 +201,22 @@ export const importVisaRulesV2Csv = async (req, res, next) => {
         neededPairs.set(`${entry.passport}|${entry.destination}`, entry),
       );
 
-      const neededDocs = neededPairs.size
+      const destinationsByPassport = new Map();
+      neededPairs.forEach((entry) => {
+        if (!destinationsByPassport.has(entry.passport)) {
+          destinationsByPassport.set(entry.passport, new Set());
+        }
+        destinationsByPassport.get(entry.passport).add(entry.destination);
+      });
+
+      const neededDocs = destinationsByPassport.size
         ? await VisaRuleV2.find({
-            $or: Array.from(neededPairs.values()).map((entry) => ({
-              passport: entry.passport,
-              destination: entry.destination,
-            })),
+            $or: Array.from(destinationsByPassport.entries()).map(
+              ([passport, destinations]) => ({
+                passport,
+                destination: { $in: Array.from(destinations) },
+              }),
+            ),
           })
             .maxTimeMS(25000)
             .lean()
@@ -468,9 +480,24 @@ export const importVisaRulesV2RowCsv = async (req, res, next) => {
 
     if (isDryRun) {
       // Only fetch the pairs this file mentions — a full unfiltered
-      // collection scan here hangs in production.
+      // collection scan here hangs in production. Grouped by passport
+      // (destinations repeat under far fewer passports than there are
+      // rows) instead of one $or clause per row, so a full-sheet upload
+      // (tens of thousands of rows) doesn't turn into a tens-of-thousands
+      // -clause query.
+      const destinationsByPassport = new Map();
+      rows.forEach((row) => {
+        if (!destinationsByPassport.has(row.passport)) {
+          destinationsByPassport.set(row.passport, new Set());
+        }
+        destinationsByPassport.get(row.passport).add(row.destination);
+      });
+
       const neededDocs = await VisaRuleV2.find({
-        $or: rows.map((row) => ({ passport: row.passport, destination: row.destination })),
+        $or: Array.from(destinationsByPassport.entries()).map(([passport, destinations]) => ({
+          passport,
+          destination: { $in: Array.from(destinations) },
+        })),
       })
         .maxTimeMS(25000)
         .lean();
