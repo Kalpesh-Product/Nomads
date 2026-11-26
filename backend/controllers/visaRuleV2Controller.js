@@ -189,7 +189,7 @@ export const importVisaRulesV2Csv = async (req, res, next) => {
       // Diff only, nothing written — mirrors the exact two update paths
       // below (requirement-row path sets both fields; duration-only path
       // never touches an existing row's requirement).
-      const allDocs = await VisaRuleV2.find().lean();
+      const allDocs = await VisaRuleV2.find().maxTimeMS(25000).lean();
       const docByKey = new Map(
         allDocs.map((doc) => [
           `${doc.normalizedPassport || normalizeCountryKey(doc.passport)}|${
@@ -449,7 +449,7 @@ export const importVisaRulesV2RowCsv = async (req, res, next) => {
       String(req.query.dryRun || req.body.dryRun || "").toLowerCase() === "true";
 
     if (isDryRun) {
-      const allDocs = await VisaRuleV2.find().lean();
+      const allDocs = await VisaRuleV2.find().maxTimeMS(25000).lean();
       const docByKey = new Map(
         allDocs.map((doc) => [
           `${doc.normalizedPassport || normalizeCountryKey(doc.passport)}|${
@@ -557,7 +557,10 @@ export const importVisaRulesV2RowCsv = async (req, res, next) => {
 // reupload is a round trip.
 export const exportVisaRulesV2Csv = async (req, res, next) => {
   try {
-    const rules = await VisaRuleV2.find().sort({ passport: 1, destination: 1 }).lean();
+    const rules = await VisaRuleV2.find()
+      .sort({ passport: 1, destination: 1 })
+      .maxTimeMS(25000)
+      .lean();
 
     const header = ["Passport", "Destination", "Requirement", "DurationDays"];
     const lines = [header.join(",")];
