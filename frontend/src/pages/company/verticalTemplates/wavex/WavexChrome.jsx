@@ -1,5 +1,5 @@
 import React from "react";
-import { AnimatePresence, motion } from "../motion";
+import { AnimatePresence, motion as Motion } from "../motion";
 import { isProductsNavItem } from "../templateNavigation";
 import { SOCIAL_ICON } from "../socialIcons";
 import { groupOpeningHours } from "../templateKit";
@@ -46,9 +46,9 @@ export const WavexHeader = () => {
       </header>
 
       <AnimatePresence>
-        {t.mobileMenuOpen ? (<motion.div className="wx-drawer" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+        {t.mobileMenuOpen ? (<Motion.div className="wx-drawer" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
             <button type="button" className="wx-drawer-backdrop" aria-label="Close menu" onClick={() => t.setMobileMenuOpen(false)}/>
-            <motion.div className="wx-drawer-panel" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
+            <Motion.div className="wx-drawer-panel" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}>
               <div className="wx-drawer-head">
                 <span className="wx-brand">{draft?.companyName || "WaveX"}</span>
                 <button type="button" className="wx-drawer-close" aria-label="Close menu" onClick={() => t.setMobileMenuOpen(false)}>
@@ -56,7 +56,7 @@ export const WavexHeader = () => {
                 </button>
               </div>
               <nav className="wx-drawer-nav" aria-label="Mobile navigation">
-                {t.navItems.map((item) => (<button key={item.slug} type="button" onClick={() => t.goToSection(item.slug)}>
+                {t.navItems.map((item) => (<button key={item.slug} type="button" aria-current={active(item) ? "page" : undefined} onClick={() => t.goToSection(item.slug)}>
                     {item.name}
                     <span aria-hidden="true">{Icon.arrow(15)}</span>
                   </button>))}
@@ -64,8 +64,8 @@ export const WavexHeader = () => {
               <button type="button" className="wx-btn" onClick={book}>
                 {primary?.leadEnabled ? profile.labels.cta : "Get in touch"}
               </button>
-            </motion.div>
-          </motion.div>) : null}
+            </Motion.div>
+          </Motion.div>) : null}
       </AnimatePresence>
     </>);
 };
