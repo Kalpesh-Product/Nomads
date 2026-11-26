@@ -189,12 +189,30 @@ export const importVisaRulesV2Csv = async (req, res, next) => {
       // Diff only, nothing written — mirrors the exact two update paths
       // below (requirement-row path sets both fields; duration-only path
       // never touches an existing row's requirement).
-      const allDocs = await VisaRuleV2.find().maxTimeMS(25000).lean();
+      // Only fetch the pairs the uploaded file actually mentions — a full
+      // unfiltered collection scan here hangs in production.
+      const neededPairs = new Map();
+      requirementMap.forEach((entry) =>
+        neededPairs.set(`${entry.passport}|${entry.destination}`, entry),
+      );
+      durationMap.forEach((entry) =>
+        neededPairs.set(`${entry.passport}|${entry.destination}`, entry),
+      );
+
+      const neededDocs = neededPairs.size
+        ? await VisaRuleV2.find({
+            $or: Array.from(neededPairs.values()).map((entry) => ({
+              passport: entry.passport,
+              destination: entry.destination,
+            })),
+          })
+            .maxTimeMS(25000)
+            .lean()
+        : [];
+
       const docByKey = new Map(
-        allDocs.map((doc) => [
-          `${doc.normalizedPassport || normalizeCountryKey(doc.passport)}|${
-            doc.normalizedDestination || normalizeCountryKey(doc.destination)
-          }`,
+        neededDocs.map((doc) => [
+          `${normalizeCountryKey(doc.passport)}|${normalizeCountryKey(doc.destination)}`,
           doc,
         ]),
       );
@@ -449,12 +467,17 @@ export const importVisaRulesV2RowCsv = async (req, res, next) => {
       String(req.query.dryRun || req.body.dryRun || "").toLowerCase() === "true";
 
     if (isDryRun) {
-      const allDocs = await VisaRuleV2.find().maxTimeMS(25000).lean();
+      // Only fetch the pairs this file mentions — a full unfiltered
+      // collection scan here hangs in production.
+      const neededDocs = await VisaRuleV2.find({
+        $or: rows.map((row) => ({ passport: row.passport, destination: row.destination })),
+      })
+        .maxTimeMS(25000)
+        .lean();
+
       const docByKey = new Map(
-        allDocs.map((doc) => [
-          `${doc.normalizedPassport || normalizeCountryKey(doc.passport)}|${
-            doc.normalizedDestination || normalizeCountryKey(doc.destination)
-          }`,
+        neededDocs.map((doc) => [
+          `${normalizeCountryKey(doc.passport)}|${normalizeCountryKey(doc.destination)}`,
           doc,
         ]),
       );
