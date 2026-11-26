@@ -1,4 +1,5 @@
 import { useState } from "react";
+import headBarista from "./head-barista.jpg";
 import { priceWithUnit } from "../templateKit";
 import { getCareersJobMeta, getCareersJobTitle, getMediaSrc } from "../useWebsiteTemplateData";
 import { ApplyForm, MessageForm, RoleSection } from "../shared/TplForms";
@@ -70,12 +71,20 @@ export function MenuItemPage({ service, item }) {
       <PhotoViewer images={photos} index={photoIndex} onClose={() => setPhotoIndex(null)} onChange={setPhotoIndex}/>
     </section>);
 }
+const SAMPLE_TEAM_PORTRAIT = /^https:\/\/images\.unsplash\.com\/photo-1573497019236-17f8177b81e8(?:[?#]|$)/;
+
 export function AboutPage() {
     const { t, draft, navLabel, photo } = useItaliano();
     const images = draft.aboutPageImages || [];
     const founders = t.isSectionEnabled("about_founders") ? t.founders : [];
     const team = t.isSectionEnabled("about_team") ? t.aboutPageImageCards : [];
-    const people = [...founders, ...team];
+    const hasSampleFounderPortrait = founders.some((founder) => SAMPLE_TEAM_PORTRAIT.test(getMediaSrc(founder.image)));
+    // Replace the duplicated portrait in older Italiano sample content.
+    const people = [...founders, ...team.map((member) =>
+        hasSampleFounderPortrait && member.title === "Rhea" && SAMPLE_TEAM_PORTRAIT.test(getMediaSrc(member.image))
+            ? { ...member, image: headBarista }
+            : member
+    )];
     return (<>
       <ItalianoPageHero title={draft.aboutPageHeading || navLabel("about", "About us")} body={draft.aboutPageIntro} image={photo("about.image", getMediaSrc(images[0]) || t.heroImages[0] || "")}/>
       <section className="italiano-section italiano-shell">
