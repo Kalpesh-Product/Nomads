@@ -94,6 +94,26 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isVisaPartner: {
+      type: Boolean,
+      default: false,
+    },
+    isCompanySetupPartner: {
+      type: Boolean,
+      default: false,
+    },
+    isActivationSupportPartner: {
+      type: Boolean,
+      default: false,
+    },
+    isConsultationSupportPartner: {
+      type: Boolean,
+      default: false,
+    },
+    isWorkationPartner: {
+      type: Boolean,
+      default: false,
+    },
     contributionsActivationEmailSentAt: {
       type: Date,
       default: null,

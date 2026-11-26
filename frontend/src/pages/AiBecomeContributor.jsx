@@ -49,13 +49,11 @@ const getFlagIconUrl = (isoCode) =>
 const CONTRIBUTION_TYPE_OPTIONS = [
   "Become a Nomad Blog & News Writer",
   "Become a Content Creator",
-  "Add your Business Listing & Services",
-  "Become a Overall Destination Partner",
-  "Become a Local Experience Partner",
   "Become a Visa & Immigration Partner",
-  "Become a Tax & Financial Advisory Partner",
   "Become a Company Setup Services Partner",
-  "Become a Remote Jobs Posting Partner",
+  "Become a Activation Support Partner",
+  "Become a Consultation Support Partner",
+  "Become a Workation Support Partner",
   "Not Sure - Lets Connect & Explore",
 ];
 // Expand each displayed contributor choice into the existing API role options.

@@ -2,7 +2,7 @@ import * as yup from "yup";
 import BecomeContributor from "../models/BecomeContributor.js";
 import mongoose from "mongoose";
 import NomadUser from "../models/NomadUser.js";
-import { CONTRIBUTOR_ROLE_OPTIONS, getContributorRoleStatus, getRequestedContributorRoles } from "../utils/contributorRoles.js";
+import { CONTRIBUTOR_ROLE_OPTIONS, PARTNER_ROLE_KEYS, getContributorRoleStatus, getRequestedContributorRoles } from "../utils/contributorRoles.js";
 import { notifyFirstContributorActivation } from "../utils/contributorActivationEmail.js";
 
 const MESSAGE_CHARACTER_LIMIT = 1000;
@@ -57,7 +57,7 @@ export const getBecomeContributorRequests = async (req, res, next) => {
     const users = await NomadUser.find({ $or: [
       { _id: { $in: requests.map((lead) => lead.nomadUser).filter(Boolean) } },
       { email: { $in: requests.filter((lead) => !lead.nomadUser).map((lead) => lead.email) } },
-    ] }).select("email isBlogger isNewsWriter isEventWriter isPlaceWriter").lean();
+    ] }).select("email isBlogger isNewsWriter isEventWriter isPlaceWriter isVisaPartner isCompanySetupPartner isActivationSupportPartner isConsultationSupportPartner isWorkationPartner").lean();
     const usersById = new Map(users.map((user) => [String(user._id), user]));
     const usersByEmail = new Map(users.map((user) => [user.email, user]));
 
@@ -90,10 +90,11 @@ export const updateContributorLeadStatus = async (req, res, next) => {
       lead.nomadUser ? { _id: lead.nomadUser } : { email: lead.email },
       { $set: { [role]: isActive } },
       { new: true, runValidators: true },
-    ).select("fullName email isBlogger isNewsWriter isEventWriter isPlaceWriter").lean();
+    ).select("fullName email isBlogger isNewsWriter isEventWriter isPlaceWriter isVisaPartner isCompanySetupPartner isActivationSupportPartner isConsultationSupportPartner isWorkationPartner").lean();
     if (!user) return res.status(409).json({ message: "No Nomad account is linked to this lead. The contributor must register first." });
     let warning;
-    if (isActive) {
+    // Partner roles get their own invite/registration flow, not the Contributions activation email.
+    if (isActive && !PARTNER_ROLE_KEYS.includes(role)) {
       try {
         await notifyFirstContributorActivation(user);
       } catch (error) {
