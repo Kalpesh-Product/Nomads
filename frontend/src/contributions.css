@@ -14,6 +14,17 @@
   overflow-wrap: anywhere;
 }
 
+/* Draft pages scroll inside the Nomad layout, including at the footer. */
+html:has(#nomad-ai-scroll-container [data-contribution-draft]),
+body:has(#nomad-ai-scroll-container [data-contribution-draft]) {
+  overflow-y: hidden;
+  overscroll-behavior-y: none;
+}
+
+#nomad-ai-scroll-container:has([data-contribution-draft]) {
+  overscroll-behavior-y: none;
+}
+
 @media (max-width: 1023px) {
   .contributions-layout {
     height: 100dvh;
