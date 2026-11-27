@@ -7,6 +7,7 @@ import {
   importVisaRulesV2Csv,
   importVisaRulesV2RowCsv,
   exportVisaRulesV2Csv,
+  getVisaRulesV2Cached,
   updateVisaRuleByPassportV2,
 } from "../controllers/visaRuleV2Controller.js";
 
@@ -14,6 +15,7 @@ const router = Router();
 
 router.get("/", getVisaRulesV2);
 router.get("/export-csv", exportVisaRulesV2Csv);
+router.get("/cached-all", getVisaRulesV2Cached);
 router.get("/destinations/countries", getUniqueDestinationCountriesV2);
 router.get("/passport/:passport", getVisaRuleDetailsByPassportV2);
 router.patch("/passport/:passport", updateVisaRuleByPassportV2);
