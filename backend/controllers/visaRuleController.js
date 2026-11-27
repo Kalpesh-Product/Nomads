@@ -119,13 +119,18 @@ export const buildMatrixMap = (rows = [], valueMapper = (value) => value) => {
       if (destination === getFirstColumnKey(row)) return;
 
       const cleanedDestination = String(destination || "").trim();
-      const value = valueMapper(rawValue);
-
-      if (!cleanedDestination || value === undefined) return;
+      if (!cleanedDestination) return;
 
       const key = `${normalizeCountryKey(passport)}|${normalizeCountryKey(
         cleanedDestination,
       )}`;
+
+      // No visa rule needed to travel to your own country — never create
+      // one, however the source sheet's diagonal cell is filled in.
+      if (normalizeCountryKey(passport) === normalizeCountryKey(cleanedDestination)) return;
+
+      const value = valueMapper(rawValue);
+      if (value === undefined) return;
 
       matrix.set(key, {
         passport,

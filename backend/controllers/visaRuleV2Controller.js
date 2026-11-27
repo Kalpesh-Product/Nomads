@@ -123,6 +123,25 @@ export const getUniqueDestinationCountriesV2 = async (req, res, next) => {
   }
 };
 
+// Shared by the live endpoint below and the background cache refresher —
+// one scoped, already-proven-fast query per passport, never an unfiltered
+// full-collection scan.
+const fetchVisaRulesForPassport = async (passport) => {
+  const normalizedPassport = normalizeCountryKey(passport);
+
+  const data = await VisaRuleV2.find({
+    $or: [{ passport }, { normalizedPassport }],
+  })
+    .sort({ destination: 1 })
+    .lean();
+
+  return data.filter(
+    (rule) =>
+      (rule.normalizedPassport || normalizeCountryKey(rule.passport)) ===
+      normalizedPassport,
+  );
+};
+
 export const getVisaRuleDetailsByPassportV2 = async (req, res, next) => {
   try {
     const passport = String(req.params.passport || "").trim();
@@ -134,24 +153,121 @@ export const getVisaRuleDetailsByPassportV2 = async (req, res, next) => {
       });
     }
 
-    const normalizedPassport = normalizeCountryKey(passport);
-
-    const data = await VisaRuleV2.find({
-      $or: [{ passport }, { normalizedPassport }],
-    })
-      .sort({ destination: 1 })
-      .lean();
-
-    const filteredData = data.filter(
-      (rule) =>
-        (rule.normalizedPassport || normalizeCountryKey(rule.passport)) ===
-        normalizedPassport,
-    );
+    const filteredData = await fetchVisaRulesForPassport(passport);
 
     return res.status(200).json({
       success: true,
       count: filteredData.length,
       data: filteredData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// --- IN-MEMORY CACHE (mirrors masterpanel's destinationDataControllers.js
+// stale-while-revalidate pattern) ---
+// Refresh batches the same scoped per-passport query already proven safe —
+// never an unfiltered collection scan, just done once on a timer instead of
+// once per export click. Export reads only ever come from here; dry-run and
+// commit always hit the live DB directly, never this cache.
+const VISA_CACHE_TTL_MS = 10 * 60 * 1000;
+const VISA_CACHE_BATCH_SIZE = 5;
+// Minimum gap between retry attempts when a refresh fails, so repeated
+// requests during an outage can't hammer the DB.
+const VISA_CACHE_RETRY_MS = 30 * 1000;
+
+const visaRulesCache = { countries: null, byPassport: null, fetchedAt: 0 };
+let visaRulesRefreshPromise = null;
+let visaRulesRefreshAttemptAt = 0;
+
+const refreshVisaRulesCache = () => {
+  if (!visaRulesRefreshPromise) {
+    visaRulesRefreshPromise = (async () => {
+      const rawCountries = await VisaRuleV2.distinct("destination");
+      const countries = Array.from(
+        new Set(rawCountries.map((value) => String(value || "").trim()).filter(Boolean)),
+      ).sort((a, b) => a.localeCompare(b));
+
+      const byPassport = new Map();
+      for (let i = 0; i < countries.length; i += VISA_CACHE_BATCH_SIZE) {
+        const batch = countries.slice(i, i + VISA_CACHE_BATCH_SIZE);
+        const results = await Promise.allSettled(
+          batch.map((passport) => fetchVisaRulesForPassport(passport)),
+        );
+        results.forEach((result, index) => {
+          const passport = batch[index];
+          // A failed passport is just left out of this pass — picked up on
+          // the next refresh, never blocks the rest of the cache.
+          if (result.status === "fulfilled") {
+            byPassport.set(passport, result.value);
+          }
+        });
+      }
+
+      visaRulesCache.countries = countries;
+      visaRulesCache.byPassport = byPassport;
+      visaRulesCache.fetchedAt = Date.now();
+      return visaRulesCache;
+    })().finally(() => {
+      visaRulesRefreshPromise = null;
+    });
+  }
+
+  return visaRulesRefreshPromise;
+};
+
+const getVisaRulesCacheState = () => {
+  const isFresh =
+    visaRulesCache.byPassport &&
+    Date.now() - visaRulesCache.fetchedAt < VISA_CACHE_TTL_MS;
+
+  if (isFresh) {
+    return {
+      countries: visaRulesCache.countries,
+      byPassport: visaRulesCache.byPassport,
+      isRefreshing: false,
+      isInitialLoading: false,
+    };
+  }
+
+  if (
+    !visaRulesRefreshPromise &&
+    Date.now() - visaRulesRefreshAttemptAt >= VISA_CACHE_RETRY_MS
+  ) {
+    visaRulesRefreshAttemptAt = Date.now();
+    refreshVisaRulesCache().catch((error) => {
+      console.error("Background visa rules cache refresh failed:", error.message);
+    });
+  }
+
+  return {
+    countries: visaRulesCache.countries || [],
+    byPassport: visaRulesCache.byPassport || new Map(),
+    isRefreshing: true,
+    isInitialLoading: !visaRulesCache.byPassport,
+  };
+};
+
+// Export reads from the cache. A cold cache (first request after a restart)
+// waits for the one-time refresh instead of returning empty — same
+// trade-off as the live per-passport endpoint, just paid once globally
+// rather than once per page load.
+export const getVisaRulesV2Cached = async (req, res, next) => {
+  try {
+    let state = getVisaRulesCacheState();
+
+    if (state.isInitialLoading) {
+      await refreshVisaRulesCache();
+      state = getVisaRulesCacheState();
+    }
+
+    return res.status(200).json({
+      success: true,
+      isRefreshing: state.isRefreshing,
+      fetchedAt: visaRulesCache.fetchedAt,
+      countries: state.countries,
+      rulesByPassport: Object.fromEntries(state.byPassport),
     });
   } catch (error) {
     next(error);
@@ -393,6 +509,7 @@ export const importVisaRulesV2Csv = async (req, res, next) => {
     }
 
     const result = await VisaRuleV2.bulkWrite(operations, { ordered: false });
+    visaRulesCache.fetchedAt = 0; // next export refreshes instead of serving stale data
 
     return res.status(200).json({
       message: "Visa rules (v2) imported successfully.",
@@ -434,6 +551,14 @@ export const importVisaRulesV2RowCsv = async (req, res, next) => {
 
       if (!passport || !destination) {
         rowErrors.push({ rowNumber, reason: "Missing Passport or Destination" });
+        return;
+      }
+
+      if (normalizeCountryKey(passport) === normalizeCountryKey(destination)) {
+        rowErrors.push({
+          rowNumber,
+          reason: "Passport and Destination are the same country — no visa rule needed",
+        });
         return;
       }
 
@@ -589,6 +714,7 @@ export const importVisaRulesV2RowCsv = async (req, res, next) => {
     }));
 
     const result = await VisaRuleV2.bulkWrite(operations, { ordered: false });
+    visaRulesCache.fetchedAt = 0; // next export refreshes instead of serving stale data
 
     return res.status(200).json({
       message: "Visa rules (v2) updated from CSV.",
@@ -716,6 +842,8 @@ export const updateVisaRuleByPassportV2 = async (req, res, next) => {
           "Visa rule not found for the provided passport and destination.",
       });
     }
+
+    visaRulesCache.fetchedAt = 0; // next export refreshes instead of serving stale data
 
     return res.status(200).json({
       success: true,
