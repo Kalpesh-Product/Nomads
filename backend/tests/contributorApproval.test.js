@@ -21,10 +21,12 @@ const query = (data) => ({ select() { return this; }, lean: async () => data });
 test("new accounts are inactive and combined requests map to independent roles", () => {
   assert.deepEqual(getContributorRoleStatus(new NomadUser()), {
     isBlogger: false, isNewsWriter: false, isEventWriter: false, isPlaceWriter: false,
+    isVisaPartner: false, isCompanySetupPartner: false, isActivationSupportPartner: false,
+    isConsultationSupportPartner: false, isWorkationPartner: false,
   });
   assert.deepEqual(getRequestedContributorRoles("Become a Nomad Blog & News Writer"), ["isBlogger", "isNewsWriter"]);
   assert.deepEqual(getRequestedContributorRoles("Become a Content Creator"), ["isEventWriter", "isPlaceWriter"]);
-  assert.deepEqual(getRequestedContributorRoles("Become a Visa & Immigration Partner"), []);
+  assert.deepEqual(getRequestedContributorRoles("Become a Visa & Immigration Partner"), ["isVisaPartner"]);
 });
 
 test("submission records the signed-in account and never grants roles supplied in the body", async (t) => {
@@ -76,7 +78,7 @@ test("a lead is inactive until approval and status follows the linked account ra
   assert.equal(res.body.data[2].isBlogger, false);
 });
 
-test("approval and revocation update only the selected role for each of the four tabs", async (t) => {
+test("approval and revocation update only the selected requested content role", async (t) => {
   const account = getContributorRoleStatus();
   t.mock.method(BecomeContributor, "findById", () => query({
     _id: leadId, nomadUser: userId, email: "other@example.com",
@@ -88,7 +90,7 @@ test("approval and revocation update only the selected role for each of the four
     Object.assign(account, update.$set);
     return query({ ...account });
   });
-  for (const role of Object.keys(account)) {
+  for (const role of ["isBlogger", "isNewsWriter", "isEventWriter", "isPlaceWriter"]) {
     for (const isActive of [true, false]) {
       const before = { ...account };
       const res = response();
@@ -98,6 +100,35 @@ test("approval and revocation update only the selected role for each of the four
       assert.equal(res.body.data[role], isActive);
     }
   }
+});
+
+test("partner leads use pending, approved and rejected review states without requiring a Nomad account", async (t) => {
+  t.mock.method(BecomeContributor, "findById", () => query({
+    _id: leadId,
+    contributionType: "Become a Visa & Immigration Partner",
+    partnerStatuses: { isVisaPartner: "pending" },
+  }));
+  let savedUpdate;
+  t.mock.method(BecomeContributor, "findByIdAndUpdate", (_id, update) => {
+    savedUpdate = update;
+    return query({
+      _id: leadId,
+      contributionType: "Become a Visa & Immigration Partner",
+      partnerStatuses: { isVisaPartner: "approved" },
+    });
+  });
+
+  const res = response();
+  await updateContributorLeadStatus({
+    params: { id: leadId },
+    body: { role: "isVisaPartner", status: "approved" },
+  }, res, fail);
+
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(savedUpdate, {
+    $set: { "partnerStatuses.isVisaPartner": "approved" },
+  });
+  assert.equal(res.body.data.partnerStatuses.isVisaPartner, "approved");
 });
 
 test("invalid roles, unrequested roles and string statuses cannot activate access", async (t) => {
@@ -140,6 +171,9 @@ test("contributor submission needs login; partner submissions remain public; adm
   let allowed = false;
   authenticateContributorSubmission({ body: { contributionType: "Not Sure - Lets Connect & Explore" } }, response(), () => { allowed = true; });
   assert.equal(allowed, true);
+  let partnerAllowed = false;
+  authenticateContributorSubmission({ body: { contributionType: "Become a Visa & Immigration Partner" } }, response(), () => { partnerAllowed = true; });
+  assert.equal(partnerAllowed, true);
   const adminRes = response();
   verifyAdminApiKey({ headers: {} }, adminRes, () => assert.fail("Non-admin passed"));
   assert.equal(adminRes.statusCode, 401);

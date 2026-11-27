@@ -1,9 +1,16 @@
 import NomadUser from "../models/NomadUser.js";
-import { getRequestedContributorRoles } from "../utils/contributorRoles.js";
+import {
+  getRequestedContributorRoles,
+  PARTNER_ROLE_KEYS,
+} from "../utils/contributorRoles.js";
 import { verifyJwt } from "./verifyJwt.js";
 
 export const authenticateContributorSubmission = (req, res, next) => {
-  if (getRequestedContributorRoles(req.body?.contributionType).length) {
+  const requestedContentRoles = getRequestedContributorRoles(
+    req.body?.contributionType,
+  ).filter((role) => !PARTNER_ROLE_KEYS.includes(role));
+
+  if (requestedContentRoles.length) {
     return verifyJwt(req, res, next);
   }
   return next();

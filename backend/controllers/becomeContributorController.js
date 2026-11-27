@@ -75,15 +75,35 @@ export const getBecomeContributorRequests = async (req, res, next) => {
 
 export const updateContributorLeadStatus = async (req, res, next) => {
   try {
-    const { role, isActive } = req.body || {};
+    const { role, isActive, status } = req.body || {};
     if (!mongoose.Types.ObjectId.isValid(req.params.id) ||
-        !Object.hasOwn(CONTRIBUTOR_ROLE_OPTIONS, role) || typeof isActive !== "boolean") {
-      return res.status(400).json({ message: "A valid lead, contributor role and boolean status are required." });
+        !Object.hasOwn(CONTRIBUTOR_ROLE_OPTIONS, role)) {
+      return res.status(400).json({ message: "A valid lead and role are required." });
     }
     const lead = await BecomeContributor.findById(req.params.id).lean();
     if (!lead) return res.status(404).json({ message: "Contributor lead not found." });
     if (!getRequestedContributorRoles(lead.contributionType).includes(role)) {
       return res.status(400).json({ message: "This lead did not request that contributor role." });
+    }
+
+    if (PARTNER_ROLE_KEYS.includes(role)) {
+      const normalizedStatus = String(status || "").trim().toLowerCase();
+      if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
+        return res.status(400).json({ message: "Partner lead status must be pending, approved or rejected." });
+      }
+      const updatedLead = await BecomeContributor.findByIdAndUpdate(
+        req.params.id,
+        { $set: { [`partnerStatuses.${role}`]: normalizedStatus } },
+        { new: true, runValidators: true },
+      ).lean();
+      return res.status(200).json({
+        message: `Partner lead marked as ${normalizedStatus}.`,
+        data: updatedLead,
+      });
+    }
+
+    if (typeof isActive !== "boolean") {
+      return res.status(400).json({ message: "Contributor access requires a boolean status." });
     }
     // Older leads predate account linking; their registered email identifies the account.
     const user = await NomadUser.findOneAndUpdate(

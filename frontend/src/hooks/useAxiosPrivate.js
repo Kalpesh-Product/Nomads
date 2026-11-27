@@ -10,7 +10,7 @@ export default function useAxiosPrivate() {
   useEffect(() => {
     const requestIntercept = axiosPrivate.interceptors.request.use(
       (config) => {
-        if (!config.headers["Authorization"]) {
+        if (!config.headers["Authorization"] && auth.accessToken) {
           config.headers["Authorization"] = `Bearer ${auth.accessToken}`;
         }
         return config;
@@ -24,6 +24,9 @@ export default function useAxiosPrivate() {
         if (error?.response?.status === 403 && !prevRequest.sent) {
           prevRequest.sent = true;
           const authData = await refresh();
+          if (!authData?.accessToken) {
+            return Promise.reject(error);
+          }
           prevRequest.headers[
             "Authorization"
           ] = `Bearer ${authData?.accessToken}`;

@@ -12,7 +12,7 @@ import { Country } from "country-state-city";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
 import Container from "../components/Container";
-import axios from "../utils/axios";
+import { api as axios } from "../utils/axios";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { HiCheck } from "react-icons/hi";

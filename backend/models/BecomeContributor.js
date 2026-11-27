@@ -18,6 +18,13 @@ const becomeContributorSchema = new mongoose.Schema(
             default: "",
             maxlength: MESSAGE_CHARACTER_LIMIT,
         },
+        partnerStatuses: {
+            isVisaPartner: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+            isCompanySetupPartner: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+            isActivationSupportPartner: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+            isConsultationSupportPartner: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+            isWorkationPartner: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+        },
     },
     { timestamps: true },
 );
