@@ -760,7 +760,7 @@ export const bulkUpdateStateWiseWeightV2Weights = async (req, res, next) => {
           // isActive/continent filter) so rank deltas match what staff
           // already sees elsewhere; it's a global-rank approximation, not
           // the exact filtered list any one visitor view would show.
-          const allDocs = await StateWiseWeightV2.find().lean();
+          const allDocs = await StateWiseWeightV2.find().maxTimeMS(25000).lean();
           const docById = new Map(allDocs.map((doc) => [String(doc._id), doc]));
           const rowById = new Map(rows.map((row) => [row.id, row]));
 

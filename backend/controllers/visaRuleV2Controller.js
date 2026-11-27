@@ -189,12 +189,42 @@ export const importVisaRulesV2Csv = async (req, res, next) => {
       // Diff only, nothing written — mirrors the exact two update paths
       // below (requirement-row path sets both fields; duration-only path
       // never touches an existing row's requirement).
-      const allDocs = await VisaRuleV2.find().lean();
+      // Only fetch the pairs the uploaded file actually mentions — a full
+      // unfiltered collection scan here hangs in production. Grouped by
+      // passport (same as the row importer) so a full matrix doesn't turn
+      // into one $or clause per pair.
+      const neededPairs = new Map();
+      requirementMap.forEach((entry) =>
+        neededPairs.set(`${entry.passport}|${entry.destination}`, entry),
+      );
+      durationMap.forEach((entry) =>
+        neededPairs.set(`${entry.passport}|${entry.destination}`, entry),
+      );
+
+      const destinationsByPassport = new Map();
+      neededPairs.forEach((entry) => {
+        if (!destinationsByPassport.has(entry.passport)) {
+          destinationsByPassport.set(entry.passport, new Set());
+        }
+        destinationsByPassport.get(entry.passport).add(entry.destination);
+      });
+
+      const neededDocs = destinationsByPassport.size
+        ? await VisaRuleV2.find({
+            $or: Array.from(destinationsByPassport.entries()).map(
+              ([passport, destinations]) => ({
+                passport,
+                destination: { $in: Array.from(destinations) },
+              }),
+            ),
+          })
+            .maxTimeMS(25000)
+            .lean()
+        : [];
+
       const docByKey = new Map(
-        allDocs.map((doc) => [
-          `${doc.normalizedPassport || normalizeCountryKey(doc.passport)}|${
-            doc.normalizedDestination || normalizeCountryKey(doc.destination)
-          }`,
+        neededDocs.map((doc) => [
+          `${normalizeCountryKey(doc.passport)}|${normalizeCountryKey(doc.destination)}`,
           doc,
         ]),
       );
@@ -449,12 +479,32 @@ export const importVisaRulesV2RowCsv = async (req, res, next) => {
       String(req.query.dryRun || req.body.dryRun || "").toLowerCase() === "true";
 
     if (isDryRun) {
-      const allDocs = await VisaRuleV2.find().lean();
+      // Only fetch the pairs this file mentions — a full unfiltered
+      // collection scan here hangs in production. Grouped by passport
+      // (destinations repeat under far fewer passports than there are
+      // rows) instead of one $or clause per row, so a full-sheet upload
+      // (tens of thousands of rows) doesn't turn into a tens-of-thousands
+      // -clause query.
+      const destinationsByPassport = new Map();
+      rows.forEach((row) => {
+        if (!destinationsByPassport.has(row.passport)) {
+          destinationsByPassport.set(row.passport, new Set());
+        }
+        destinationsByPassport.get(row.passport).add(row.destination);
+      });
+
+      const neededDocs = await VisaRuleV2.find({
+        $or: Array.from(destinationsByPassport.entries()).map(([passport, destinations]) => ({
+          passport,
+          destination: { $in: Array.from(destinations) },
+        })),
+      })
+        .maxTimeMS(25000)
+        .lean();
+
       const docByKey = new Map(
-        allDocs.map((doc) => [
-          `${doc.normalizedPassport || normalizeCountryKey(doc.passport)}|${
-            doc.normalizedDestination || normalizeCountryKey(doc.destination)
-          }`,
+        neededDocs.map((doc) => [
+          `${normalizeCountryKey(doc.passport)}|${normalizeCountryKey(doc.destination)}`,
           doc,
         ]),
       );
@@ -557,7 +607,10 @@ export const importVisaRulesV2RowCsv = async (req, res, next) => {
 // reupload is a round trip.
 export const exportVisaRulesV2Csv = async (req, res, next) => {
   try {
-    const rules = await VisaRuleV2.find().sort({ passport: 1, destination: 1 }).lean();
+    const rules = await VisaRuleV2.find()
+      .sort({ passport: 1, destination: 1 })
+      .maxTimeMS(25000)
+      .lean();
 
     const header = ["Passport", "Destination", "Requirement", "DurationDays"];
     const lines = [header.join(",")];

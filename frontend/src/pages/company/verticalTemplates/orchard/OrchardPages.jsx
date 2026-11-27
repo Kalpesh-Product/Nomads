@@ -13,6 +13,16 @@ export const OrchardAbout = () => {
         .concat(t.galleryItems || []);
     const team = t.aboutPageImageCards || [];
     const founders = t.founders || [];
+    // Repair the repeated stock portraits in older Orchard preview content.
+    const teamPortraits = team.map((member) => {
+        const sample = member.title === "Kabir" ? ["photo-1576558656222-ba66febe3dec", "photo-1758525589507-1d64a20415ac"]
+            : member.title === "Anjali" ? ["photo-1573497019236-17f8177b81e8", "photo-1573496799515-eebbb63814f2"] : null;
+        if (!sample) return member;
+        const [original, replacement] = sample;
+        const prefix = "https://images.unsplash.com/" + original;
+        if (img(member.image).split(/[?#]/, 1)[0] !== prefix || !founders.some((founder) => img(founder.image).split(/[?#]/, 1)[0] === prefix)) return member;
+        return { ...member, image: "https://images.unsplash.com/" + replacement + "?auto=format&fit=crop&crop=faces&w=700&h=875&q=80" };
+    });
     return (<>
       <OrchardPageHero eyebrow={c("about.eyebrow", "Our story")} title={navLabel("about", draft?.aboutTitle || c("about.title", "Built around the way people actually live."))} text={t.aboutIntroBlocks?.[0]} image={photos[0]}/>
       <section className="ol-section ol-section-soft">
@@ -26,7 +36,6 @@ export const OrchardAbout = () => {
             c("about.story.body", "Orchard started with a simple question: why do the places we stay so often feel disposable? We set out to make somewhere comfortable, calm and genuinely connected to its neighbourhood.")}
             </p>
           </div>
-          <OrchardPhoto src={photo("about.image2", photos[2] || t.galleryItems?.[2])} alt="A shared space" className="ol-about-photo ol-about-photo-offset"/>
         </div>
       </section>
 
@@ -49,7 +58,7 @@ export const OrchardAbout = () => {
           <div className="ol-shell">
             <OrchardHeading eyebrow={c("about.team.eyebrow", "The people here")} title={c("about.team.title", "Local hosts, real recommendations.")} small/>
             <div className="ol-team-grid">
-              {[...founders, ...team].slice(0, 6).map((person, index) => (<article key={`${person.name || person.title}-${index}`} className="ol-team-card">
+              {[...founders, ...teamPortraits].slice(0, 6).map((person, index) => (<article key={`${person.name || person.title}-${index}`} className="ol-team-card">
                   <OrchardPhoto src={img(person.image)} alt={person.name || person.title || "Team member"} className="ol-team-photo"/>
                   <h3>{person.name || person.title}</h3>
                   <p>{person.role || person.description}</p>
@@ -158,7 +167,7 @@ export const OrchardCareers = () => {
             c("careers.title", `Join ${draft?.companyName || "our team"}`)} text={draft?.careersPageIntro || t.careersFallbackIntro?.[0]} image={t.galleryItems?.[2]}/>
       <section className="ol-section">
         <div className="ol-shell">
-          <OrchardHeading eyebrow={c("careers.roles.eyebrow", "Open roles")} title={c("careers.roles.title", "Bring your energy. We will teach the rest.")} sub={c("careers.roles.sub", "From housekeeping to guest experience, good people make this place work.")}/>
+          <OrchardHeading className="ol-careers-roles-heading" eyebrow={c("careers.roles.eyebrow", "Open roles")} title={c("careers.roles.title", "Bring your energy. We will teach the rest.")} sub={c("careers.roles.sub", "From housekeeping to guest experience, good people make this place work.")}/>
           {t.careersJobsLoading ? (<p className="ol-lead">{c("careers.loading", "Loading roles…")}</p>) : t.careersJobs.length ? (<div className="ol-role-list">
               {t.careersJobs.map((role, index) => (<button key={index} type="button" onClick={() => t.openCareersJob(role)}>
                   <span className="ol-eyebrow">{getCareersJobMeta(role)}</span>
