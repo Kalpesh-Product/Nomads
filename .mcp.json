@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "nomads-visa-rules": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "D:\\wono\\Nomads\\backend\\mcp\\visaRuleMcpServer.js"
+      ]
+    }
+  }
+}

@@ -6,8 +6,21 @@ const visaRuleV2Schema = new mongoose.Schema(
     normalizedPassport: { type: String, trim: true, default: "" },
     destination: { type: String, required: true, trim: true },
     normalizedDestination: { type: String, trim: true, default: "" },
-    requirement: { type: String, trim: true, default: "" },
-    durationDays: { type: Number, default: null },
+    requirement: {
+      type: String,
+      trim: true,
+      default: "",
+      enum: [
+        "",
+        "visa free",
+        "visa on arrival",
+        "e-visa",
+        "physical visa",
+        "eta",
+        "no admission",
+      ],
+    },
+    durationDays: { type: Number, default: null, min: 0 },
   },
   { timestamps: true },
 );
