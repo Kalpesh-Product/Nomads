@@ -9,6 +9,7 @@ import {
   PARTNER_ROLE_KEYS,
 } from "../../utils/contributorRoles.js";
 import { aiBecomeContributorSchema } from "./b2cFormControllers.js";
+import { checkPartnerPanelEmail } from "../../utils/partnerPanelAccounts.js";
 
 const TOKEN_PURPOSE = "contributor-submission-verification";
 const LINK_EXPIRY = "24h";
@@ -77,6 +78,30 @@ const isPartnerSubmission = (contributionType) =>
   getRequestedContributorRoles(contributionType).some((role) =>
     PARTNER_ROLE_KEYS.includes(role),
   );
+
+const partnerEmailConflictMessage =
+  "This email already has a WONO Partner account. Please sign in to Partners Panel or use a different email.";
+
+const partnerEmailIsUnavailable = async (submission) =>
+  isPartnerSubmission(submission.contributionType) &&
+  (await checkPartnerPanelEmail(submission.email));
+
+export const checkPartnerUserEmail = async (req, res, next) => {
+  try {
+    const email = String(req.query?.email || "").trim().toLowerCase();
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return res.status(400).json({ message: "A valid email is required." });
+    }
+
+    const exists = await checkPartnerPanelEmail(email);
+    return res.status(200).json({
+      exists,
+      message: exists ? partnerEmailConflictMessage : "Email is available.",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
 
 const buildVerificationLinkEmail = ({ submission, verifyUrl }) => ({
   subject: "Verify your WONO submission",
@@ -159,6 +184,9 @@ export const sendContributorVerificationLink = async (req, res, next) => {
       { abortEarly: false, stripUnknown: true },
     );
     submission.email = submission.email.trim().toLowerCase();
+    if (await partnerEmailIsUnavailable(submission)) {
+      return res.status(409).json({ message: partnerEmailConflictMessage });
+    }
     const verificationId = randomUUID();
     const token = jwt.sign(
       {
@@ -194,6 +222,9 @@ export const sendContributorVerificationOtp = async (req, res, next) => {
     }
     const { decoded } = resolved;
     const submission = decoded.submission;
+    if (await partnerEmailIsUnavailable(submission)) {
+      return res.status(409).json({ message: partnerEmailConflictMessage });
+    }
     if (await BecomeContributor.exists({ verificationId: decoded.verificationId })) {
       return res.status(200).json({ alreadyVerified: true, email: maskEmail(submission.email) });
     }
@@ -254,6 +285,9 @@ export const verifyContributorSubmissionOtp = async (req, res, next) => {
     const submission = decoded.submission;
     const existing = await BecomeContributor.findOne({ verificationId: decoded.verificationId });
     if (existing) return res.status(200).json({ verified: true, alreadyVerified: true });
+    if (await partnerEmailIsUnavailable(submission)) {
+      return res.status(409).json({ message: partnerEmailConflictMessage });
+    }
 
     const record = await Otp.findOne({
       email: submission.email,

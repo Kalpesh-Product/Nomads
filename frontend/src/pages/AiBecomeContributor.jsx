@@ -56,6 +56,13 @@ const CONTRIBUTION_TYPE_OPTIONS = [
   "Become a Workation Support Partner",
   "Not Sure - Lets Connect & Explore",
 ];
+const PARTNER_CONTRIBUTION_OPTIONS = new Set([
+  "Become a Visa & Immigration Partner",
+  "Become a Company Setup Services Partner",
+  "Become a Activation Support Partner",
+  "Become a Consultation Support Partner",
+  "Become a Workation Support Partner",
+]);
 // Expand each displayed contributor choice into the existing API role options.
 const CONTRIBUTOR_ROLES_BY_OPTION = {
   "Become a Nomad Blog & News Writer": [
@@ -131,8 +138,14 @@ const AiBecomeContributor = () => {
   const [typedPageHeading, setTypedPageHeading] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [partnerEmailCheckState, setPartnerEmailCheckState] = useState({
+    checking: false,
+    exists: false,
+    error: "",
+  });
   const messageLimitAlertedRef = useRef(false);
   const pendingSubmissionHandledRef = useRef(false);
+  const partnerEmailCheckRequestRef = useRef(0);
   const navigate = useNavigate();
   const location = useLocation();
   const axiosPrivate = useAxiosPrivate();
@@ -143,6 +156,14 @@ const AiBecomeContributor = () => {
     defaultValues,
   });
   const selectedContributionTypes = watch("contributionType");
+  const enteredEmail = watch("email");
+  const hasSelectedPartnerService = useMemo(
+    () =>
+      (selectedContributionTypes || []).some((option) =>
+        PARTNER_CONTRIBUTION_OPTIONS.has(option),
+      ),
+    [selectedContributionTypes],
+  );
   const selectedCountry = watch("currentCountry");
   const selectedCountryData = useMemo(
     () => countries.find((country) => country.name === selectedCountry) || null,
@@ -199,6 +220,21 @@ const AiBecomeContributor = () => {
   });
 
   const handleFormSubmit = (formValues) => {
+    if (
+      hasSelectedPartnerService &&
+      (partnerEmailCheckState.checking ||
+        partnerEmailCheckState.exists ||
+        partnerEmailCheckState.error)
+    ) {
+      void showContributorErrorAlert(
+        partnerEmailCheckState.exists
+          ? "This email already has a WONO Partner account. Please sign in to Partners Panel or use a different email."
+          : partnerEmailCheckState.error ||
+              "Please wait while we verify your email.",
+      );
+      return;
+    }
+
     const { contributorOptions, normalizedValues } =
       getContributorSubmissionPayload(formValues);
 
@@ -208,6 +244,43 @@ const AiBecomeContributor = () => {
       contributorOptions,
     });
   };
+
+  useEffect(() => {
+    const requestId = ++partnerEmailCheckRequestRef.current;
+    const normalizedEmail = String(enteredEmail || "").trim().toLowerCase();
+
+    if (
+      !hasSelectedPartnerService ||
+      !/^\S+@\S+\.\S+$/.test(normalizedEmail)
+    ) {
+      setPartnerEmailCheckState({ checking: false, exists: false, error: "" });
+      return undefined;
+    }
+
+    setPartnerEmailCheckState({ checking: true, exists: false, error: "" });
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await axios.get("/forms/check-partner-user-email", {
+          params: { email: normalizedEmail },
+        });
+        if (requestId !== partnerEmailCheckRequestRef.current) return;
+        setPartnerEmailCheckState({
+          checking: false,
+          exists: Boolean(response.data?.exists),
+          error: "",
+        });
+      } catch {
+        if (requestId !== partnerEmailCheckRequestRef.current) return;
+        setPartnerEmailCheckState({
+          checking: false,
+          exists: false,
+          error: "Unable to verify this partner email right now. Please try again.",
+        });
+      }
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [enteredEmail, hasSelectedPartnerService]);
 
   const selectedContributorOptionsRequireLogin = (selectedOptions = []) =>
     getSelectedContributorOptions(selectedOptions).length > 0;
@@ -635,17 +708,32 @@ const AiBecomeContributor = () => {
                       message: "Invalid email address",
                     },
                   }}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Email"
-                      variant="standard"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message}
-                      InputLabelProps={{ sx: floatingLabelSx }}
-                    />
-                  )}
+                  render={({ field, fieldState }) => {
+                    const partnerEmailHelper = hasSelectedPartnerService
+                      ? partnerEmailCheckState.checking
+                        ? "Checking Partner account email..."
+                        : partnerEmailCheckState.exists
+                          ? "This email already has a WONO Partner account. Please sign in or use a different email."
+                          : partnerEmailCheckState.error
+                      : "";
+                    return (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        label="Email"
+                        variant="standard"
+                        error={
+                          !!fieldState.error ||
+                          (hasSelectedPartnerService &&
+                            !partnerEmailCheckState.checking &&
+                            (partnerEmailCheckState.exists ||
+                              Boolean(partnerEmailCheckState.error)))
+                        }
+                        helperText={fieldState.error?.message || partnerEmailHelper}
+                        InputLabelProps={{ sx: floatingLabelSx }}
+                      />
+                    );
+                  }}
                 />
 
                 <div className="md:col-span-2">
@@ -701,7 +789,13 @@ const AiBecomeContributor = () => {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={isSubmitting}
+                    disabled={
+                      isSubmitting ||
+                      (hasSelectedPartnerService &&
+                        (partnerEmailCheckState.checking ||
+                          partnerEmailCheckState.exists ||
+                          Boolean(partnerEmailCheckState.error)))
+                    }
                     sx={{
                       bgcolor: "black",
                       borderRadius: 20,

@@ -102,7 +102,7 @@ test("approval and revocation update only the selected requested content role", 
   }
 });
 
-test("partner leads use pending, approved and rejected review states without requiring a Nomad account", async (t) => {
+test("partner leads use pending, contacted, approved and rejected review states without requiring a Nomad account", async (t) => {
   t.mock.method(BecomeContributor, "findById", () => query({
     _id: leadId,
     contributionType: "Become a Visa & Immigration Partner",
@@ -114,21 +114,21 @@ test("partner leads use pending, approved and rejected review states without req
     return query({
       _id: leadId,
       contributionType: "Become a Visa & Immigration Partner",
-      partnerStatuses: { isVisaPartner: "approved" },
+      partnerStatuses: { isVisaPartner: "contacted" },
     });
   });
 
   const res = response();
   await updateContributorLeadStatus({
     params: { id: leadId },
-    body: { role: "isVisaPartner", status: "approved" },
+    body: { role: "isVisaPartner", status: "contacted" },
   }, res, fail);
 
   assert.equal(res.statusCode, 200);
   assert.deepEqual(savedUpdate, {
-    $set: { "partnerStatuses.isVisaPartner": "approved" },
+    $set: { "partnerStatuses.isVisaPartner": "contacted" },
   });
-  assert.equal(res.body.data.partnerStatuses.isVisaPartner, "approved");
+  assert.equal(res.body.data.partnerStatuses.isVisaPartner, "contacted");
 });
 
 test("invalid roles, unrequested roles and string statuses cannot activate access", async (t) => {

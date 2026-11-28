@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import NomadUser from "../models/NomadUser.js";
 import { CONTRIBUTOR_ROLE_OPTIONS, PARTNER_ROLE_KEYS, getContributorRoleStatus, getRequestedContributorRoles } from "../utils/contributorRoles.js";
 import { notifyFirstContributorActivation } from "../utils/contributorActivationEmail.js";
+import { checkPartnerPanelEmail } from "../utils/partnerPanelAccounts.js";
 
 const MESSAGE_CHARACTER_LIMIT = 1000;
 
@@ -35,6 +36,17 @@ export const createBecomeContributor = async (req, res, next) => {
       abortEarly: false,
       stripUnknown: true,
     });
+
+    payload.email = payload.email.trim().toLowerCase();
+    const requestsPartnerAccess = getRequestedContributorRoles(
+      payload.contributionType,
+    ).some((role) => PARTNER_ROLE_KEYS.includes(role));
+    if (requestsPartnerAccess && (await checkPartnerPanelEmail(payload.email))) {
+      return res.status(409).json({
+        message:
+          "This email already has a WONO Partner account. Please sign in to Partners Panel or use a different email.",
+      });
+    }
 
     const becomeContributor = await BecomeContributor.create({ ...payload, nomadUser: req.userData?._id || null });
 
@@ -88,8 +100,8 @@ export const updateContributorLeadStatus = async (req, res, next) => {
 
     if (PARTNER_ROLE_KEYS.includes(role)) {
       const normalizedStatus = String(status || "").trim().toLowerCase();
-      if (!["pending", "approved", "rejected"].includes(normalizedStatus)) {
-        return res.status(400).json({ message: "Partner lead status must be pending, approved or rejected." });
+      if (!["pending", "contacted", "approved", "rejected"].includes(normalizedStatus)) {
+        return res.status(400).json({ message: "Partner lead status must be pending, contacted, approved or rejected." });
       }
       const updatedLead = await BecomeContributor.findByIdAndUpdate(
         req.params.id,

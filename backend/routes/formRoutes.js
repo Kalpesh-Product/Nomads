@@ -29,6 +29,7 @@ import {
   sendContributorVerificationLink,
   sendContributorVerificationOtp,
   verifyContributorSubmissionOtp,
+  checkPartnerUserEmail,
 } from "../controllers/form-controllers/contributorSubmissionVerificationController.js";
 const router = Router();
 
@@ -39,6 +40,7 @@ router.post(
 );
 router.post("/contributor-email/send-otp", sendContributorVerificationOtp);
 router.post("/contributor-email/verify-otp", verifyContributorSubmissionOtp);
+router.get("/check-partner-user-email", checkPartnerUserEmail);
 
 router.post(
   "/add-new-b2c-form-submission",
