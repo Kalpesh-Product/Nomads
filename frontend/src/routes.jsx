@@ -146,6 +146,9 @@ const AiManualSearch = lazyPage(() => import("./pages/AiManualSearch"));
 const AiBecomeContributor = lazyPage(() =>
   import("./pages/AiBecomeContributor"),
 );
+const AiContributorVerifyEmail = lazyPage(() =>
+  import("./pages/AiContributorVerifyEmail"),
+);
 const AiContributionDashboard = lazyPage(() =>
   import("./pages/AiContributionDashboard"),
 );
@@ -470,6 +473,10 @@ if (tenant === "main") {
               element: <AiBecomeContributor />,
             },
             {
+              path: "verify-contributor-email",
+              element: <AiContributorVerifyEmail />,
+            },
+            {
               path: "about",
               element: <AiAbout />,
             },
@@ -677,6 +684,10 @@ if (tenant === "main") {
             {
               path: "become-a-contributor",
               element: <AiBecomeContributor />,
+            },
+            {
+              path: "verify-contributor-email",
+              element: <AiContributorVerifyEmail />,
             },
             {
               path: "about",

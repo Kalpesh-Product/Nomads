@@ -21,6 +21,7 @@ const otpSchema = new mongoose.Schema(
         "password_change",
         "login",
         "host_email_verification",
+        "contributor_submission",
       ],
       required: true,
       index: true,

@@ -167,24 +167,22 @@ const AiBecomeContributor = () => {
     return { contributorOptions, normalizedValues };
   };
 
-  const { mutate: submitContributor } = useMutation({
+  const { mutate: requestContributorEmailVerification } = useMutation({
     mutationFn: async ({ formValues, contributorOptions }) => {
       const client = isLoggedIn && contributorOptions.length ? axiosPrivate : axios;
-      const response = await client.post("forms/add-new-b2c-form-submission", {
+      const response = await client.post("forms/contributor-email/send-link", {
         ...formValues,
         sheetName: "AI_Become_Contributor",
       });
       return response.data;
     },
     onSuccess: async (data) => {
-      if (data?.warning) {
-        console.warn(data.warning);
-      }
       clearPendingContributorSubmission();
       await showContributorSuccessAlert(
-        "We’ll review your details and get back to you soon.",
+        data?.message ||
+          "We sent a verification link to your email. Open it and enter the verification code to complete your submission.",
         {
-          title: "Thank You for Your Interest!",
+          title: "Verify Your Email",
         },
       );
       reset(defaultValues);
@@ -192,7 +190,7 @@ const AiBecomeContributor = () => {
     onError: (error) => {
       void showContributorErrorAlert(
         error?.response?.data?.message ||
-          "Something went wrong while submitting your request.",
+          "Something went wrong while sending your verification email.",
       );
     },
     onSettled: () => {
@@ -205,7 +203,10 @@ const AiBecomeContributor = () => {
       getContributorSubmissionPayload(formValues);
 
     setIsSubmitting(true);
-    submitContributor({ formValues: normalizedValues, contributorOptions });
+    requestContributorEmailVerification({
+      formValues: normalizedValues,
+      contributorOptions,
+    });
   };
 
   const selectedContributorOptionsRequireLogin = (selectedOptions = []) =>
@@ -292,7 +293,7 @@ const AiBecomeContributor = () => {
 
         setIsFormVisible(true);
         setIsSubmitting(true);
-        submitContributor({
+        requestContributorEmailVerification({
           formValues: normalizedValues,
           contributorOptions,
         });
@@ -316,7 +317,13 @@ const AiBecomeContributor = () => {
         setValue("currentCountry", userCountry);
       }
     }
-  }, [isLoggedIn, auth, reset, setValue, submitContributor]);
+  }, [
+    isLoggedIn,
+    auth,
+    reset,
+    setValue,
+    requestContributorEmailVerification,
+  ]);
 
   useEffect(() => {
     const hasSeenTypingEffect =

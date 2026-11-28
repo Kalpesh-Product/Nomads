@@ -464,7 +464,7 @@ const aiWorkationSchema = yup.object({
   sheetName: yup.string().required("Please provide a sheet name"),
 });
 
-const aiBecomeContributorSchema = yup.object({
+export const aiBecomeContributorSchema = yup.object({
   contributionType: yup
     .string()
     .trim()

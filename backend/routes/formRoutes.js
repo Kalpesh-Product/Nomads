@@ -25,7 +25,20 @@ import {
 import upload, { uploadImages } from "../config/multerConfig.js";
 import { authenticateContributorSubmission } from "../middlewares/contributorAccess.js";
 import { getVerifyBusinessClick } from "../controllers/verifyBusinessClickController.js";
+import {
+  sendContributorVerificationLink,
+  sendContributorVerificationOtp,
+  verifyContributorSubmissionOtp,
+} from "../controllers/form-controllers/contributorSubmissionVerificationController.js";
 const router = Router();
+
+router.post(
+  "/contributor-email/send-link",
+  authenticateContributorSubmission,
+  sendContributorVerificationLink,
+);
+router.post("/contributor-email/send-otp", sendContributorVerificationOtp);
+router.post("/contributor-email/verify-otp", verifyContributorSubmissionOtp);
 
 router.post(
   "/add-new-b2c-form-submission",
@@ -33,6 +46,12 @@ router.post(
   (req, res, next) =>
     req.body?.sheetName === "AI_Become_Contributor"
       ? authenticateContributorSubmission(req, res, next)
+      : next(),
+  (req, res, next) =>
+    req.body?.sheetName === "AI_Become_Contributor"
+      ? res.status(400).json({
+          message: "Please verify your email before submitting this form.",
+        })
       : next(),
   addB2CformSubmission,
 );
