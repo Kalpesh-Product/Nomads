@@ -333,7 +333,10 @@ const ArticlePreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   });
 
   return (
-    <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+    <div
+      data-contribution-draft={item.isDraft ? "" : undefined}
+      className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8"
+    >
       <PreviewHeader config={config} item={item} onEdit={onEdit} onDelete={onDelete} isDeleting={isDeleting} />
 
       <div className="flex flex-col gap-8">
@@ -411,7 +414,10 @@ const DestinationPreview = ({ item, config, onEdit, onDelete, isDeleting }) => {
   const rightMeta = item.venue;
 
   return (
-    <div className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+    <div
+      data-contribution-draft={item.isDraft ? "" : undefined}
+      className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8"
+    >
       <PreviewHeader config={config} item={item} onEdit={onEdit} onDelete={onDelete} isDeleting={isDeleting} />
 
       <section className="mt-4">
@@ -978,6 +984,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
     return (
       <ArticleInlineEdit
         config={editConfig}
+        isDraft={isDraft}
         deleteAction={onDelete ? (
           <button
             type="button"
@@ -1013,6 +1020,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
   return (
     <DestinationInlineEdit
       config={editConfig}
+      isDraft={isDraft}
       formValues={formValues}
       updateFormField={updateFormField}
       updateBlogImageFile={updateBlogImageFile}
@@ -1027,6 +1035,7 @@ const ContributionEditForm = ({ item, config, onCancel, onDelete, isDeleting = f
 
 const ArticleInlineEdit = ({
   config,
+  isDraft,
   deleteAction,
   formValues,
   updateFormField,
@@ -1053,7 +1062,10 @@ const ArticleInlineEdit = ({
   });
 
   return (
-    <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+    <main
+      data-contribution-draft={isDraft ? "" : undefined}
+      className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8"
+    >
       <EditActions
         deleteAction={deleteAction}
         config={config}
@@ -1225,6 +1237,7 @@ const ArticleInlineEdit = ({
 
 const DestinationInlineEdit = ({
   config,
+  isDraft,
   formValues,
   updateFormField,
   updateBlogImageFile,
@@ -1239,7 +1252,10 @@ const DestinationInlineEdit = ({
   const titlePlaceholder = isEvent ? "Event name" : "Place name";
 
   return (
-    <main className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8">
+    <main
+      data-contribution-draft={isDraft ? "" : undefined}
+      className="contribution-content mx-auto w-full max-w-[80rem] px-4 pb-10 pt-4 md:px-8 lg:px-8"
+    >
       <EditActions
         config={config}
         isSaving={isSaving}

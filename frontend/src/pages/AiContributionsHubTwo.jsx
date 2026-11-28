@@ -271,7 +271,10 @@ const AiContributionsHubTwo = () => {
   const communityRank = auth.user.rank ?? Math.max(7, 72 - rankScore * 5);
   const hasRank = auth.user.rank != null && auth.user.rank !== "";
   const recentItems = sortRecent(allItems);
-  const topItems = rankContributionsByFavorites(recentItems, favoriteCountsQuery.data || []).slice(0, 5);
+  const topItems = rankContributionsByFavorites(
+    sortRecent(approvedItems),
+    favoriteCountsQuery.data || [],
+  ).slice(0, 5);
   const recentListItems = recentItems.slice(0, 5);
   const isLoading = sections.some((section) => section.query?.isLoading);
 
@@ -446,7 +449,7 @@ const AiContributionsHubTwo = () => {
                     Top contributions
                   </h2>
                   <p className="mt-1 text-xs text-black/55">
-                    Your most favorited items across blogs, news, events, and places.
+                    Your most favorited approved contributions across blogs, news, events, and places.
                   </p>
 
                   {isLoading || favoriteCountsQuery.isLoading ? (
@@ -480,7 +483,7 @@ const AiContributionsHubTwo = () => {
                     </div>
                   ) : (
                     <div className="mt-5 rounded-lg border border-dotted bg-white p-8 text-center text-sm text-black/50">
-                      Add your first contribution to start building this list.
+                      No approved contributions yet.
                     </div>
                   )}
                 </div>

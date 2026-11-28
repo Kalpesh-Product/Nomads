@@ -15,6 +15,10 @@ import { RestobarBooking } from "./RestobarBooking";
 import { RestobarCursor } from "./RestobarCursor";
 import { AboutPage, CareersPage, ContactPage, GalleryPage, MenuPage, MenuItemPage, MenusPage, PartnerPage, ReviewsPage, } from "./RestobarPages";
 import { RESTOBAR_CSS } from "./restobarTheme";
+import cafePhoto from "./cafe-visit.jpg";
+
+const BROKEN_SAMPLE_PHOTO = /^https:\/\/images\.unsplash\.com\/photo-1527761939622-911909463c76(?:[?#]|$)/;
+
 export default function RestobarTemplate() {
     const t = useWebsiteTemplateData();
     const { draft } = t;
@@ -27,7 +31,9 @@ export default function RestobarTemplate() {
     if (!draft)
         return <div className="resto resto-shell">No preview data found.</div>;
     const context = {
-        t, draft, services, primary, kind,
+        // Use the same photo in the gallery tiles and the lightbox for existing Restobar drafts.
+        t: { ...t, galleryItems: t.galleryItems.map((image) => BROKEN_SAMPLE_PHOTO.test(image) ? cafePhoto : image) },
+        draft, services, primary, kind,
         profile: getServiceProfile(kind),
         rating: averageRating(t.testimonials),
         status: openStatus(draft.openingHours),

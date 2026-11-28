@@ -36,7 +36,21 @@ const moduleSchema = new mongoose.Schema(
     verticals: { type: [String], default: [] },
     summary: { type: String, trim: true, default: "" },
     bullets: { type: [String], default: [] },
+    // Fallback screenshot, shown regardless of which plan tab is active.
     image: { type: imageSchema, default: () => ({}) },
+    // Optional per-plan screenshots for a module whose write-up is the same
+    // across plans but whose real HostPanel screen looks different per tier
+    // (e.g. a plan badge in the sidebar, or extra tabs on higher plans) — a
+    // module only needs the slots for the plans it's actually shown under.
+    // When a slot is empty for the active plan, the frontend falls back to
+    // `image` above.
+    planImages: {
+      type: new mongoose.Schema(
+        { basic: imageSchema, professional: imageSchema, custom: imageSchema },
+        { _id: false },
+      ),
+      default: () => ({}),
+    },
     // Master-panel kill switch — hides this module from host.wono.co
     // without deleting its content. Absent on documents seeded before this
     // field existed, which the public read treats the same as `true`.

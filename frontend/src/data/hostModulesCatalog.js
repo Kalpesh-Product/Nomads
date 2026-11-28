@@ -1760,15 +1760,8 @@ const hostModuleIconMap = {
   HiOutlineWrenchScrewdriver,
 };
 
-const findLocalModule = (category, moduleId, parentId = null) => {
-  if (!category) return null;
-  if (parentId) {
-    return category.modules
-      .find((module) => module.id === parentId)
-      ?.children?.find((child) => child.id === moduleId);
-  }
-  return category.modules.find((module) => module.id === moduleId);
-};
+const findLocalModule = (category, moduleId) =>
+  category?.modules.find((module) => module.id === moduleId) || null;
 
 const hydrateModule = (remoteModule, localModule) => {
   const remoteImage =
@@ -1785,6 +1778,10 @@ const hydrateModule = (remoteModule, localModule) => {
     ...remoteModule,
     icon,
     image: remoteImage || localModule?.image || "",
+    // Optional per-plan screenshot overrides ({ basic, professional, custom },
+    // each `{url, key}` or absent) — same write-up across plans, a different
+    // picture of HostPanel per plan tier. See planImageFor() below.
+    planImages: remoteModule?.planImages || localModule?.planImages || {},
     verticals: Array.isArray(remoteModule?.verticals)
       ? remoteModule.verticals
       : localModule?.verticals || [],
@@ -1793,6 +1790,25 @@ const hydrateModule = (remoteModule, localModule) => {
       : localModule?.bullets || [],
   };
 };
+
+// Resolves which screenshot to show for a tile under a given plan tab —
+// the per-plan slot if that plan's image was uploaded, else the shared
+// fallback `image`.
+export const planImageFor = (tile, plan) => tile?.planImages?.[plan]?.url || tile?.image || "";
+
+// Recursive so a grandchild (e.g. Tech Department > Website Builder >
+// Website Leads) also gets its image unpacked from `{url, key}` to a plain
+// string and its iconKey resolved — hydrateModule alone only shapes the one
+// module passed to it, not any nested children it's carrying.
+const hydrateModuleTree = (remoteModule, localModule) => ({
+  ...hydrateModule(remoteModule, localModule),
+  children: (remoteModule.children || []).map((remoteChild) =>
+    hydrateModuleTree(
+      remoteChild,
+      localModule?.children?.find((child) => child.id === remoteChild.id) || null,
+    ),
+  ),
+});
 
 // The API owns structure, visibility, order and copy. The checked-in catalog
 // only supplies local icon components and bundled screenshot fallbacks for
@@ -1811,29 +1827,22 @@ export const hydrateHostModuleCatalog = (remoteCategories) => {
     return {
       ...localCategory,
       ...remoteCategory,
-      modules: (remoteCategory.modules || []).map((remoteModule) => {
-        const localModule = findLocalModule(localCategory, remoteModule.id);
-        const hydrated = hydrateModule(remoteModule, localModule);
-        return {
-          ...hydrated,
-          children: (remoteModule.children || []).map((remoteChild) =>
-            hydrateModule(
-              remoteChild,
-              findLocalModule(localCategory, remoteChild.id, remoteModule.id),
-            ),
-          ),
-        };
-      }),
+      modules: (remoteCategory.modules || []).map((remoteModule) =>
+        hydrateModuleTree(remoteModule, findLocalModule(localCategory, remoteModule.id)),
+      ),
     };
   });
 };
 
-const findInModules = (modules, moduleId) => {
+// Recursive so a grandchild (e.g. Tech Department > Website Builder >
+// Website Leads) resolves too, not just a direct child — `parent` is always
+// the match's immediate parent, same as the one-level case.
+const findInModules = (modules, moduleId, parent = null) => {
   for (const module of modules) {
-    if (module.id === moduleId) return { module, parent: null };
-    if (module.children) {
-      const child = module.children.find((c) => c.id === moduleId);
-      if (child) return { module: child, parent: module };
+    if (module.id === moduleId) return { module, parent };
+    if (module.children?.length) {
+      const found = findInModules(module.children, moduleId, module);
+      if (found) return found;
     }
   }
   return null;

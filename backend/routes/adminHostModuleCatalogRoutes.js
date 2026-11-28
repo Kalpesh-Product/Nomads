@@ -21,6 +21,11 @@ router.post(
   uploadImages.single("image"),
   uploadModuleScreenshot,
 );
+router.post(
+  "/:categoryId/modules/:moduleId/screenshot/:plan",
+  uploadImages.single("image"),
+  uploadModuleScreenshot,
+);
 router.delete("/:categoryId/modules/:moduleId", deleteModule);
 
 export default router;

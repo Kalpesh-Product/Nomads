@@ -2,6 +2,7 @@ import { Router } from "express";
 import upload from "../config/multerConfig.js";
 import {
   bulkInsertStateWiseWeightV2Csv,
+  bulkUpdateStateWiseWeightV2Weights,
   createStateWiseWeightV2,
   getAllStateWiseWeightV2,
   getStateWiseWeightV2,
@@ -17,6 +18,11 @@ router.post(
   "/bulk-upload-csv",
   upload.single("state-wise-weight-file"),
   bulkInsertStateWiseWeightV2Csv,
+);
+router.post(
+  "/bulk-update-weights",
+  upload.single("state-wise-weight-file"),
+  bulkUpdateStateWiseWeightV2Weights,
 );
 router.patch("/:id", upload.array("images"), updateStateWiseWeightV2);
 

@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { HiX, HiOutlineZoomIn } from "react-icons/hi";
+
 export const planBadgeStyles = {
   basic: "bg-emerald-50 text-emerald-700 border border-emerald-200",
   professional: "bg-blue-50 text-blue-700 border border-blue-200",
@@ -8,25 +11,33 @@ export const planLabels = { basic: "Basic", professional: "Professional", custom
 const freeBadgeStyles = "bg-emerald-50 text-emerald-700 border border-emerald-200";
 const planOrder = { basic: 0, professional: 1, custom: 2 };
 
+// Recursively flattens a module tree down to its leaves — a department's
+// own sub-module (e.g. Leads Management, Website Builder) can itself nest a
+// Dashboard/pages, so one level of children isn't enough. Each leaf inherits
+// plan/planAccessMode from the nearest ancestor that sets one, and tags
+// `parentLabel`/`parentIcon` from its immediate (non-leaf) parent so the UI
+// can still group sub-pages under their module's heading.
+const flattenToLeaves = (modules, parentLabel = null, parentIcon = null) =>
+  modules.flatMap((module) =>
+    module.children?.length
+      ? flattenToLeaves(module.children, module.label, module.icon).map((child) => ({
+          ...child,
+          plan: child.plan || module.plan,
+          planAccessMode: child.planAccessMode || module.planAccessMode,
+        }))
+      : [{ ...module, parentLabel, parentIcon }],
+  );
+
 // Flattens a category's modules (including nested sub-pages like Website
 // Builder > Website Leads) into one ordered list, each tile inheriting its
 // parent's plan tier unless it sets its own, then sorts Basic → Professional
 // → Custom so "what's included in Basic, what's an upsell" reads top to
 // bottom. Every tile keeps its own id so the real site sidebar can deep-link
 // straight to it.
-const flattenModules = (modules, sortByPlan) => {
-  const flat = modules.flatMap((module) =>
-    module.children?.length
-      ? module.children.map((child) => ({
-          ...child,
-          parentLabel: module.label,
-          parentIcon: module.icon,
-          plan: child.plan || module.plan,
-        }))
-      : [module],
-  );
+export const flattenModules = (modules, sortByPlan) => {
+  const flat = flattenToLeaves(modules);
   return sortByPlan
-    ? flat.sort((a, b) => (planOrder[a.plan] ?? 99) - (planOrder[b.plan] ?? 99))
+    ? [...flat].sort((a, b) => (planOrder[a.plan] ?? 99) - (planOrder[b.plan] ?? 99))
     : flat;
 };
 
@@ -36,6 +47,17 @@ const flattenModules = (modules, sortByPlan) => {
 // identical without duplicating the markup.
 export const ModuleDetailTile = ({ tile, planBadgeLabel }) => {
   const Icon = tile.icon;
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isPreviewOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setIsPreviewOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isPreviewOpen]);
+
   return (
     <div className="flex w-full flex-col items-start gap-5 sm:gap-6 lg:flex-row lg:gap-8 2xl:gap-12">
       <div className="flex w-full flex-1 flex-col gap-3 lg:basis-5/12">
@@ -77,8 +99,48 @@ export const ModuleDetailTile = ({ tile, planBadgeLabel }) => {
       </div>
 
       {tile.image && (
-        <div className="w-full flex-1 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 lg:basis-7/12">
-          <img src={tile.image} alt={tile.label} className="h-auto max-h-[18rem] min-h-[13rem] w-full object-contain sm:max-h-[24rem] sm:min-h-[18rem] lg:h-[22rem] lg:max-h-none 2xl:h-[26rem]" />
+        <button
+          type="button"
+          onClick={() => setIsPreviewOpen(true)}
+          className="group relative w-full flex-1 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 text-left lg:basis-7/12"
+          aria-label={`View ${tile.label} screenshot larger`}
+        >
+          <img
+            src={tile.image}
+            alt={tile.label}
+            className="h-auto max-h-[18rem] min-h-[13rem] w-full object-contain transition-transform duration-200 group-hover:scale-[1.02] sm:max-h-[24rem] sm:min-h-[18rem] lg:h-[22rem] lg:max-h-none 2xl:h-[26rem]"
+          />
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/20 group-hover:opacity-100">
+            <span className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-secondary-dark shadow-sm">
+              <HiOutlineZoomIn size={16} />
+              View larger
+            </span>
+          </span>
+        </button>
+      )}
+
+      {isPreviewOpen && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          onClick={() => setIsPreviewOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${tile.label} screenshot preview`}
+        >
+          <button
+            type="button"
+            onClick={() => setIsPreviewOpen(false)}
+            className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-secondary-dark shadow-md transition-colors hover:bg-white"
+            aria-label="Close preview"
+          >
+            <HiX size={20} />
+          </button>
+          <img
+            src={tile.image}
+            alt={tile.label}
+            onClick={(event) => event.stopPropagation()}
+            className="max-h-[90vh] max-w-[95vw] rounded-xl object-contain shadow-2xl"
+          />
         </div>
       )}
     </div>
